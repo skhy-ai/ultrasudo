@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+  <script src="../desktop/app-shell.js"></script>
+  <script src="../desktop/data-manager.js"></script>
+  <div class="container">
+    <h1><i class="fas fa-code"></i> Code Generator</h1>
+    <p>Multi-provider generator with staged flow: Prompt → Testcases → Validate → Generate.</p>
+
+    <div class="provider-row">
+      <label>
+        Provider
+        <select id="provider">
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Gemini</option>
+          <option value="lmstudio">LMStudio (local)</option>
+        </select>
+      </label>
+      <label class="flex1">
+        Model
+        <input id="model" type="text" placeholder="leave blank to use saved default" />
+      </label>
+      <button id="test-api">Test API</button>
+      <span id="api-status" class="status"></span>
+    </div>
+
+    <section class="stage">
+      <h2>1. Describe Application</h2>
+      <label for="prompt-input">Describe the application you want to build:</label>
+      <textarea id="prompt-input" rows="4"
+        placeholder="e.g., A simple todo list with add/edit/delete and localStorage."></textarea>
+      <div class="actions">
+        <button id="gen-tests">Generate Blueprint Artifacts</button>
+      </div>
+    </section>
+
+    <section class="stage" id="stage-2" style="display:none; opacity: 0; transition: opacity 0.5s ease;">
+      <h2>2. Artifact Review</h2>
+      <p style="text-align:left; margin-bottom: 10px; font-size: 13px;">Review the generated Testcases, README,
+        Architecture, and Task List below. Once approved, Opencode-AI will automatically implement the entire project.
+      </p>
+      <div id="tests-container" class="tests"></div>
+      <div class="actions">
+        <button id="regen-tests" class="secondary">Regenerate</button>
+        <button id="accept-tests"
+          style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.5), rgba(5, 150, 105, 0.5)); border-color: rgba(16, 185, 129, 0.5);">Approve
+          & Start Automating</button>
+      </div>
+      <div class="response-container">
+        <pre id="cli-output"
+          style="display:none; margin-top: 15px; border-left: 4px solid var(--brand-color);"><code id="response-output">Awaiting approval...</code></pre>
+      </div>
+    </section>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AppShell) {
+        AppShell.init({ appId: 'code-generator', title: 'Code Generator', showSave: false, showOpen: false });
+      }
+    });
+  </script>
+</body>
+
+</html>

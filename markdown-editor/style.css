@@ -1,0 +1,10 @@
+.md-container{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:1200px; margin:20px auto; padding:12px }
+.pane{ background:#111; color:#eee; border-radius:12px; overflow:hidden; box-shadow:0 6px 24px rgba(0,0,0,.35) }
+.pane-header{ padding:10px 12px; background:#181818; border-bottom:1px solid #222; font-weight:600 }
+#editor{ width:100%; height:70vh; border:0; outline:none; resize:none; background:#0f0f0f; color:#eaeaea; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace }
+.preview{ height:70vh; overflow:auto; padding:14px }
+.preview h1,.preview h2,.preview h3{ margin:12px 0 8px }
+.preview pre{ background:#0f0f0f; padding:10px; border-radius:8px; overflow:auto }
+.preview code{ background:#0f0f0f; padding:2px 4px; border-radius:4px }
+.preview a{ color:#4dabf7 }
+.preview ul{ padding-left:20px }

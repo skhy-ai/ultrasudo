@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <script src="../desktop/app-shell.js"></script>
+    <div class="converter-container">
+        <h1>Currency Converter</h1>
+
+        <div class="input-group">
+            <label for="amount">Amount</label>
+            <div class="input-row">
+                <input type="number" id="amount" value="1" min="0" step="any">
+                <select id="from-currency">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+
+        <button class="swap-btn" id="swap-btn" title="Swap currencies">
+            <i class="fas fa-exchange-alt"></i>
+        </button>
+
+        <div class="input-group">
+            <label for="to-currency">Converted To</label>
+            <div class="input-row">
+                <input type="number" id="converted-amount" readonly placeholder="Result">
+                <select id="to-currency">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+
+        <div class="result" id="result-box">
+            <h2 id="result-text">---</h2>
+            <p id="rate-text">Exchange rate data</p>
+        </div>
+
+        <div class="error-message" id="error-message">
+            Unable to fetch exchange rates. Using offline backup if available.
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) {
+                AppShell.init({ appId: 'currency-converter', title: 'Currency Converter' });
+            }
+        });
+    </script>
+</body>
+
+</html>

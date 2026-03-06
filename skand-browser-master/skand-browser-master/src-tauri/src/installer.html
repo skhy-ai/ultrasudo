@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Skand Browser</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #1e293b;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: #10b981;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #e2e8f0;
+        }
+
+        p {
+            color: #94a3b8;
+            line-height: 1.6;
+            font-size: 15px;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .terms-box {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn.linux {
+            background-color: #f59e0b;
+        }
+
+        .btn.linux:hover:not(:disabled) {
+            background-color: #d97706;
+        }
+
+        .btn:disabled {
+            background-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-globe"></i> Skand <span>Browser</span>
+        </div>
+
+        <h2>Download the Future of Browsing</h2>
+        <p>Experience a secure, offline-first, highly integrated desktop environment right from your browser.</p>
+
+        <div class="terms-box">
+            <strong>Terms and Conditions</strong><br><br>
+            1. <strong>Liability Wrapper:</strong> The Skand Browser software is provided "as is", without warranty of
+            any kind, express or implied. In no event shall the authors or copyright holders be liable for any claim,
+            damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in
+            connection with the software or the use or other dealings in the software.<br><br>
+            2. <strong>Copyrights:</strong> Copyrights and all intellectual property rights for the Skand Browser are
+            held exclusively by <strong>Skand Dev Technologies (OPC) Pvt Ltd.</strong><br><br>
+            3. <strong>Usage:</strong> By downloading, you agree to not reverse engineer, decompile, or disassemble the
+            browser core components without explicit written permission.<br><br>
+            4. <strong>Data Privacy:</strong> Skand Browser respects your privacy. Local data remains local unless
+            explicitly synchronized by the user to an encrypted cloud node.
+        </div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="agree-terms" onchange="toggleButtons()">
+            <label for="agree-terms">I agree to the Terms and Conditions and acknowledge the Copyrights held by Skand
+                Dev Technologies (OPC) Pvt Ltd.</label>
+        </div>
+
+        <div class="download-buttons">
+            <!-- These point to standard static file paths for actual installers if they exist -->
+            <a href="installers/SkandBrowser-Windows.exe" class="btn windows" id="btn-win" disabled
+                onclick="return checkDisabled(this)">
+                <i class="fab fa-windows"></i> Download for Windows
+            </a>
+            <a href="installers/SkandBrowser-Linux.AppImage" class="btn linux" id="btn-lin" disabled
+                onclick="return checkDisabled(this)">
+                <i class="fab fa-linux"></i> Download for Linux
+            </a>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Skand Dev Technologies (OPC) Pvt Ltd. All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        function toggleButtons() {
+            const agreed = document.getElementById('agree-terms').checked;
+            const btnWin = document.getElementById('btn-win');
+            const btnLin = document.getElementById('btn-lin');
+
+            if (agreed) {
+                btnWin.removeAttribute('disabled');
+                btnLin.removeAttribute('disabled');
+            } else {
+                btnWin.setAttribute('disabled', 'true');
+                btnLin.setAttribute('disabled', 'true');
+            }
+        }
+
+        function checkDisabled(element) {
+            if (element.hasAttribute('disabled')) {
+                alert("Please agree to the Terms and Conditions first.");
+                return false;
+            }
+            alert("Downloading installer package...");
+            return true; // allow navigation to the href
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spreadsheets</title>
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <script src="../desktop/app-shell.js"></script>
+    <script src="../desktop/file-helper.js"></script>
+    <script src="../desktop/data-manager.js"></script>
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" data-action="cut"><i class="fas fa-cut"></i> Cut</div>
+        <div class="context-menu-item" data-action="copy"><i class="far fa-copy"></i> Copy</div>
+        <div class="context-menu-item" data-action="paste"><i class="far fa-clipboard"></i> Paste</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="insertRowAbove"><i class="fas fa-plus"></i> Insert Row Above</div>
+        <div class="context-menu-item" data-action="insertRowBelow"><i class="fas fa-plus"></i> Insert Row Below</div>
+        <div class="context-menu-item" data-action="deleteRow"><i class="fas fa-trash"></i> Delete Row</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="insertColumnLeft"><i class="fas fa-plus"></i> Insert Column Left
+        </div>
+        <div class="context-menu-item" data-action="insertColumnRight"><i class="fas fa-plus"></i> Insert Column Right
+        </div>
+        <div class="context-menu-item" data-action="deleteColumn"><i class="fas fa-trash"></i> Delete Column</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="clearContents"><i class="fas fa-eraser"></i> Clear Contents</div>
+    </div>
+
+    <div class="container">
+        <h1>Spreadsheets</h1>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-button" id="addRow"><i class="fas fa-plus"></i> Add Row</button>
+            <button class="action-button" id="addColumn"><i class="fas fa-plus"></i> Add Column</button>
+            <button class="action-button" id="deleteRow"><i class="fas fa-trash"></i> Delete Row</button>
+            <button class="action-button" id="deleteColumn"><i class="fas fa-trash"></i> Delete Column</button>
+            <div style="flex: 1;"></div>
+            <button class="action-button" id="clearContents"><i class="fas fa-eraser"></i> Clear</button>
+        </div>
+        <!-- Formatting Toolbar -->
+        <div class="format-toolbar">
+            <select id="font-family" class="font-selector">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+            <select id="font-size" class="font-size-selector">
+                <option value="12">12</option>
+                <option value="14" selected>14</option>
+                <option value="16">16</option>
+                <option value="18">18</option>
+                <option value="20">20</option>
+            </select>
+            <button class="format-btn" data-command="bold" title="Bold"><i class="fas fa-bold"></i></button>
+            <button class="format-btn" data-command="italic" title="Italic"><i class="fas fa-italic"></i></button>
+            <button class="format-btn" data-command="underline" title="Underline"><i
+                    class="fas fa-underline"></i></button>
+            <input type="color" id="text-color" class="color-picker" value="#000000" title="Text Color">
+            <input type="color" id="bg-color" class="color-picker" value="#ffffff" title="Background Color">
+            <button id="text-to-columns" class="format-btn" title="Text to Columns"><i class="fas fa-columns"></i> Text
+                to Columns</button>
+            <button id="create-chart" class="format-btn" title="Create Chart"><i class="fas fa-chart-bar"></i>
+                Chart</button>
+            <button id="create-pivot" class="format-btn" title="Create Pivot Table"><i class="fas fa-table"></i> Pivot
+                Table</button>
+        </div>
+        <div class="toolbar">
+            <div class="formula-bar">
+                <span id="selected-cell" class="cell-reference">A1</span>
+                <div class="formula-input-container">
+                    <div class="formula-dropdown">
+                        <button id="formula-dropdown-btn" class="formula-dropbtn" aria-haspopup="true"
+                            aria-expanded="false">
+                            <span>Functions</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div id="formula-dropdown-content" class="dropdown-content">
+                            <div class="dropdown-section">Common Formulas</div>
+                            <a href="#" data-formula="=SUM(">SUM</a>
+                            <a href="#" data-formula="=AVERAGE(">AVERAGE</a>
+                            <a href="#" data-formula="=COUNT(">COUNT</a>
+                            <a href="#" data-formula="=MAX(">MAX</a>
+                            <a href="#" data-formula="=MIN(">MIN</a>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-section">Financial</div>
+                            <a href="#" data-formula="=PMT(0.05/12, 60, 10000, 0, 0)">PMT (Loan Payment)</a>
+                            <a href="#" data-formula="=FV(0.05/12, 60, -100, -1000, 0)">FV (Future Value)</a>
+                            <a href="#" data-formula="=PV(0.05/12, 60, -100, 0, 0)">PV (Present Value)</a>
+                            <a href="#" data-formula="=NPV(0.1, ">NPV (Net Present Value)</a>
+                            <a href="#" data-formula="=IRR({">IRR (Internal Rate of Return)</a>
+                        </div>
+                    </div>
+                    <input id="formula-input" type="text" placeholder="Type a value or =FORMULA(...)"
+                        spellcheck="false" />
+                </div>
+            </div>
+            <div class="export-buttons">
+                <button id="export-xlsx" title="Export to Excel">
+                    <i class="fas fa-file-excel"></i> XLSX
+                </button>
+                <button id="export-csv" title="Export to CSV">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+            </div>
+        </div>
+        <div id="spreadsheet-container"></div>
+    </div>
+
+    <!-- Chart Modal -->
+    <div id="chartModal" class="chart-container">
+        <button class="chart-close">&times;</button>
+        <h3>Create Chart</h3>
+        <div>
+            <label>Chart Type:</label>
+            <select id="chart-type">
+                <option value="bar">Bar Chart</option>
+                <option value="line">Line Chart</option>
+                <option value="pie">Pie Chart</option>
+                <option value="doughnut">Doughnut Chart</option>
+            </select>
+        </div>
+        <div>
+            <label>Data Range:</label>
+            <input type="text" id="data-range" placeholder="e.g., A1:B10">
+        </div>
+        <div>
+            <label>Chart Title:</label>
+            <input type="text" id="chart-title" placeholder="Chart Title">
+        </div>
+        <button id="generate-chart">Create Chart</button>
+        <div id="chart-area" style="width: 600px; height: 400px; margin-top: 20px;"></div>
+    </div>
+
+    <!-- Pivot Table Modal -->
+    <div id="pivotModal" class="chart-container" style="width: 80%; max-width: 1000px;">
+        <button class="chart-close">&times;</button>
+        <h3>Create Pivot Table</h3>
+        <div class="pivot-controls">
+            <div>
+                <label>Data Range:</label>
+                <input type="text" id="pivot-data-range" placeholder="e.g., A1:D100">
+            </div>
+            <div style="display: flex; gap: 20px; margin-top: 10px;">
+                <div>
+                    <label>Rows:</label>
+                    <select id="pivot-rows" multiple style="min-height: 100px;"></select>
+                </div>
+                <div>
+                    <label>Columns:</label>
+                    <select id="pivot-cols" multiple style="min-height: 100px;"></select>
+                </div>
+                <div>
+                    <label>Values:</label>
+                    <select id="pivot-values" multiple style="min-height: 100px;"></select>
+                </div>
+                <div>
+                    <label>Aggregation:</label>
+                    <select id="pivot-agg">
+                        <option value="sum">Sum</option>
+                        <option value="average">Average</option>
+                        <option value="count">Count</option>
+                        <option value="min">Min</option>
+                        <option value="max">Max</option>
+                    </select>
+                </div>
+            </div>
+            <button id="generate-pivot" style="margin-top: 10px;">Create Pivot Table</button>
+        </div>
+        <div id="pivot-area" class="pivot-area"></div>
+    </div>
+
+    <!-- Text to Columns Modal -->
+    <div id="textToColumnsModal" class="chart-container">
+        <button class="chart-close">&times;</button>
+        <h3>Text to Columns</h3>
+        <div>
+            <label>Select cells to split:</label>
+            <input type="text" id="text-to-cols-range" placeholder="e.g., A1:A10">
+        </div>
+        <div style="margin: 15px 0;">
+            <label>Delimiter:</label>
+            <input type="text" id="delimiter" value="," style="width: 50px;">
+            <label><input type="checkbox" id="space-delimiter" value=" "> Space</label>
+            <label><input type="checkbox" id="comma-delimiter" value="," checked> Comma</label>
+            <label><input type="checkbox" id="tab-delimiter" value="\t"> Tab</label>
+            <label><input type="checkbox" id="semicolon-delimiter" value=";"> Semicolon</label>
+        </div>
+        <div>
+            <label>Destination:</label>
+            <input type="text" id="destination-cell" placeholder="e.g., B1">
+            <small>Leave empty to replace original data</small>
+        </div>
+        <button id="apply-text-to-columns" style="margin-top: 10px;">Split Text</button>
+        <div id="preview-area" style="margin-top: 15px; padding: 10px; border: 1px solid #ddd; min-height: 100px;">
+            <p>Preview will appear here</p>
+        </div>
+    </div>
+
+    <!-- Load Chart.js for charting functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="grid-view.js"></script>
+    <script type="module" src="data-model.js"></script>
+    <script type="module" src="formula-engine.js"></script>
+    <script type="module" src="selection-controller.js"></script>
+    <script type="module" src="grid-controller.js"></script>
+    <script type="module" src="ui-controller.js"></script>
+    <script type="module" src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) {
+                AppShell.init({ appId: 'spreadsheets', title: 'Spreadsheets', showSave: true, showOpen: true });
+                // Save/Open via FileHelper using CSV snapshot
+                AppShell.onSave(async () => {
+                    if (window.SpreadsheetAPI?.toCSV) {
+                        const csv = window.SpreadsheetAPI.toCSV();
+                        await FileHelper.saveText('sheet.csv', csv);
+                    }
+                });
+                AppShell.onOpen(async () => {
+                    if (window.SpreadsheetAPI?.fromCSV) {
+                        const res = await FileHelper.openText();
+                        if (res.ok) window.SpreadsheetAPI.fromCSV(res.content || '');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanban Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <script src="../desktop/app-shell.js"></script>
+  <script src="../desktop/file-helper.js"></script>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <h2><i class="fa-solid fa-layer-group"></i> <span id="board-title">Kanban Board</span></h2>
+      </div>
+      <div class="header-actions">
+        <select id="board-select" class="board-select" style="display: none;"></select>
+        <button id="new-board-btn" class="secondary-button" style="display: none;"><i class="fa-solid fa-plus"></i> New
+          Board</button>
+        <div id="members-bar" class="members-bar"></div>
+        <button id="team-btn" class="team-button"><i class="fa-solid fa-users"></i> Team</button>
+        <button id="share-btn" class="share-button"><i class="fa-solid fa-share-nodes"></i> Share</button>
+      </div>
+    </header>
+
+    <main id="board" class="kb-board">
+      <!-- Columns injected via JS -->
+    </main>
+  </div>
+
+  <!-- Invite Modal -->
+  <div id="invite-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content panel">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <h3>Share & Sync Board</h3>
+      <p class="sync-explainer">
+        This board syncs peer-to-peer natively. Exchange invite codes to collaborate directly in real-time.
+      </p>
+      <div class="invite-steps">
+        <div class="step">
+          <h4>Step 1: Create Invite</h4>
+          <p>Generate a secure code. Send it to your collaborator.</p>
+          <button id="create-invite-btn" class="primary-btn">Create Invite Code</button>
+          <textarea id="offer-output" readonly placeholder="Invite code will appear here..."></textarea>
+        </div>
+        <div class="step">
+          <h4>Step 2: Accept Invite</h4>
+          <p>Paste an invite code and click Accept.</p>
+          <textarea id="signal-input" placeholder="Paste invite code here..."></textarea>
+          <button id="accept-invite-btn" class="primary-btn">Accept Invite</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Modal -->
+  <div id="team-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content panel">
+      <button class="modal-close" id="team-modal-close">&times;</button>
+      <h3>Team Members</h3>
+      <p class="sync-explainer">Set your display name so others can assign you tasks.</p>
+      <div class="team-controls input-group">
+        <input id="my-name-input" type="text" placeholder="Your name" />
+        <button id="save-my-name-btn" class="primary-btn">Save</button>
+      </div>
+      <div class="team-list">
+        <h4>Current Members</h4>
+        <ul id="members-list"></ul>
+      </div>
+      <div class="agent-controls">
+        <h4>AI Agents</h4>
+        <p class="sync-explainer">Add Autonomous AI Agents to automate tasks and research.</p>
+        <div class="team-controls input-group">
+          <input id="agent-name-input" type="text" placeholder="Agent name (e.g. CodeBot)" />
+          <button id="add-agent-btn" class="agent-btn"><i class="fa-solid fa-robot"></i> Add Agent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/automerge@2.1.8/dist/automerge.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../auth/config.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AppShell) {
+        AppShell.init({ appId: 'kanban-board', title: 'Kanban Board', showSave: true, showOpen: true });
+        AppShell.onSave(async () => {
+          if (!window.Kanban) return;
+          const data = window.Kanban.serialize();
+          await FileHelper.saveText('kanban.json', JSON.stringify(data));
+        });
+        AppShell.onOpen(async () => {
+          if (!window.Kanban) return;
+          const res = await FileHelper.openText();
+          if (res.ok) {
+            try { window.Kanban.load(JSON.parse(res.content)); } catch (e) { alert('Invalid JSON'); }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

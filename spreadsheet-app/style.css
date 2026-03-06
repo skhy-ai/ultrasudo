@@ -1,0 +1,443 @@
+:root {
+    --primary-color: #217346;
+    --primary-hover: #185c37;
+    --border-color: #e0e0e0;
+    --header-bg: #f8f9fa;
+    --selected-cell: #e8f0fe;
+    --selected-border: #1a73e8;
+    --row-hover: #f5f5f5;
+    --formula-bar-bg: #f8f9fa;
+    --dropdown-bg: #ffffff;
+    --dropdown-hover: #f5f5f5;
+    --text-primary: #202124;
+    --text-secondary: #5f6368;
+    --context-menu-bg: #ffffff;
+    --context-menu-hover: #f1f3f4;
+    --context-menu-border: #dadce0;
+    --action-button-bg: #f1f3f4;
+    --action-button-hover: #e8eaed;
+    --action-button-border: #dadce0;
+}
+
+body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f1f3f4;
+    color: var(--text-primary);
+    user-select: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 15px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.action-button {
+    padding: 6px 12px;
+    background-color: var(--action-button-bg);
+    border: 1px solid var(--action-button-border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+}
+
+.action-button:hover {
+    background-color: var(--action-button-hover);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.action-button i {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+h1 {
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    font-weight: 400;
+    font-size: 24px;
+}
+
+/* Toolbar Styles */
+.toolbar {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 8px 0;
+    background: var(--header-bg);
+    border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Formatting Toolbar */
+.format-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    padding: 8px;
+    background: #f1f3f4;
+    border-radius: 4px;
+}
+
+.format-btn {
+    padding: 4px 8px;
+    border: 1px solid #dadce0;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.format-btn:hover {
+    background: #f1f3f4;
+}
+
+.color-picker {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.font-selector,
+.font-size-selector {
+    padding: 4px 8px;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    background: white;
+}
+
+/* Chart container */
+.chart-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+}
+
+.chart-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Pivot table controls */
+.pivot-controls {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.pivot-area {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.formula-bar {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    gap: 8px;
+    background: var(--formula-bar-bg);
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.cell-reference {
+    background: #e8e8e8;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+    border: 1px solid #d0d0d0;
+}
+
+.formula-input-container {
+    flex: 1;
+    display: flex;
+    position: relative;
+}
+
+.formula-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.formula-dropbtn {
+    background-color: #f1f3f4;
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    transition: background-color 0.2s;
+}
+
+.formula-dropbtn:hover {
+    background-color: #e8eaed;
+}
+
+.dropdown-arrow {
+    font-size: 0.7em;
+    margin-left: 4px;
+    opacity: 0.7;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--dropdown-bg);
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border: 1px solid var(--dropdown-border);
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: var(--text-primary);
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--dropdown-hover);
+}
+
+.dropdown-section {
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 4px 0;
+}
+
+.show {
+    display: block;
+}
+
+#formula-input {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 0 4px 4px 0;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+}
+
+#formula-input:focus {
+    outline: none;
+    border-color: var(--selected-border);
+    box-shadow: 0 0 0 1px var(--selected-border);
+}
+
+.export-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.export-buttons button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+#export-xlsx {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#export-xlsx:hover {
+    background-color: var(--primary-hover);
+}
+
+#export-csv {
+    background-color: #f1f3f4;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+#export-csv:hover {
+    background-color: #e8eaed;
+}
+
+#spreadsheet-container table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#spreadsheet-container th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+#spreadsheet-container td {
+    text-align: left;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.row-resizer {
+    width: 100%;
+    height: 4px;
+    background: #ddd;
+    cursor: row-resize;
+    position: absolute;
+    bottom: 0;
+}
+
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: var(--context-menu-bg);
+    border: 1px solid var(--context-menu-border);
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    min-width: 200px;
+    font-size: 13px;
+    padding: 6px 0;
+    color: var(--text-primary);
+}
+
+.context-menu-item {
+    padding: 8px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background-color 0.1s;
+}
+
+.context-menu-item:hover {
+    background-color: var(--context-menu-hover);
+}
+
+.context-menu-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 6px 0;
+}
+
+.context-menu i {
+    width: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+th:first-child {
+    z-index: 4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .action-buttons,
+    .toolbar {
+        gap: 4px;
+    }
+
+    .action-button,
+    .format-btn,
+    .font-selector,
+    .font-size-selector {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    th,
+    td {
+        padding: 2px 4px;
+        font-size: 12px;
+    }
+
+    .context-menu {
+        font-size: 12px;
+        min-width: 160px;
+    }
+
+    #formula-input {
+        font-size: 12px;
+    }
+
+    .export-buttons {
+        justify-content: flex-end;
+    }
+}

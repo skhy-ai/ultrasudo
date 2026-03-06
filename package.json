@@ -1,0 +1,50 @@
+{
+  "name": "skand-browser",
+  "version": "1.0.0",
+  "description": "Secure, private desktop environment with peer-to-peer transfers and cloud sync.",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build:frontend": "node build_frontend.js",
+    "tauri:dev": "npm run build:frontend && tauri dev",
+    "tauri:build": "npm run build:frontend && tauri build"
+  },
+  "author": "Skand",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@tauri-apps/cli": "^2.10.0",
+    "electron": "^29.4.6",
+    "electron-builder": "^24.13.3",
+    "fs-extra": "^11.3.3",
+    "terser": "^5.46.0"
+  },
+  "build": {
+    "appId": "com.skand.browser",
+    "productName": "Skand Browser",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/*",
+      "!node_modules/*",
+      "!.gemini/*",
+      "!tmp/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0}
+.container{max-width:900px;margin:40px auto;padding:20px}
+h1{margin:0 0 16px;font-size:28px}
+.provider{background:#111827;border:1px solid #1f2937;border-radius:10px;padding:16px;margin:16px 0}
+.provider h2{margin-top:0}
+label{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+input{background:#0b1220;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:10px}
+.actions{display:flex;gap:10px;margin-top:8px}
+button{background:#16a34a;border:none;color:#fff;padding:10px 14px;border-radius:6px;cursor:pointer}
+button:hover{background:#15803d}
+.status{margin-top:8px;font-size:12px;color:#93c5fd}

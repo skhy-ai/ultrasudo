@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+    <div class="container">
+        <div class="todo-app">
+            <h2>To-Do List <i class="fas fa-list-check"></i></h2>
+            <div class="row">
+                <input type="text" id="input-box" placeholder="Add your task">
+                <input type="date" id="due-date">
+                <input type="text" id="category-box" placeholder="Category">
+                <button onclick="addTask()">Add</button>
+            </div>
+            <ul id="list-container"></ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.AppShell) AppShell.init({ appId: 'todo-list', title: 'To-Do List' });
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+App Status Tracker
+==================
+
+This file tracks the development status of apps in the intuitive-simple-apps repository.
+
+Status Legend:
+- Complete: Fully functional and ready for use
+- Incomplete: Partially implemented, not fully functional
+- In Development: Actively being worked on
+- Empty: No significant content or implementation
+
+App Statuses:
+- api-key-manager: Complete
+- birthday-card-generator: Complete
+- calculator: Complete
+- calendar: Complete
+- code-generator: Complete
+- datascience-notebook: Complete
+- desktop: Complete
+- galactic-simulator: Complete
+- home-diagnostics: Complete
+- investment-board: Complete
+- kanban-board: Complete
+- life-board: Complete
+- markdown-editor: Complete
+- mermaid-editor: Complete
+- music: Complete
+- notebook: Complete
+- patent-researcher: Complete
+- pomodoro-timer: Complete
+- portfolio-manager: Complete
+- python-IDE: Complete
+- quote-and-catalog-generator: Empty
+- spreadsheet-app: Complete
+- stock-screener: Complete
+- stock-ticker: Complete
+- timer: Complete
+- todo-list: Complete
+- weather: Complete
+- Healthy-kitchen: Incomplete
+- games: Empty
+- knowledge: Empty
+- manual-generator: Empty
+
+Note: Update this file as apps are completed or new ones are added.

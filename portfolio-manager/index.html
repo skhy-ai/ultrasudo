@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h2><i class="fa-solid fa-chart-pie"></i> Portfolio Manager</h2>
+      <div class="date-badge" id="current-date">--</div>
+    </header>
+
+    <main class="dashboard">
+      <section class="add-asset-section panel">
+        <h3>Add New Asset</h3>
+        <div class="input-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px;">
+          <select id="asset-class"
+            style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-family: inherit;">
+            <option value="stocks">Stocks</option>
+            <option value="mutual_funds">Mutual Funds</option>
+            <optgroup label="Metals">
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+              <option value="palladium">Palladium</option>
+            </optgroup>
+            <optgroup label="Land/Property">
+              <option value="house">House</option>
+              <option value="property">Property</option>
+              <option value="agricultural">Agricultural Land</option>
+            </optgroup>
+          </select>
+          <input type="text" id="asset-symbol" placeholder="Symbol/Name (e.g. AAPL, Gold Coin)">
+          <input type="number" id="asset-amount" placeholder="Quantity">
+          <input type="number" id="asset-invested" placeholder="Amount Invested ($)" step="0.01">
+          <button id="add-asset-btn" class="primary-btn"><i class="fa-solid fa-plus"></i> Add</button>
+        </div>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="portfolio-list-section panel">
+          <h3>Your Assets</h3>
+          <div class="table-container">
+            <table id="portfolio-table">
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Asset</th>
+                  <th>QTY</th>
+                  <th>Invested</th>
+                  <th>Est. Value</th>
+                  <th>YoY Return</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="portfolio-list">
+                <!-- Rows JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="chart-section panel">
+          <h3>Allocation</h3>
+          <div class="chart-container">
+            <canvas id="allocation-chart"></canvas>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="../desktop/app-shell.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../auth/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AppShell) AppShell.init({ appId: 'portfolio-manager', title: 'Portfolio Manager' });
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markdown Editor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="md-container">
+    <div class="pane">
+      <div class="pane-header">Editor</div>
+      <textarea id="editor" placeholder="# Welcome\n\nStart typing markdown..."></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-header">Preview</div>
+      <div id="preview" class="preview"></div>
+    </div>
+  </div>
+
+  <script src="../desktop/app-shell.js"></script>
+  <script src="../desktop/file-helper.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AppShell.init({ appId: 'markdown-editor', title: 'Markdown Editor', showSave: true, showOpen: true });
+      // Wire Save/Open
+      AppShell.onSave(async () => {
+        const text = document.getElementById('editor').value || '';
+        await FileHelper.saveText('notes.md', text);
+      });
+      AppShell.onOpen(async () => {
+        const res = await FileHelper.openText();
+        if (res.ok) {
+          const ta = document.getElementById('editor');
+          ta.value = res.content || '';
+          if (window.updatePreview) updatePreview();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

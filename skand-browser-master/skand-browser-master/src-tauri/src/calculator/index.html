@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+    <script src="../desktop/file-helper.js"></script>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'calculator')">Scientific Calculator</button>
+            <button class="tab-link" onclick="openTab(event, 'converter')">Unit Converter</button>
+        </div>
+
+        <div id="calculator" class="tab-content" style="display: block;">
+            <div class="calculator-grid">
+                <div class="output">
+                    <div data-previous-operand class="previous-operand"></div>
+                    <div data-current-operand class="current-operand">0</div>
+                </div>
+                <button data-all-clear class="span-two">AC</button>
+                <button data-delete>DEL</button>
+                <button data-operation>÷</button>
+                <button data-number>1</button>
+                <button data-number>2</button>
+                <button data-number>3</button>
+                <button data-operation>*</button>
+                <button data-number>4</button>
+                <button data-number>5</button>
+                <button data-number>6</button>
+                <button data-operation>+</button>
+                <button data-number>7</button>
+                <button data-number>8</button>
+                <button data-number>9</button>
+                <button data-operation>-</button>
+                <button data-number>.</button>
+                <button data-number>0</button>
+                <button data-equals class="span-two">=</button>
+                <button data-operation>sin</button>
+                <button data-operation>cos</button>
+                <button data-operation>tan</button>
+                <button data-operation>log</button>
+                <button data-operation>sqrt</button>
+                <button data-operation>^</button>
+                <button data-number>(</button>
+                <button data-number>)</button>
+            </div>
+        </div>
+
+        <div id="converter" class="tab-content">
+            <h2>Unit Converter</h2>
+            <div class="converter-wrapper">
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category">
+                        <option value="length">Length</option>
+                        <option value="weight">Weight</option>
+                        <option value="temperature">Temperature</option>
+                         <option value="area">Area</option>
+                        <option value="volume">Volume</option>
+                        <option value="time">Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="inputValue" placeholder="Enter value">
+                    <select id="fromUnit">
+                    </select>
+                </div>
+                <div class="to-section">
+                    <p>TO</p>
+                </div>
+                <div class="form-group">
+                    <p id="outputValue">-</p>
+                    <select id="toUnit">
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.AppShell) {
+          AppShell.init({ appId: 'calculator', title: 'Calculator', showSave: false, showOpen: false });
+        }
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investment Board</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <script src="../desktop/app-shell.js"></script>
+  <div class="app-container">
+    <h1>Investment Board</h1>
+    <p>Starter app. Portfolio analytics coming soon.</p>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AppShell) AppShell.init({ appId: 'investment-board', title: 'Investment Board' });
+    });
+  </script>
+</body>
+</html>

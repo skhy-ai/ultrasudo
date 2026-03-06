@@ -1,0 +1,8 @@
+.app-container{ max-width:700px; margin:30px auto; padding:20px; background:#111; color:#eee; border-radius:12px; box-shadow:0 6px 24px rgba(0,0,0,.4) }
+.timer-display{ font-size:64px; text-align:center; margin:20px 0; font-variant-numeric: tabular-nums }
+.controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center }
+.controls input{ width:90px; padding:8px 10px; border-radius:8px; border:1px solid #333; background:#1a1a1a; color:#eee }
+.controls button, .presets button{ padding:8px 12px; border:0; border-radius:8px; background:#2b8a3e; color:#fff; cursor:pointer }
+.controls button:hover, .presets button:hover{ filter:brightness(1.1) }
+.presets{ display:flex; gap:8px; justify-content:center; margin-top:12px }
+.alert{ text-align:center; margin-top:16px; color:#ff6b6b; font-weight:700 }

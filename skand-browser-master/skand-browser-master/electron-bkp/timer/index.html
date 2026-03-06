@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <div class="timer-display" id="display">00:00:00</div>
+    <div class="controls">
+      <input type="number" id="hours" min="0" placeholder="hh" />
+      <input type="number" id="minutes" min="0" max="59" placeholder="mm" />
+      <input type="number" id="seconds" min="0" max="59" placeholder="ss" />
+      <button id="set">Set</button>
+      <button id="start">Start</button>
+      <button id="pause">Pause</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div class="presets">
+      <button data-preset="1500">Pomodoro 25:00</button>
+      <button data-preset="300">Break 5:00</button>
+      <button data-preset="600">Break 10:00</button>
+    </div>
+    <div id="alert" class="alert" hidden>Time's up!</div>
+  </div>
+
+  <script src="../desktop/app-shell.js"></script>
+  <script src="../desktop/data-manager.js"></script>
+  <script src="../desktop/file-helper.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AppShell.init({ appId: 'timer', title: 'Timer' });
+    });
+  </script>
+</body>
+</html>

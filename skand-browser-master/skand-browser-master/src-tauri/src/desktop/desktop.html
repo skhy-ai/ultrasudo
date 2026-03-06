@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop</title>
+    <link rel="stylesheet" href="desktop.css">
+
+    <!-- Supabase Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../auth/config.js"></script>
+    <script src="../auth/auth-check.js"></script>
+    <link rel="stylesheet" href="../vendor/fontawesome/css/all.min.css">
+</head>
+
+<body>
+    <div class="desktop-container">
+        <!-- Network Status Bar -->
+        <div id="network-status-bar" class="network-status-bar">
+            <div class="status-indicator" id="network-indicator">
+                <i class="fas fa-wifi"></i>
+                <span id="network-text">Online</span>
+            </div>
+            <div class="cache-status" id="cache-status">
+                <i class="fas fa-download"></i>
+                <span id="cache-text">Cache: 0/5</span>
+            </div>
+            <button class="btn-small" onclick="openSystemModal()">
+                <i class="fas fa-cog"></i> System
+            </button>
+            <div style="position: relative; display: inline-block;">
+                <button class="btn-small"
+                    onclick="document.getElementById('theme-menu').style.display = document.getElementById('theme-menu').style.display === 'none' ? 'block' : 'none'">
+                    <i class="fas fa-paint-brush"></i> Theme
+                </button>
+                <div id="theme-menu"
+                    style="display:none; position: absolute; top: 120%; right: 0; background: #fff; color: #0f172a; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); width: max-content; z-index: 1000; text-align: left;">
+                    <div onclick="setTheme('default')"
+                        style="padding: 8px; cursor: pointer; border-radius: 4px; font-size: 13px;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        🌌 Default (Deep Blue)</div>
+                    <div onclick="setTheme('light')"
+                        style="padding: 8px; cursor: pointer; border-radius: 4px; font-size: 13px;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        ☀️ Light Desktop</div>
+                    <div onclick="setTheme('dark-grey')"
+                        style="padding: 8px; cursor: pointer; border-radius: 4px; font-size: 13px;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        🌑 Dark Grey</div>
+                    <div onclick="setTheme('nature')"
+                        style="padding: 8px; cursor: pointer; border-radius: 4px; font-size: 13px;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                        🌿 Nature Green</div>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 8px 0;">
+                    <label style="font-size: 11px; color: #64748b; margin-bottom: 5px; display: block;">Custom
+                        Background Image (URL)</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="custom-bg-input" placeholder="https://..."
+                            style="width: 130px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px;">
+                        <button onclick="setCustomBg()"
+                            style="padding: 4px 8px; font-size: 11px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <button id="logout-btn" class="btn-small"
+                style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: inherit;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="search-bar-container">
+            <input type="text" id="search-bar" placeholder="Search apps, notes, tasks (Cmd/Ctrl + Space)...">
+            <div id="spotlight-results" class="spotlight-results"></div>
+            <div class="search-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="offline">📱 Offline</button>
+                <button class="filter-btn" data-filter="online">🌐 Online</button>
+                <button class="filter-btn" data-filter="hybrid">🔄 Hybrid</button>
+            </div>
+            <button id="add-widget-btn">+ Widget</button>
+        </div>
+
+        <div class="desktop-layout">
+            <!-- News Panel -->
+            <div class="news-panel">
+                <h3><i class="fas fa-newspaper" style="color: #3b82f6;"></i> Top News</h3>
+                <div class="news-controls">
+                    <select id="news-category-select" onchange="window.fetchNews()">
+                        <option value="general">General</option>
+                        <option value="business">Business</option>
+                        <option value="tech">Technology</option>
+                        <option value="science">Science</option>
+                        <option value="health">Health</option>
+                        <option value="sports">Sports</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="gaming">Gaming</option>
+                    </select>
+                    <input type="text" id="news-search-input" placeholder="Search news..."
+                        style="width: 100%; margin-top: 8px; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;"
+                        oninput="window.filterNews()">
+                </div>
+                <div id="news-feed-container" class="news-feed">
+                    <div class="loading-state">Loading latest headlines...</div>
+                </div>
+            </div>
+
+            <!-- Favourites Panel -->
+            <div class="favourites-panel">
+                <h3>
+                    <span><i class="fas fa-star" style="color: #f59e0b;"></i> Favourite Sites</span>
+                    <button class="btn-icon" onclick="window.addFavouritePrompt()" title="Add Favourite">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </h3>
+                <div id="favourites-grid" class="favourites-grid">
+                    <!-- Favourite links rendered here -->
+                </div>
+            </div>
+
+            <!-- Apps Panel -->
+            <div class="apps-panel">
+                <h3><i class="fas fa-th-large" style="color: #8b5cf6;"></i> Applications</h3>
+                <div id="app-grid" class="app-grid">
+                    <!-- Icons are now rendered dynamically by desktop.js from app-classifier.js registry -->
+                </div>
+            </div>
+
+            <!-- Widgets Panel -->
+            <div class="widgets-panel">
+                <h3>
+                    <span><i class="fas fa-puzzle-piece" style="color: #10b981;"></i> Active Widgets</span>
+                    <button class="btn-icon" id="add-widget-btn" title="Add Widget">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </h3>
+                <div id="widget-area" class="widget-area">
+                    <!-- Widgets will be added here -->
+                    <div class="empty-state" style="grid-column: 1/-1;">No widgets added. Click + to add.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Favourite Modal -->
+    <div id="add-fav-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; padding: 20px;">
+            <span class="close-btn"
+                onclick="document.getElementById('add-fav-modal').style.display='none'">&times;</span>
+            <h3 style="margin-top: 0; color: #1e293b;">Add Favourite</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <input type="text" id="fav-name-input" placeholder="Website Name (e.g. GitHub)"
+                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                <input type="text" id="fav-url-input" placeholder="URL (https://github.com)"
+                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                <input type="text" id="fav-icon-input" placeholder="Icon Class (e.g. fab fa-github)"
+                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                <button onclick="window.saveNewFavourite()"
+                    style="padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px;">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Management Modal -->
+    <div id="system-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeSystemModal()">&times;</span>
+            <h2>System Management</h2>
+
+            <div class="system-tabs">
+                <button class="tab-btn active" onclick="openTab('network')">Network Monitor</button>
+                <button class="tab-btn" onclick="openTab('cache')">Offline Cache</button>
+                <button class="tab-btn" onclick="openTab('data')">Data Manager</button>
+                <button class="tab-btn" onclick="openTab('apps')">App Store</button>
+            </div>
+
+            <!-- Network Monitor Tab -->
+            <div id="network-tab" class="tab-content active">
+                <h3>Network Traffic Monitor</h3>
+
+                <!-- Network Stats Cards -->
+                <div class="network-stats">
+                    <div class="stat-card">
+                        <div class="value" id="total-requests">0</div>
+                        <div class="label">Total Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="blocked-requests">0</div>
+                        <div class="label">Blocked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="avg-latency">0ms</div>
+                        <div class="label">Avg Latency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="data-transferred">0B</div>
+                        <div class="label">Data Transferred</div>
+                    </div>
+                </div>
+
+                <!-- Traffic Log -->
+                <div class="section">
+                    <h4>Recent Network Activity</h4>
+                    <div id="traffic-log">
+                        <div class="empty-state">No network activity yet</div>
+                    </div>
+                </div>
+
+                <!-- Blocked Domains -->
+                <div class="blocked-domains">
+                    <h4>
+                        <span>Blocked Domains</span>
+                        <button class="btn-small" onclick="showBlockDomainPrompt()">
+                            <i class="fas fa-plus"></i> Add Domain
+                        </button>
+                    </h4>
+                    <div id="blocked-domains-list" class="empty">
+                        <div class="empty-state">No domains blocked</div>
+                    </div>
+                    <p class="hint">Blocked domains will be prevented from loading across all apps.</p>
+                </div>
+            </div>
+
+            <!-- Cache Management Tab -->
+            <div id="cache-tab" class="tab-content">
+                <h3>Offline Asset Cache</h3>
+                <div id="cache-stats"></div>
+                <button class="btn" onclick="downloadAllAssets()">Download All Assets</button>
+                <button class="btn btn-secondary" onclick="clearCache()">Clear Cache</button>
+                <div id="download-progress"></div>
+            </div>
+
+            <!-- Data Manager Tab -->
+            <div id="data-tab" class="tab-content">
+                <h3>Cross-App Data</h3>
+                <div id="data-stats"></div>
+                <button class="btn" onclick="exportAllData()">Export Data</button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+                <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import
+                    Data</button>
+
+                <h4 style="margin-top:20px;">Security Settings (Experimental)</h4>
+                <div class="setting-row" style="margin-top:10px;">
+                    <label>
+                        <input type="checkbox" id="enable-pqc-toggle" onchange="togglePQC(this.checked)"> Enable
+                        Post-Quantum Cryptography Encryption
+                    </label>
+                    <p class="hint" style="color:#666; font-size:12px; margin-top:5px;">When enabled, your cloud data
+                        payloads will be securely obfuscated using AES-GCM combined with a simulated Kyber KEM derived
+                        key, protecting against harvest-now-decrypt-later attacks.</p>
+                </div>
+            </div>
+
+            <!-- App Store Tab -->
+            <div id="apps-tab" class="tab-content">
+                <h3>Available Applications</h3>
+                <div class="app-categories">
+                    <div class="category">
+                        <h4>📱 Offline Apps</h4>
+                        <div id="offline-apps-list"></div>
+                    </div>
+                    <div class="category">
+                        <h4>🌐 Online Apps</h4>
+                        <div id="online-apps-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="network-monitor.js"></script>
+    <script>
+        // Initialize network monitoring and PQC settings
+        document.addEventListener('DOMContentLoaded', () => {
+            const pqcToggle = document.getElementById('enable-pqc-toggle');
+            if (pqcToggle) {
+                pqcToggle.checked = localStorage.getItem('enable_pqc') === 'true';
+            }
+            // Update stats periodically
+            setInterval(updateNetworkStats, 2000);
+            updateNetworkStats();
+        });
+
+        function togglePQC(enabled) {
+            localStorage.setItem('enable_pqc', enabled ? 'true' : 'false');
+            if (enabled && !localStorage.getItem('pqc_device_key')) {
+                // Generate a strong fallback AES key representing the derived shared secret from the PQC tunnel
+                const array = new Uint8Array(32);
+                window.crypto.getRandomValues(array);
+                const keyHex = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+                localStorage.setItem('pqc_device_key', keyHex);
+                console.log("Generated simulated ML-KEM derived AES key for cloud sync.");
+            }
+        }
+
+        function updateNetworkStats() {
+            const monitor = window.networkMonitor;
+            if (!monitor) return;
+
+            const traffic = monitor.trafficLog || [];
+            const blocked = traffic.filter(t => t.type === 'fetch_blocked').length;
+            const total = traffic.length;
+            const avgLatency = traffic.length > 0
+                ? Math.round(traffic.reduce((sum, t) => sum + (t.duration || 0), 0) / traffic.length)
+                : 0;
+            const dataTransferred = traffic.reduce((sum, t) => sum + (t.size || 0), 0);
+
+            // Update UI
+            const el = (id) => document.getElementById(id);
+            el('total-requests').textContent = total;
+            el('blocked-requests').textContent = blocked;
+            el('avg-latency').textContent = `${avgLatency}ms`;
+            el('data-transferred').textContent = formatBytes(dataTransferred);
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0B';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
+        }
+    </script>
+    <script src="data-manager.js?v=1"></script>
+    <script src="../core/sync-manager.js"></script>
+    <script src="offline-cache.js?v=1"></script>
+    <script src="app-classifier.js?v=2"></script>
+    <script src="../news/rss_sources.js"></script>
+    <script src="desktop.js?v=3"></script>
+    <script src="../sw-register.js"></script>
+</body>
+
+</html>

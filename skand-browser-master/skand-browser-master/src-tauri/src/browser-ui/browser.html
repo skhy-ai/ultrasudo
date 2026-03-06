@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skand Browser</title>
+    <link rel="stylesheet" href="browser.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="browser-header">
+        <div class="logo">SKAND</div>
+        <div class="nav-controls">
+            <button id="btn-back" title="Go Back"><i class="fas fa-arrow-left"></i></button>
+            <button id="btn-forward" title="Go Forward"><i class="fas fa-arrow-right"></i></button>
+            <button id="btn-reload" title="Reload"><i class="fas fa-redo"></i></button>
+            <button id="btn-home" title="Home"><i class="fas fa-home"></i></button>
+        </div>
+
+        <div class="url-bar-container">
+            <i class="fas fa-lock security-icon" id="security-icon"></i>
+            <input type="text" id="url-input" placeholder="Search or enter web address"
+                value="http://localhost:8000/desktop/desktop.html" spellcheck="false">
+            <button id="btn-bookmark" title="Bookmark this page"><i class="far fa-star"></i></button>
+        </div>
+
+        <div class="menu-controls">
+            <button id="btn-passwords" title="Saved Passwords"><i class="fas fa-key"></i></button>
+            <button id="btn-history" title="Browsing History"><i class="fas fa-history"></i></button>
+            <button id="btn-bookmarks-menu" title="Bookmarks"><i class="fas fa-book"></i></button>
+        </div>
+    </div>
+
+    <div class="tabs-bar">
+        <div id="tabs-container" class="tabs-container">
+            <!-- dynamic tabs go here -->
+        </div>
+        <button id="btn-new-tab" class="btn-new-tab" title="New Tab"><i class="fas fa-plus"></i></button>
+    </div>
+    </div>
+
+    <div class="browser-content" id="webviews-container">
+        <!-- iframes go here dynamically -->
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="history-modal" class="modal hidden">
+            <div class="modal-header">
+                <h2>Browsing History</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="history-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div id="bookmarks-modal" class="modal hidden">
+            <div class="modal-header">
+                <h2>Bookmarks</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="bookmarks-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div id="passwords-modal" class="modal hidden">
+            <div class="modal-header">
+                <h2>Password Manager</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="add-password-form">
+                    <input type="text" id="pass-site" placeholder="Website URL">
+                    <input type="text" id="pass-user" placeholder="Username">
+                    <input type="password" id="pass-pass" placeholder="Password">
+                    <button id="btn-save-password">Save</button>
+                </div>
+                <div id="passwords-list" style="margin-top:15px;">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="browser.js"></script>
+</body>
+
+</html>

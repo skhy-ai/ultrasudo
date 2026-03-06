@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Live Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        /* Custom scrollbar for a better dark mode experience */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        .mermaid-preview svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans antialiased">
+    <script src="../desktop/app-shell.js"></script>
+    <script src="../desktop/file-helper.js"></script>
+    <div class="flex flex-col h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 p-4 shadow-md z-10 flex items-center gap-4">
+            <button id="toggle-controls-btn" class="p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            </button>
+            <div>
+                <h1 class="text-2xl font-bold text-emerald-400">Mermaid Live Editor</h1>
+                <p class="text-sm text-gray-400">Instantly render and edit your Mermaid diagrams with powerful controls.</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
+
+            <!-- Controls Panel -->
+            <aside id="controls-panel" class="w-full lg:w-80 xl:w-96 bg-gray-800 rounded-lg shadow-lg p-6 overflow-y-auto">
+                <h2 class="text-xl font-semibold mb-6 border-b border-gray-600 pb-2 text-emerald-300">Controls</h2>
+                
+                <!-- General Settings -->
+                <div class="space-y-4 mb-8">
+                    <div>
+                        <label for="layout-select" class="block text-sm font-medium text-gray-300 mb-1">Diagram Layout</label>
+                        <select id="layout-select" class="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="TD">Top to Bottom</option>
+                            <option value="LR">Left to Right</option>
+                            <option value="BT">Bottom to Top</option>
+                            <option value="RL">Right to Left</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="theme-select" class="block text-sm font-medium text-gray-300 mb-1">Color Schema</label>
+                        <select id="theme-select" class="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="dark">Dark</option>
+                            <option value="default">Default</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="forest">Forest</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Node Specific Controls -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-semibold text-emerald-300 border-b border-gray-600 pb-2">Node Editor</h3>
+                    <div class="p-4 bg-gray-700/50 rounded-lg">
+                        <label for="node-select" class="block text-sm font-medium text-gray-300 mb-2">Select Node to Edit</label>
+                        <select id="node-select" class="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-emerald-500 focus:border-emerald-500 mb-4">
+                            <option>No nodes found</option>
+                        </select>
+                        
+                        <label for="node-color" class="block text-sm font-medium text-gray-300">Node Color</label>
+                        <input type="color" id="node-color" value="#3b82f6" class="mt-1 w-full h-10 p-1 bg-gray-700 border-gray-600 rounded-md cursor-pointer">
+                    </div>
+
+                    <div class="p-4 bg-gray-700/50 rounded-lg">
+                         <h4 class="text-md font-semibold mb-2 text-gray-200">Add Link</h4>
+                         <p class="text-xs text-gray-400 mb-3">Select a node from the dropdown above first.</p>
+                         <input type="url" id="link-url" placeholder="https://example.com" class="w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500 mb-2">
+                         <button id="add-link-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add/Update Link</button>
+                    </div>
+
+                    <div class="p-4 bg-gray-700/50 rounded-lg">
+                        <h4 class="text-md font-semibold mb-2 text-gray-200">Upload Image</h4>
+                        <p class="text-xs text-gray-400 mb-3">Select a node to add this image to.</p>
+                        <input type="file" id="image-upload" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                         <button id="add-image-btn" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">Add Image to Node</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Editor and Preview -->
+            <section class="flex-grow flex flex-col gap-4 overflow-hidden">
+                <!-- Mermaid Code Editor -->
+                <div class="w-full h-1/2 flex flex-col">
+                    <h2 class="text-xl font-semibold mb-2 text-emerald-300">Mermaid Code</h2>
+                    <textarea id="mermaid-code" class="w-full flex-grow bg-gray-800 border border-gray-600 rounded-lg p-4 font-mono text-sm text-gray-200 focus:ring-emerald-500 focus:border-emerald-500" spellcheck="false">graph TD
+    A[Start] --> B{Is it responsive?};
+    B -->|Yes| C[Great!];
+    B -->|No| D[Fix it!];
+    C --> E[End];
+    D --> B;
+
+style A fill:#22c55e,stroke:#15803d,stroke-width:2px,color:#fff
+style D fill:#ef4444,stroke:#b91c1c,stroke-width:2px,color:#fff</textarea>
+                </div>
+
+                <!-- Live Preview -->
+                <div class="w-full h-1/2 flex flex-col">
+                     <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-xl font-semibold text-emerald-300">Live Preview</h2>
+                        <div class="flex items-center gap-2">
+                            <button id="zoom-out-btn" title="Zoom Out" class="p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                                <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6"></path></svg>
+                            </button>
+                            <button id="zoom-in-btn" title="Zoom In" class="p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                                <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10h-6"></path></svg>
+                            </button>
+                             <button id="reset-zoom-btn" title="Reset Zoom" class="p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors">
+                                <svg class="w-5 h-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                            <button id="download-png-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 text-sm">Download PNG</button>
+                        </div>
+                     </div>
+                     <div id="mermaid-preview-container" class="mermaid-preview flex-grow bg-gray-800 border border-gray-600 rounded-lg p-4 flex items-center justify-center overflow-auto">
+                        <div id="mermaid-preview"></div>
+                        <div id="error-container" class="hidden text-red-400 font-mono"></div>
+                     </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const codeInput = document.getElementById('mermaid-code');
+            const preview = document.getElementById('mermaid-preview');
+            const errorContainer = document.getElementById('error-container');
+            const layoutSelect = document.getElementById('layout-select');
+            const themeSelect = document.getElementById('theme-select');
+            const nodeSelect = document.getElementById('node-select');
+            const nodeColorPicker = document.getElementById('node-color');
+            const linkUrlInput = document.getElementById('link-url');
+            const addLinkBtn = document.getElementById('add-link-btn');
+            const imageUpload = document.getElementById('image-upload');
+            const addImageBtn = document.getElementById('add-image-btn');
+            const toggleControlsBtn = document.getElementById('toggle-controls-btn');
+            const controlsPanel = document.getElementById('controls-panel');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const resetZoomBtn = document.getElementById('reset-zoom-btn');
+            const downloadPngBtn = document.getElementById('download-png-btn');
+
+            let imageBase64 = null;
+            let zoomLevel = 1;
+
+            // --- Initializer ---
+            mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+            
+            // --- Core Functions ---
+            const updateAndRender = (newCode) => {
+                if(newCode !== undefined) {
+                    codeInput.value = newCode;
+                }
+                renderMermaid();
+            };
+
+            const renderMermaid = async () => {
+                const code = codeInput.value;
+                try {
+                    // Check if mermaid can parse the code without throwing an error
+                    await mermaid.parse(code);
+                    const { svg } = await mermaid.render('graphDiv', code);
+                    preview.innerHTML = svg;
+                    preview.style.display = 'block';
+                    errorContainer.style.display = 'none';
+                    parseNodesAndPopulateSelector();
+                } catch (e) {
+                    preview.style.display = 'none';
+                    errorContainer.style.display = 'block';
+                    errorContainer.textContent = e.message;
+                }
+            };
+            
+            const parseNodesAndPopulateSelector = () => {
+                const code = codeInput.value;
+                const nodeRegex = /^\s*([a-zA-Z0-9_]+)/gm;
+                const nodes = new Set();
+                let match;
+                while ((match = nodeRegex.exec(code)) !== null) {
+                    // This is necessary to avoid infinite loops with zero-width matches
+                    if (match.index === nodeRegex.lastIndex) {
+                        nodeRegex.lastIndex++;
+                    }
+                    if (match[1] && !['graph', 'subgraph', 'style', 'classDef', 'click', 'linkStyle'].includes(match[1])) {
+                        nodes.add(match[1]);
+                    }
+                }
+
+                const currentSelection = nodeSelect.value;
+                nodeSelect.innerHTML = '';
+                if (nodes.size === 0) {
+                    nodeSelect.innerHTML = '<option>No nodes found</option>';
+                } else {
+                    nodes.forEach(node => {
+                        const option = document.createElement('option');
+                        option.value = node;
+                        option.textContent = node;
+                        nodeSelect.appendChild(option);
+                    });
+                    if (nodes.has(currentSelection)) {
+                        nodeSelect.value = currentSelection;
+                    }
+                }
+            };
+            
+            // --- Event Handlers ---
+            const handleLayoutChange = () => {
+                let code = codeInput.value;
+                const newLayout = layoutSelect.value;
+                code = code.replace(/^(graph\s+)(TD|LR|BT|RL)/, `$1${newLayout}`);
+                updateAndRender(code);
+            };
+
+            const handleThemeChange = () => {
+                let code = codeInput.value;
+                const newTheme = themeSelect.value;
+                // Remove existing theme directive
+                code = code.replace(/^\s*%%{init:.*?\}%%\s*\n/m, '');
+                // Add new theme directive
+                const themeDirective = `%%{init: {'theme': '${newTheme}'}}%%\n`;
+                updateAndRender(themeDirective + code);
+            };
+
+            const handleNodeColorChange = () => {
+                const nodeId = nodeSelect.value;
+                if (!nodeId || nodeId === 'No nodes found') return;
+                const color = nodeColorPicker.value;
+                
+                let code = codeInput.value;
+                const styleString = `style ${nodeId} fill:${color}`;
+
+                const styleRegex = new RegExp(`^style ${nodeId}.*`, 'm');
+                if (styleRegex.test(code)) {
+                    code = code.replace(styleRegex, styleString);
+                } else {
+                    code += `\n${styleString}`;
+                }
+                updateAndRender(code);
+            };
+            
+            const handleAddLink = () => {
+                const nodeId = nodeSelect.value;
+                const url = linkUrlInput.value.trim();
+                if (!nodeId || nodeId === 'No nodes found' || !url) {
+                    alert('Please select a node and enter a valid URL.');
+                    return;
+                }
+
+                let code = codeInput.value;
+                const clickString = `click ${nodeId} "${url}"`;
+
+                const clickRegex = new RegExp(`^click ${nodeId}.*`, 'm');
+                if (clickRegex.test(code)) {
+                    code = code.replace(clickRegex, clickString);
+                } else {
+                    code += `\n${clickString}`;
+                }
+                updateAndRender(code);
+            };
+            
+            const handleImageUpload = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    imageBase64 = reader.result;
+                    alert('Image ready. Select a node and click "Add Image to Node".');
+                };
+                reader.readAsDataURL(file);
+            };
+
+            const handleAddImage = () => {
+                const nodeId = nodeSelect.value;
+                if (!nodeId || nodeId === 'No nodes found') {
+                    alert('Please select a node first.');
+                    return;
+                }
+                if (!imageBase64) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+                
+                let code = codeInput.value;
+                const imageTag = `<img src='${imageBase64}' width='50' />`;
+                const nodeDefRegex = new RegExp(`(${nodeId})\\[(.*?)\\]`, 'm');
+
+                if (nodeDefRegex.test(code)) {
+                    // Node with description exists, e.g., A[Some text]
+                    code = code.replace(nodeDefRegex, `$1["${imageTag}<br/>$2"]`);
+                } else {
+                    // Node might just be an ID, e.g., A --> B
+                    const bareNodeRegex = new RegExp(`^\\s*${nodeId}\\s*$`, 'm');
+                     if (bareNodeRegex.test(code)) {
+                         code = code.replace(bareNodeRegex, `${nodeId}["${imageTag}"]`);
+                     } else {
+                         // As a fallback, create a new definition
+                         code += `\n${nodeId}["${imageTag}"]`;
+                     }
+                }
+                updateAndRender(code);
+                imageBase64 = null; // Reset after use
+                imageUpload.value = ''; // Clear file input
+            };
+
+            const handleToggleControls = () => {
+                controlsPanel.classList.toggle('hidden');
+            };
+
+            const updateZoom = () => {
+                preview.style.transform = `scale(${zoomLevel})`;
+            };
+
+            const handleZoomIn = () => {
+                zoomLevel += 0.1;
+                updateZoom();
+            };
+
+            const handleZoomOut = () => {
+                zoomLevel = Math.max(0.2, zoomLevel - 0.1); // Prevent zooming out too much
+                updateZoom();
+            };
+            
+            const handleResetZoom = () => {
+                zoomLevel = 1;
+                updateZoom();
+            };
+
+            const handleDownloadPNG = () => {
+                const svgElement = preview.querySelector('svg');
+                if (!svgElement) {
+                    alert('Could not find the diagram to download.');
+                    return;
+                }
+
+                // Get SVG data and convert it to a base64 data URL to avoid tainting the canvas
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const svgUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+
+                // Create an image to draw on canvas
+                const img = new Image();
+                img.onload = () => {
+                    // For higher resolution, scale the canvas
+                    const scaleFactor = 2;
+                    const canvas = document.createElement('canvas');
+                    
+                    const svgRect = svgElement.getBoundingClientRect();
+                    canvas.width = svgRect.width * scaleFactor;
+                    canvas.height = svgRect.height * scaleFactor;
+
+                    const ctx = canvas.getContext('2d');
+                    
+                    // The default SVG background is transparent. Fill it with the theme color.
+                    ctx.fillStyle = getComputedStyle(preview.closest('.bg-gray-800')).backgroundColor;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Trigger download
+                    const pngUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = 'mermaid-diagram.png';
+                    link.href = pngUrl;
+                    document.body.appendChild(link); // Required for Firefox
+                    link.click();
+                    document.body.removeChild(link); // Clean up
+                };
+                img.onerror = () => {
+                    alert('Failed to load diagram for conversion.');
+                };
+                img.src = svgUrl;
+            };
+
+            // App Shell integration
+            if (window.AppShell) {
+                AppShell.init({ appId: 'mermaid-editor', title: 'Mermaid Editor' });
+                AppShell.onSave(async () => {
+                    const name = prompt('Save as', 'diagram.mmd') || 'diagram.mmd';
+                    const res = await FileHelper.saveText(name, codeInput.value);
+                    if (!res.ok) alert('Save failed: ' + (res.error || res.method));
+                });
+                AppShell.onOpen(async () => {
+                    const res = await FileHelper.openText();
+                    if (res.ok) { codeInput.value = res.content; renderMermaid(); }
+                    else alert('Open failed: ' + (res.error || res.method));
+                });
+            }
+
+            // --- Event Listeners ---
+            codeInput.addEventListener('input', renderMermaid);
+            layoutSelect.addEventListener('change', handleLayoutChange);
+            themeSelect.addEventListener('change', handleThemeChange);
+            nodeColorPicker.addEventListener('input', handleNodeColorChange);
+            addLinkBtn.addEventListener('click', handleAddLink);
+            imageUpload.addEventListener('change', handleImageUpload);
+            addImageBtn.addEventListener('click', handleAddImage);
+            toggleControlsBtn.addEventListener('click', handleToggleControls);
+            zoomInBtn.addEventListener('click', handleZoomIn);
+            zoomOutBtn.addEventListener('click', handleZoomOut);
+            resetZoomBtn.addEventListener('click', handleResetZoom);
+            downloadPngBtn.addEventListener('click', handleDownloadPNG);
+
+            // --- Initial Render ---
+            renderMermaid();
+        });
+    </script>
+</body>
+</html>

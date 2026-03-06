@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #ef4444;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Password Recovery for Skand Browser</h2>
+        <p>We received a request to reset the password for your Skand Browser account.</p>
+        <p>Click the link below to securely reset your password:</p>
+        <a href="{{ .ConfirmationURL }}" class="btn">Reset Password</a>
+        <p>If you didn't ask for this, you can ignore this email and your password will remain unchanged.</p>
+    </div>
+</body>
+
+</html>

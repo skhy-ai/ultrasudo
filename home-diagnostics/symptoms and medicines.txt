@@ -1,0 +1,402 @@
+[mermaid]---
+config:
+  layout: dagre
+  theme: base
+---
+flowchart TD
+    A["Start: Symptom Assessment"] --> B{"Primary Symptom Category"} & VS["Check Vital Signs"] & W["CRITICAL WARNINGS:
+    - Always check drug interactions
+    - Start with lowest effective dose
+    - Monitor vital signs regularly
+    - Track side effects
+    - Document symptoms
+    - Seek immediate medical help if:
+      * Severe symptoms develop
+      * Uncertainty about condition
+      * No improvement after treatment"]
+    VS --> VS1["Monitor:
+    - BP: Normal &lt;120/80, High &gt;130/80
+    - O2: Normal 95-100%, Low &lt;95%
+    - Temp: Normal 97.8-99°F, Fever &gt;100.4°F"]
+    B -- Pain --> P["Pain Management"]
+    B -- Digestive --> D["Digestive Issues"]
+    B -- Respiratory/Allergy --> R["Respiratory/Allergy"]
+    B -- Infection --> I["Infection Treatment"]
+    P --> P1{"Pain Location/Type"}
+    P1 -- Headache/Fever --> PH["Headache Protocol"]
+    P1 -- Muscle Pain --> PM["Muscle Protocol"]
+    P1 -- Joint/Inflammation --> PJ["Joint Protocol"]
+    P1 -- Menstrual --> PW["Menstrual Protocol"]
+    PH --> PHC{"Check Conditions"}
+    PHC -- Liver Problems --> PH1["Check:
+    - Yellow eyes/skin
+    - Dark urine
+    - Right upper pain
+    SAFE:
+    - Paracetamol 500-1000mg only"]
+    PHC -- Heart Disease --> PH2["Check:
+    - BP & oxygen levels
+    - Chest pain
+    - Irregular heartbeat
+    SAFE:
+    - Paracetamol 500-1000mg
+    - Low-dose aspirin only"]
+    PHC -- Neither --> PH3["OPTIONS:
+    - Paracetamol 500-1000mg
+    - Ibuprofen 400mg
+    - Naproxen 250-500mg
+    - Aspirin 300-900mg
+    - Celecoxib"]
+    PM --> PMC{"Check Conditions"}
+    PMC -- Glaucoma --> PM1["Check:
+    - Eye pressure
+    - Vision changes
+    - Halos around lights
+    SAFE:
+    - Paracetamol
+    - NSAIDs"]
+    PMC -- Elderly --> PM2["Check:
+    - Balance issues
+    - Joint stability
+    - Recovery time
+    USE WITH CAUTION:
+    - Orphenadrine 100mg
+    - Eperisone 50mg
+    - Low-dose muscle relaxants"]
+    PMC -- Neither --> PM3["OPTIONS:
+    - Orphenadrine 100mg
+    - Eperisone 50mg
+    - Methocarbamol 500-750mg
+    - Myonal"]
+    PJ --> PJC{"Check Conditions"}
+    PJC -- Ulcers --> PJ1["Check:
+    - Stomach pain
+    - Black stools
+    - Loss of appetite
+    CONSULT DOCTOR"]
+    PJC -- Heart Disease --> PJ2["Check:
+    - BP & heart rate
+    - Chest pain
+    SAFE:
+    - Paracetamol"]
+    PJC -- Neither --> PJ3["OPTIONS:
+    - Naproxen
+    - Celecoxib
+    - Mefenamic Acid"]
+    D --> D1{"Specific Issue"}
+    D1 -- Acid/Heartburn --> DH["Acid Protocol"]
+    D1 -- Nausea/Vomiting --> DN["Nausea Protocol"]
+    D1 -- Diarrhea --> DD["Diarrhea Protocol"]
+    D1 -- Gas/Bloating --> DG["Gas Protocol"]
+    D1 -- Spasms --> DS["Spasm Protocol"]
+    DH --> DHC{"Check Conditions"}
+    DHC -- Osteoporosis Risk --> DH1["Check:
+    - Bone density history
+    SHORT TERM:
+    - Antacids
+    - H2 blockers"]
+    DHC -- Kidney Problems --> DH2["Check:
+    - Urine color/frequency
+    - Lower back pain
+    - Swelling
+    AVOID:
+    - Aluminum antacids
+    - High-dose PPIs"]
+    DHC -- Neither --> DH3["OPTIONS:
+    - Omeprazole 20mg
+    - Esomeprazole
+    - Rabeprazole
+    - Famotidine 20mg
+    - Calcium carbonate
+    - Magnesium hydroxide"]
+    R --> R1{"Specific Issue"}
+    R1 -- Allergies --> RA["Allergy Protocol"]
+    R1 -- Asthma --> RAS["Asthma Protocol"]
+    R1 -- Congestion --> RC["Congestion Protocol"]
+    R1 -- Motion Sickness --> RM["Motion Protocol"]
+    RA --> RAC{"Check Conditions"}
+    RAC -- Driving --> RA1["Check:
+    - Alertness needed
+    SAFE:
+    - Loratadine 10mg
+    - Cetirizine 10mg
+    AVOID:
+    - Diphenhydramine
+    - Chlorpheniramine"]
+    RAC -- Liver Problems --> RA2["Check:
+    - Liver function tests
+    USE:
+    - Levocetirizine"]
+    RAC -- Neither --> RA3["OPTIONS:
+    - Loratadine 10mg
+    - Cetirizine 10mg
+    - Levocetirizine
+    - Diphenhydramine 25mg
+    - Chlorpheniramine 4mg"]
+    I --> I1{"Infection Type"}
+    I1 -- Bacterial --> IB["Bacterial Protocol"]
+    I1 -- Fungal --> IF["Fungal Protocol"]
+    I1 -- Skin --> IS["Skin Protocol"]
+    IB --> IBC{"Check Conditions"}
+    IBC -- Penicillin Allergy --> IB1["OPTIONS:
+    - Azithromycin 500mg
+    - Clarithromycin 500mg
+    - Doxycycline 100mg"]
+    IBC -- Pregnancy --> IB2["Check:
+    - Pregnancy stage
+    - BP changes
+    SAFE:
+    - Amoxicillin
+    - Cephalexin
+    AVOID:
+    - Tetracyclines
+    - Fluoroquinolones"]
+    IBC -- Neither --> IB3["OPTIONS:
+    - Enhancin
+    - Norfloxacin
+    - Azithromycin 500mg
+    - Amoxicillin 500mg
+    - Cephalexin 500mg"]
+    PW --> PWC{"Check Conditions"}
+    PWC -- Pregnant --> PW1["Check:
+    - BP changes
+    - Unusual pain
+    - Swelling
+    CONSULT DOCTOR"]
+    PWC -- Bleeding Disorder --> PW2["Check:
+    - Bleeding severity
+    - Clotting time
+    - Anemia signs
+    SAFE:
+    - Paracetamol 500-1000mg"]
+    PWC -- Neither --> PW3["OPTIONS:
+    - Mefenamic Acid 500mg
+    - Tranexamic Acid 500mg
+    - Ibuprofen 400mg
+    Monitor:
+    - Flow intensity
+    - Pain levels
+    - Side effects"]
+    DD --> DDC{"Bacterial Infection?"}
+    DDC -- Yes --> DD1["Check:
+    - Fever presence
+    - Blood in stool
+    - Severe cramping
+    CONSULT DOCTOR"]
+    DDC -- No --> DD2["Check:
+    - Stool consistency
+    - Dehydration signs
+    - Duration
+    USE:
+    - Loperamide 2mg
+    - Oral rehydration
+    MONITOR:
+    - Fluid intake
+    - Electrolyte balance
+    - Frequency of stools"]
+    DN --> DNC{"Check Conditions"}
+    DNC -- Heart Problems --> DN1["Check:
+    - BP & heart rate
+    - Chest pain
+    - Dizziness
+    CONSULT DOCTOR"]
+    DNC -- Parkinson's --> DN2["Check:
+    - Motor symptoms
+    - Balance issues
+    USE WITH CAUTION:
+    - Domperidone 10mg
+    Monitor:
+    - Motor function
+    - Side effects"]
+    DNC -- Neither --> DN3["OPTIONS:
+    - Domperidone 10mg
+    - Prochlorperazine 5mg
+    - Ondansetron 4-8mg
+    Monitor:
+    - Frequency of nausea
+    - Hydration status
+    - Dietary triggers"]
+    DG --> DGC{"Associated Symptoms?"}
+    DGC -- With Pain --> DG1["Check:
+    - Bloating severity
+    - Pain location
+    - Dietary triggers
+    USE:
+    - Simeticone 40mg
+    - Antispasmodics"]
+    DGC -- Without Pain --> DG2["Check:
+    - Frequency
+    - Dietary patterns
+    USE:
+    - Simeticone 40mg
+    LIFESTYLE:
+    - Dietary modifications
+    - Eating habits review"]
+    DS --> DSC{"Check Conditions"}
+    DSC -- Glaucoma/Prostate Problems --> DS1["Check:
+    - Eye pressure
+    - Urination patterns
+    - Vision changes
+    CONSULT DOCTOR"]
+    DSC -- Neither --> DS2["Check:
+    - Spasm location
+    - Trigger factors
+    - Pain intensity
+    USE:
+    - Hyoscine Butylbromide 10mg
+    - Dicyclomine 10mg
+    MONITOR:
+    - Response time
+    - Side effects
+    - Pattern of spasms"]
+    RAS --> RASC{"Depression?"}
+    RASC -- Yes --> RAS1["Check:
+    - Mood changes
+    - Sleep patterns
+    - Breathing difficulties
+    CONSULT DOCTOR"]
+    RASC -- No --> RAS2["Check:
+    - Peak flow readings
+    - O2 saturation
+    - Trigger factors
+    USE:
+    - Montelukast 10mg
+    - Salbutamol inhaler prn
+    - Maintenance inhalers
+    MONITOR:
+    - Peak flow readings
+    - Symptom diary
+    - Exercise tolerance"]
+    RC --> RCC{"Check Conditions"}
+    RCC -- Peptic Ulcer --> RC1["Check:
+    - Stomach pain
+    - Acid reflux
+    - Bleeding signs
+    CONSULT DOCTOR"]
+    RCC -- No --> RC2["Check:
+    - Congestion type
+    - Breathing rate
+    - O2 levels
+    USE:
+    - Bromhexine 8mg
+    - Pseudoephedrine 60mg
+    - Saline nasal spray
+    MONITOR:
+    - Breathing ease
+    - Mucus color
+    - Sleep quality"]
+    RM --> RMC{"Check Conditions"}
+    RMC -- Glaucoma --> RM1["Check:
+    - Eye pressure
+    - Vision changes
+    CONSULT DOCTOR"]
+    RMC -- No --> RM2["Check:
+    - Travel duration
+    - Previous reactions
+    - Alertness needs
+    USE:
+    - Dimenhydrinate 50mg
+    - Meclizine 25mg
+    TIMING:
+    - Take 30-60 min before travel
+    MONITOR:
+    - Drowsiness
+    - Effectiveness
+    - Side effects"]
+    IF --> IFC{"Check Conditions"}
+    IFC -- Pregnancy --> IF1["Check:
+    - Pregnancy stage
+    - Infection location
+    - Severity
+    CONSULT DOCTOR"]
+    IFC -- No --> IF2["Check:
+    - Infection type
+    - Location
+    - Previous treatments
+    USE:
+    - Fluconazole 150mg
+    - Topical antifungals
+    - Ketoconazole 2%
+    MONITOR:
+    - Spread of infection
+    - Healing progress
+    - Side effects"]
+    IS --> ISC{"Check Conditions"}
+    ISC -- Open Wounds --> IS1["Check:
+    - Wound depth
+    - Signs of infection
+    - Healing stage
+    CONSULT DOCTOR"]
+    ISC -- No --> IS2["Check:
+    - Affected area
+    - Skin changes
+    - Allergic reactions
+    USE:
+    - Quinodochlor cream
+    - Mupirocin 2%
+    - Antihistamine if needed
+    MONITOR:
+    - Skin response
+    - Healing progress
+    - Side effects
+    - Spreading/regression"]
+    PH1 --> M["Monitor Response"]
+    PH2 --> M
+    PH3 --> M
+    PM1 --> M
+    PM2 --> M
+    PM3 --> M
+    PJ2 --> M
+    PJ3 --> M
+    DH1 --> M
+    DH2 --> M
+    DH3 --> M
+    RA1 --> M
+    RA2 --> M
+    RA3 --> M
+    IB1 --> M
+    IB2 --> M
+    IB3 --> M
+    M --> ME{"Effective?"}
+    ME -- Yes --> MC["Continue as Prescribed:
+    - Complete course
+    - Monitor side effects
+    - Follow up as needed"]
+    ME -- No --> MD["Consult Doctor:
+    - Bring symptom diary
+    - List tried medications
+    - Report side effects"]
+[/mermaid]
+
+Over the counter medicines:
+Chemical Name	Common Brand Names	Common Uses	Symptoms Addressed	Major Side Effects	Contraindications/Warnings	Timing with Meals
+Paracetamol (Acetaminophen)	Tylenol/Panadol	Pain reliever/fever reducer	Headache/fever/minor aches	Rare liver damage (high doses)	Liver disease/alcohol use disorder	Can be taken with or without food
+Naproxen	Aleve/Naprosyn	NSAID pain reliever	Joint pain/inflammation/menstrual cramps	Stomach upset/bleeding risk	Pregnancy (3rd trimester)/heart disease/ulcers	Take with food to reduce stomach upset
+Orphenadrine Citrate	Norflex	Muscle relaxant	Muscle spasms/pain	Drowsiness/dry mouth/blurred vision	Glaucoma/urinary retention/elderly patients	Take with food
+Hyoscine Butylbromide	Buscopan	Antispasmodic	Abdominal cramps/IBS	Dry mouth/constipation	Glaucoma/myasthenia gravis/enlarged prostate	Take 20 minutes before meals
+Esomeprazole	Nexium	Proton pump inhibitor	Acid reflux/ulcers	Headache/nausea/B12 deficiency	Long-term use risks/osteoporosis risk	Take 30 minutes before first meal
+Aluminum/Magnesium Hydroxide	Maalox/Mylanta	Antacid	Heartburn/indigestion	Constipation/diarrhea	Kidney disease/phosphate deficiency	Take 1-3 hours after meals
+Mefenamic Acid	Ponstel	NSAID pain reliever	Menstrual pain/arthritis	GI bleeding/kidney problems	Pregnancy/heart disease/bleeding disorders	Take with food
+Prednisolone	Various brands	Corticosteroid	Inflammation/allergies/autoimmune	Weight gain/mood changes/bone loss	Infections/diabetes/osteoporosis	Take with food in the morning
+Quinodochlor	Various brands	Antiseptic/antifungal	Skin infections	Skin irritation	Open wounds/large skin areas	External use only
+Loperamide	Imodium	Anti-diarrheal	Diarrhea	Constipation/abdominal pain	Bacterial enterocolitis/severe colitis	Can be taken with or without food
+Activated Charcoal	Various brands	Toxin absorption	Poisoning/gas	Constipation/black stools	Bowel obstruction	2 hours before or after other medications
+Simeticone	Gas-X/Infacol	Anti-gas	Bloating/gas	Rarely any side effects	Generally safe	Take with meals
+Domperidone	Motilium	Anti-nausea	Nausea/vomiting	Heart rhythm changes	Heart conditions/liver disease	15-30 minutes before meals
+Loratadine	Claritin	Antihistamine	Allergies	Drowsiness (rare)/dry mouth	Liver disease	Can be taken with or without food
+Norethisterone	Aygestin	Hormonal medication	Menstrual disorders	Mood changes/breast tenderness	Pregnancy/liver disease/blood clots	Take with food at same time daily
+Levocetirizine	Xyzal	Antihistamine	Allergies	Drowsiness/dry mouth	Kidney disease	Can be taken with or without food
+Dimenhydrinate	Dramamine	Anti-motion sickness	Motion sickness/vertigo	Drowsiness/dry mouth	Glaucoma/prostate problems	30 minutes before travel/with food
+Tranexamic Acid	Lysteda	Anti-bleeding	Heavy menstrual bleeding	Nausea/diarrhea	Blood clots/color vision problems	Take with food
+Prochlorperazine	Compazine	Anti-nausea	Nausea/vertigo	Drowsiness/movement disorders	Parkinson’s disease	Can be taken with or without food
+Montelukast	Singulair	Anti-asthma	Asthma/allergies	Mood changes/behavior changes	Depression/liver disease	Take in evening with or without food
+Chlorpheniramine	Chlor-Trimeton	Antihistamine	Allergies	Drowsiness/dry mouth	Glaucoma/enlarged prostate	Can be taken with or without food
+Eperisone HCl	Myonal	Muscle relaxant	Muscle spasms	Drowsiness/nausea	Liver disease	Take after meals
+Norfloxacin	Noroxin	Antibiotic	Bacterial infections	Tendon damage/nerve problems	Pregnancy/young children	Take on empty stomach (1hr before or 2hrs after meals)
+Enhancin	Augmentin	Antibiotic	Bacterial infections	Diarrhea/rash	Penicillin allergy/liver disease	Take at start of meal
+Celecoxib	Celebrex	NSAID pain reliever	Arthritis/pain	Heart/stroke risk/bleeding	Heart disease/stomach ulcers	Can be taken with or without food
+Metformin	Glucophage	Anti-diabetic	Type 2 diabetes	Nausea/B12 deficiency	Kidney disease/severe heart failure	Take with meals
+Rabeprazole	Aciphex	Proton pump inhibitor	Acid reflux/ulcers	Headache/vitamin deficiencies	Long-term use risks	Take 30 minutes before first meal
+Azithromycin	Zithromax	Antibiotic	Bacterial infections	Heart rhythm changes/diarrhea	Liver disease/heart conditions	Can be taken with or without food
+Fluconazole	Diflucan	Antifungal	Fungal infections	Liver problems/rash	Pregnancy/QT prolongation	Can be taken with or without food
+Bromhexine	Bisolvon	Expectorant	Chest congestion	Mild GI upset	Pregnancy/peptic ulcer	Take after meals

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataScience Notebook</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <script src="../desktop/app-shell.js"></script>
+  <div class="app-container">
+    <h1>DataScience Notebook</h1>
+    <p>Starter app. Jupyter-like features coming soon.</p>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AppShell) AppShell.init({ appId: 'datascience-notebook', title: 'DataScience Notebook' });
+    });
+  </script>
+</body>
+</html>

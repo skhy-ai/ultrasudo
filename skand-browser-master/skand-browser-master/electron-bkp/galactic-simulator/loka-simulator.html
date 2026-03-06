@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Visualization of Lokas and Star Systems</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            max-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #tooltip {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+        }
+        .label {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            pointer-events: none; /* Allows clicking through the label */
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <strong>Cosmological Visualization</strong><br>
+        - Rotate: Left-click + drag<br>
+        - Zoom: Scroll wheel<br>
+        - Pan: Right-click + drag<br>
+        <div id="tooltip">Hover over an object for details.</div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        let scene, camera, renderer, labelRenderer, controls, galaxy;
+        let raycaster, mouse;
+        const highlightedObjects = [];
+        const tooltip = document.getElementById('tooltip');
+
+        // --- COORDINATE SETUP ---
+        const earthPos = new THREE.Vector3(26670, 0, 0);
+        const satyalokaPos = new THREE.Vector3(0, 0, 6459.07);
+        const dhruvalokaPos = new THREE.Vector3(earthPos.x, earthPos.y, 157.47);
+        
+        const hypotenuseVector = new THREE.Vector3().subVectors(satyalokaPos, dhruvalokaPos);
+
+        const lokaData = [
+            { name: 'Satyaloka', pos: satyalokaPos, color: 0xffd700, scale: 100},
+            { name: 'Tapoloka', pos: new THREE.Vector3().copy(dhruvalokaPos).addScaledVector(hypotenuseVector, 0.47826), color: 0xffa500, scale: 80 },
+            { name: 'Janaloka', pos: new THREE.Vector3().copy(dhruvalokaPos).addScaledVector(hypotenuseVector, 0.13043), color: 0xff8c00, scale: 60  },
+            { name: 'Maharloka', pos: new THREE.Vector3().copy(dhruvalokaPos).addScaledVector(hypotenuseVector, 0.04347), color: 0xff4500, scale: 40},
+            { name: 'Dhruvaloka (Polaris)', pos: dhruvalokaPos, color: 0x87ceeb, scale: 20},
+            { name: 'Swarga Loka', pos: new THREE.Vector3(earthPos.x, earthPos.y, 2.75), color: 0xadd8e6, scale: 10 }
+        ];
+
+        
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000005);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
+            camera.position.set(20000, 20000, 20000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            document.body.appendChild(labelRenderer.domElement);
+
+            const targetPoint = new THREE.Vector3().addVectors(dhruvalokaPos, satyalokaPos).multiplyScalar(0.5);
+            controls = new OrbitControls(camera, labelRenderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 10;
+            controls.maxDistance = 60000;
+            controls.target.copy(targetPoint);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            window.addEventListener('mousemove', onMouseMove, false);
+
+            createCosmicObjects();
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createGalaxy() {
+            const starCount = 100000;
+            const positions = [];
+            const colors = [];
+            const galaxyRadius = 30000;
+            const arms = 4;
+            const armAngle = 2 * Math.PI / arms;
+            const spiralTightness = 0.5;
+
+            const centerColor = new THREE.Color(0xffe58f);
+            const armColor = new THREE.Color(0x7c97ff);
+
+            for (let i = 0; i < starCount; i++) {
+                const radius = Math.random() * galaxyRadius;
+                const spinAngle = radius * 0.05 / spiralTightness;
+                const armOffset = Math.floor(Math.random() * arms) * armAngle;
+                
+                const angle = spinAngle + armOffset;
+
+                const randomX = (Math.random() - 0.5) * 2000 * (1 - radius / galaxyRadius);
+                const randomY = (Math.random() - 0.5) * 2000 * (1 - radius / galaxyRadius);
+                const randomZ = (Math.random() - 0.5) * 200;
+
+                positions.push(
+                    Math.cos(angle) * radius + randomX,
+                    Math.sin(angle) * radius + randomY,
+                    randomZ
+                );
+                
+                const mixedColor = centerColor.clone();
+                mixedColor.lerp(armColor, radius / galaxyRadius);
+                colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 15,
+                sizeAttenuation: true,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            galaxy = new THREE.Points(geometry, material);
+            scene.add(galaxy);
+        }
+
+
+        function createCosmicObjects() {
+            createGalaxy();
+
+            // Galactic Center
+            const centerGeo = new THREE.SphereGeometry(200, 32, 32);
+            const centerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const galacticCenter = new THREE.Mesh(centerGeo, centerMat);
+            galacticCenter.position.set(0, 0, 0);
+            galacticCenter.name = "Galactic Center";
+            galacticCenter.userData.info = `Position: (0, 0, 0) ly`;
+            scene.add(galacticCenter);
+            addLabel(galacticCenter, "Galactic Center");
+            highlightedObjects.push(galacticCenter);
+            
+            const centerLight = new THREE.PointLight(0xffffff, 5, 20000);
+            scene.add(centerLight);
+
+            // Sol System (Earth)
+            const solGeo = new THREE.SphereGeometry(25, 32, 32);
+            const solMat = new THREE.MeshPhongMaterial({ color: 0x66ccff, emissive: 0x66ccff, emissiveIntensity: 1 });
+            const solSystem = new THREE.Mesh(solGeo, solMat);
+            solSystem.position.copy(earthPos);
+            solSystem.name = "Sol System (Earth)";
+            solSystem.userData.info = `Position: (${earthPos.x}, ${earthPos.y}, ${earthPos.z}) ly`;
+            scene.add(solSystem);
+            addLabel(solSystem, "Sol System");
+            highlightedObjects.push(solSystem);
+
+            // Create Lokas
+            lokaData.forEach(loka => {
+                const lokaGeo = new THREE.SphereGeometry(loka.scale, 32, 32);
+                const lokaMat = new THREE.MeshPhongMaterial({ color: loka.color, emissive: loka.color, emissiveIntensity: 0.6 });
+                const lokaMesh = new THREE.Mesh(lokaGeo, lokaMat);
+                lokaMesh.position.copy(loka.pos);
+                lokaMesh.name = loka.name;
+                lokaMesh.userData.info = `Position: (${loka.pos.x.toFixed(0)}, ${loka.pos.y.toFixed(0)}, ${loka.pos.z.toFixed(2)}) ly`;
+                scene.add(lokaMesh);
+                addLabel(lokaMesh, loka.name);
+                highlightedObjects.push(lokaMesh);
+            });
+
+            // Draw the hypotenuse line
+            const lineMat = new THREE.LineBasicMaterial({ color: 0xaaaaaa, transparent: true, opacity: 0.5 });
+            const points = [dhruvalokaPos, satyalokaPos];
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const hypotenuseLine = new THREE.Line(lineGeo, lineMat);
+            scene.add(hypotenuseLine);
+
+           
+        }
+
+        function addLabel(object, text) {
+            const div = document.createElement('div');
+            div.className = 'label';
+            div.textContent = text;
+            const label = new CSS2DObject(div);
+            label.position.set(0, object.geometry.parameters.radius + 20, 0); 
+            object.add(label);
+        }
+
+        function onMouseMove(event) {
+            event.preventDefault();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function checkIntersections() {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(highlightedObjects);
+
+            if (intersects.length > 0) {
+                const intersectedObject = intersects[0].object;
+                tooltip.innerHTML = `<strong>${intersectedObject.name}</strong><br>${intersectedObject.userData.info}`;
+            } else {
+                tooltip.innerHTML = 'Hover over a labeled object.';
+            }
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animate the galaxy rotation
+            if (galaxy) {
+                galaxy.rotation.z -= 0.0005;
+            }
+
+            controls.update();
+            checkIntersections();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        init();
+        animate();
+
+    </script>
+</body>
+</html>
+
