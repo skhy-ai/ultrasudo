@@ -28,11 +28,8 @@ const ignoreList = [
 function minifyHTML(html) {
     return html
         .replace(/<!--[\s\S]*?-->/g, '') // Remove HTML comments
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .join('\n')
-        .replace(/>\s+</g, '><'); // Remove whitespaces and newlines between tags
+        .replace(/\n\s*\n/g, '\n') // Remove empty lines
+        .trim();
 }
 
 function minifyCSS(css) {

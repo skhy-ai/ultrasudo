@@ -27,6 +27,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSettingsSidebar = document.getElementById('btn-settings-sidebar');
     const btnCloseSidebar = document.getElementById('close-sidebar');
 
+    const TELEMETRY_SERVER = 'http://localhost:4000/ingest'; // Will be changed to production URL later
+
+    function logTelemetry(type, details) {
+        if (!navigator.onLine) return; // Fail silently offline
+        fetch(TELEMETRY_SERVER, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                ...details
+            })
+        }).catch(err => console.error("Telemetry failed:", err));
+    }
+
+    // Global Error Catching
+    window.addEventListener('error', (event) => {
+        logTelemetry('ERROR', {
+            message: event.message,
+            source: event.filename,
+            line: event.lineno,
+            column: event.colno,
+            error: event.error ? event.error.stack : null
+        });
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+        logTelemetry('ERROR', {
+            message: 'Unhandled Promise Rejection',
+            reason: event.reason ? event.reason.toString() : 'Unknown Reason',
+            stack: event.reason && event.reason.stack ? event.reason.stack : null
+        });
+    });
+
     let tabs = [];
     let currentTabId = null;
     let tabCounter = 0;
@@ -334,6 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     url = 'https://google.com/search?q=' + encodeURIComponent(url);
                 }
+                logTelemetry('SEARCH', { engine: searchEngine });
             }
         }
 

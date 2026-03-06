@@ -1,0 +1,16 @@
+{
+  "name": "system-log-receiver",
+  "version": "1.0.0",
+  "description": "Log sink for Skand Browser telemetry and bug reports.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Skand",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "winston": "^3.13.0"
+  }
+}

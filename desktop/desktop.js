@@ -1,8 +1,47 @@
+const TELEMETRY_SERVER = 'http://localhost:4000/ingest';
+
+function logDesktopTelemetry(type, details) {
+    if (!navigator.onLine) return;
+    fetch(TELEMETRY_SERVER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            ...details
+        })
+    }).catch(err => console.warn('Telemetry offline', err));
+}
+
+// Global Error Hooks for Desktop view
+window.addEventListener('error', (event) => {
+    logDesktopTelemetry('ERROR', {
+        message: event.message,
+        source: 'desktop.js',
+        error: event.error ? event.error.stack : null
+    });
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    logDesktopTelemetry('ERROR', {
+        message: 'Unhandled Promise Rejection',
+        reason: event.reason ? event.reason.toString() : 'Unknown Reason'
+    });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // Check if setup complete
     if (!localStorage.getItem('skand_setup_complete')) {
         window.location.href = 'wizard.html';
         return;
+    } else if (!localStorage.getItem('telemetry_install_logged')) {
+        // Send initial install telemetry once
+        logDesktopTelemetry('INSTALL', {
+            os: navigator.userAgentData ? navigator.userAgentData.platform : 'Unknown OS',
+            installedApps: JSON.parse(localStorage.getItem('enabled_apps') || '[]')
+        });
+        localStorage.setItem('telemetry_install_logged', 'true');
     }
 
     const searchBar = document.getElementById('search-bar');
