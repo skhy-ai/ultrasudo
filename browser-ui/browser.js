@@ -157,7 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Tab Management ---
 
-    async function createNewTab(url = 'desktop/desktop.html', makeActive = true) {
+    async function createNewTab(url = null, makeActive = true) {
+        if (!url) {
+            const searchEngine = localStorage.getItem('setting_search_engine') || 'google';
+            url = searchEngine === 'duckduckgo' ? 'https://duckduckgo.com' : 'https://google.com';
+        }
+
         tabCounter++;
         const id = `tab-${tabCounter}`;
 
@@ -291,13 +296,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             autoFillPasswords(id, url);
             injectBlockScript(id);
+
+            // Polyfill: Manually evaluate and emit the title since native hooks might miss SPA transitions
+            try {
+                const js = `
+                    (function(){
+                        if (!window.__TITLE_POLYFILL) {
+                            window.__TITLE_POLYFILL = true;
+                            new MutationObserver(() => {
+                                const t = document.title || 'Skand App';
+                                if (window.__TAURI__) window.__TAURI__.event.emit('webview-title-changed', { id: '${id}', title: t });
+                            }).observe(document.querySelector('title') || document.head, { subtree: true, characterData: true, childList: true });
+                        }
+                        const t = document.title || 'Skand App';
+                        if (window.__TAURI__) window.__TAURI__.event.emit('webview-title-changed', { id: '${id}', title: t });
+                    })();
+                `;
+                invoke('evaluate_js', { id, js }).catch(()=>{});
+            } catch(e) {}
         }
     });
 
     listen('webview-title-changed', (event) => {
-        const [id, title] = event.payload;
+        let id, title;
+        if (Array.isArray(event.payload)) {
+            [id, title] = event.payload;
+        } else if (event.payload && typeof event.payload === 'object') {
+            id = event.payload.id;
+            title = event.payload.title;
+        } else {
+            return; // Unexpected format
+        }
+
         const tab = tabs.find(t => t.id === id);
-        if (tab) {
+        if (tab && title) {
             tab.title = title;
             tab.titleEl.innerText = title;
             saveHistory(tab.url, title);
@@ -630,15 +662,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Modal Management ---
     const allModals = [historyModal, bookmarksModal, passwordsModal];
+    const rightSidebar = document.getElementById('right-sidebar');
 
     function closeModals() {
         allModals.forEach(m => m.classList.add('hidden'));
-        modalOverlay.classList.add('hidden');
+        if (rightSidebar) rightSidebar.classList.remove('open');
     }
 
     function openModal(modal) {
         closeModals();
-        modalOverlay.classList.remove('hidden');
+        if (rightSidebar) rightSidebar.classList.add('open');
         modal.classList.remove('hidden');
     }
 
@@ -656,8 +689,17 @@ document.addEventListener('DOMContentLoaded', () => {
         loadPasswords();
     });
 
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeModals();
+    document.addEventListener('click', (e) => {
+        if (rightSidebar && rightSidebar.classList.contains('open') && 
+            !rightSidebar.contains(e.target) && 
+            e.target !== btnHistory && 
+            e.target !== btnBookmarksMenu && 
+            e.target !== btnPasswords &&
+            !btnHistory.contains(e.target) &&
+            !btnBookmarksMenu.contains(e.target) &&
+            !btnPasswords.contains(e.target)) {
+            closeModals();
+        }
     });
 
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -665,5 +707,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Initialize ---
-    createNewTab(); // Automatically open first tab pointing to desktop
+    createNewTab(); // Automatically open first tab pointing to default search engine
 });

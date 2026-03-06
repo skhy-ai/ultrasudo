@@ -251,7 +251,7 @@ button:disabled {
     min-width: 0;
     background-color: var(--header-bg);
     border-right: 1px solid var(--border-color);
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, min-width 0.3s ease;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -331,35 +331,38 @@ button:disabled {
     outline: none;
 }
 
-/* Modals */
-.modal-overlay {
-    position: fixed;
-    top: 48px;
-    /* Below header */
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+/* Modals shifted to Right Sidebar to prevent Native Webview Overlap */
+.right-sidebar {
+    width: 0;
+    min-width: 0;
+    background-color: var(--header-bg);
+    border-left: 1px solid var(--border-color);
+    transition: width 0.3s ease, min-width 0.3s ease;
+    overflow: hidden;
     display: flex;
-    justify-content: flex-end;
-    /* Slide in from right */
+    flex-direction: column;
 }
 
-.modal-overlay.hidden {
-    display: none;
+.right-sidebar.open {
+    width: 350px;
+    min-width: 350px;
+}
+
+.right-sidebar.hidden {
+    display: flex; /* Keep flex, just width 0 */
+}
+
+/* Modals inside right-sidebar */
+.modal-overlay {
+    display: none; /* No longer used */
 }
 
 .modal {
     width: 350px;
     height: 100%;
     background: var(--header-bg);
-    border-left: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal.hidden {
