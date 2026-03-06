@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if setup complete
+    if (!localStorage.getItem('skand_setup_complete')) {
+        window.location.href = 'wizard.html';
+        return;
+    }
+
     const searchBar = document.getElementById('search-bar');
     const appGrid = document.getElementById('app-grid');
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -20,7 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const categorySelect = document.getElementById('app-category-select');
         const selectedCategory = categorySelect ? categorySelect.value : 'all';
 
+        const savedEnabledApps = localStorage.getItem('enabled_apps');
+        let enabledAppIds = savedEnabledApps ? JSON.parse(savedEnabledApps) : null;
+
         const filteredApps = Array.from(registry.values()).filter(app => {
+            if (enabledAppIds && app.id !== 'desktop' && !enabledAppIds.includes(app.id)) return false;
+
             const typeOk = currentType === 'all' ? true : app.type === currentType;
             const categoryOk = selectedCategory === 'all' ? true : app.category === selectedCategory;
             const searchOk = !currentSearch || app.name.toLowerCase().includes(currentSearch.toLowerCase());
@@ -480,8 +491,69 @@ function openSystemModal() {
         modal.style.display = 'block';
         const defaultTab = document.querySelector('.tab-content.active') || document.querySelector('.tab-content');
         if (defaultTab) defaultTab.classList.add('active');
+        if (window.renderAppStore) window.renderAppStore();
     }
 }
+
+// App Store Management
+window.renderAppStore = function() {
+    const offlineContainer = document.getElementById('offline-apps-list');
+    const onlineContainer = document.getElementById('online-apps-list');
+    if (!offlineContainer || !onlineContainer || !window.appClassifier) return;
+
+    offlineContainer.innerHTML = '';
+    onlineContainer.innerHTML = '';
+
+    const registry = window.appClassifier.appRegistry;
+    const savedEnabledApps = localStorage.getItem('enabled_apps');
+    let enabledAppIds = savedEnabledApps ? JSON.parse(savedEnabledApps) : [];
+
+    Array.from(registry.values()).forEach(app => {
+        // Exclude system desktop app from being disabled
+        if (app.id === 'desktop') return;
+
+        const isEnabled = enabledAppIds.includes(app.id);
+        const toggleDiv = document.createElement('div');
+        toggleDiv.style.display = 'flex';
+        toggleDiv.style.justifyContent = 'space-between';
+        toggleDiv.style.alignItems = 'center';
+        toggleDiv.style.padding = '10px';
+        toggleDiv.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+
+        toggleDiv.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="${app.icon}" style="font-size:18px; color:#94a3b8;"></i>
+                <div>
+                    <div style="font-weight:600; font-size:13px;">${app.name}</div>
+                    <div style="font-size:11px; color:#64748b;">${app.description || ''}</div>
+                </div>
+            </div>
+            <label style="cursor:pointer; font-size:12px; display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" value="${app.id}" ${isEnabled ? 'checked' : ''} onchange="window.toggleAppRegistration('${app.id}', this.checked)">
+                ${isEnabled ? 'Enabled' : 'Disabled'}
+            </label>
+        `;
+
+        if (app.type === 'offline') offlineContainer.appendChild(toggleDiv);
+        else onlineContainer.appendChild(toggleDiv);
+    });
+};
+
+window.toggleAppRegistration = function(appId, isEnabled) {
+    const savedEnabledApps = localStorage.getItem('enabled_apps');
+    let enabledAppIds = savedEnabledApps ? JSON.parse(savedEnabledApps) : [];
+    if (isEnabled) {
+        if (!enabledAppIds.includes(appId)) enabledAppIds.push(appId);
+    } else {
+        enabledAppIds = enabledAppIds.filter(id => id !== appId);
+    }
+    localStorage.setItem('enabled_apps', JSON.stringify(enabledAppIds));
+    
+    if (window.renderAppStore) window.renderAppStore();
+    // Simulate a change event on the category select to re-render the icons on desktop
+    const categorySelect = document.getElementById('app-category-select');
+    if (categorySelect) categorySelect.dispatchEvent(new Event('change'));
+};
 
 function closeSystemModal() {
     const modal = document.getElementById('system-modal');

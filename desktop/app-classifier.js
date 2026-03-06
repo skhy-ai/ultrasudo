@@ -285,6 +285,54 @@ class AppClassifier {
         // Newly added offline apps
         const extra = [
             {
+                id: 'social-feed',
+                name: 'Unified Social Feed',
+                path: '../social-feed/index.html',
+                icon: 'fas fa-hashtag',
+                category: 'lifestyle',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: false,
+                cacheableAssets: ['index.html', 'style.css', 'script.js'],
+                description: 'Unified social media feed for LinkedIn, X, Facebook, and Instagram.'
+            },
+            {
+                id: 'p2p-calling',
+                name: 'P2P Calling',
+                path: '../p2p-calling/index.html',
+                icon: 'fas fa-phone-volume',
+                category: 'system',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn', 'peerjs'],
+                offlineCapable: false,
+                cacheableAssets: ['index.html', 'style.css', 'script.js'],
+                description: 'Secure, peer-to-peer audio and video calling using WebRTC'
+            },
+            {
+                id: 'whatsapp-web',
+                name: 'WhatsApp',
+                path: 'https://web.whatsapp.com',
+                icon: 'fab fa-whatsapp',
+                category: 'lifestyle',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: false,
+                cacheableAssets: [],
+                description: 'WhatsApp Web client wrapper'
+            },
+            {
+                id: 'telegram-web',
+                name: 'Telegram',
+                path: 'https://web.telegram.org',
+                icon: 'fab fa-telegram',
+                category: 'lifestyle',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: false,
+                cacheableAssets: [],
+                description: 'Telegram Web client wrapper'
+            },
+            {
                 id: 'community-board',
                 name: 'Community Apps',
                 path: '../community/index.html',

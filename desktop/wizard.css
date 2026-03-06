@@ -1,0 +1,134 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    background-color: #0f172a;
+    color: #f8fafc;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+}
+
+.wizard-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.wizard-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 28px;
+    color: #3b82f6;
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    color: #cbd5e1;
+    margin-bottom: 30px;
+}
+
+.wizard-apps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 20px;
+}
+
+.wizard-apps-container::-webkit-scrollbar {
+    width: 6px;
+}
+.wizard-apps-container::-webkit-scrollbar-thumb {
+    background-color: #475569;
+    border-radius: 10px;
+}
+
+.app-toggle-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.app-toggle-card:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.app-toggle-card.selected {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.app-toggle-card i.icon {
+    font-size: 24px;
+    color: #e2e8f0;
+}
+
+.app-toggle-card.selected i.icon {
+    color: #3b82f6;
+}
+
+.app-info {
+    flex-grow: 1;
+}
+
+.app-name {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+}
+
+.app-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    display: block;
+    margin-top: 4px;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+.wizard-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}

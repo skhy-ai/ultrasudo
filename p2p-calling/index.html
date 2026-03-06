@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>P2P Calling</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>P2P Connect</h2>
+            <div class="id-section">
+                <label>Your ID (Share this to receive calls):</label>
+                <div class="id-box">
+                    <input type="text" id="my-id" readonly placeholder="Generating ID...">
+                    <button id="btn-copy" title="Copy ID"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+            <div class="call-section">
+                <label>Call a Peer:</label>
+                <input type="text" id="target-id" placeholder="Enter Peer ID...">
+                <button id="btn-call" class="btn-primary"><i class="fas fa-phone"></i> Call</button>
+            </div>
+            
+            <div id="status-display" class="status">Disconnected</div>
+            
+            <!-- Incoming call alert -->
+            <div id="incoming-call" class="incoming-call-box hidden">
+                <p>Incoming Call...</p>
+                <div class="action-buttons">
+                    <button id="btn-accept" class="btn-success"><i class="fas fa-phone"></i> Accept</button>
+                    <button id="btn-reject" class="btn-danger"><i class="fas fa-phone-slash"></i> Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Video Area -->
+        <div class="main-content">
+            <div class="video-grid">
+                <div class="video-wrapper local">
+                    <video id="local-video" autoplay muted playsinline></video>
+                    <div class="video-label">You</div>
+                </div>
+                <div class="video-wrapper remote">
+                    <video id="remote-video" autoplay playsinline></video>
+                    <div class="video-label">Remote</div>
+                    <div id="remote-waiting" class="waiting-text">Waiting for connection...</div>
+                </div>
+            </div>
+            
+            <!-- Call Controls -->
+            <div class="controls-bar">
+                <button id="btn-toggle-video" class="control-btn" title="Toggle Camera"><i class="fas fa-video"></i></button>
+                <button id="btn-toggle-audio" class="control-btn" title="Toggle Microphone"><i class="fas fa-microphone"></i></button>
+                <button id="btn-share-screen" class="control-btn" title="Share Screen"><i class="fas fa-desktop"></i></button>
+                <button id="btn-end-call" class="control-btn danger" title="End Call"><i class="fas fa-phone-slash"></i></button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

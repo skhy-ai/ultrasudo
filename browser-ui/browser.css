@@ -231,6 +231,106 @@ button:disabled {
     /* only active tab's iframe is visible */
 }
 
+/* Sidebar and Main Layout */
+.main-body {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    width: 100%;
+}
+
+.main-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0; /* allows shrinking */
+}
+
+.global-sidebar {
+    width: 0;
+    min-width: 0;
+    background-color: var(--header-bg);
+    border-right: 1px solid var(--border-color);
+    transition: width 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.global-sidebar.open {
+    width: 300px;
+    min-width: 300px;
+}
+
+.sidebar-header {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-bottom: 1px solid var(--border-color);
+    min-width: 300px;
+}
+
+.sidebar-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sidebar-content {
+    padding: 15px;
+    overflow-y: auto;
+    min-width: 300px;
+    flex-grow: 1;
+}
+
+.settings-group {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.settings-group h4 {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item.action-item {
+    cursor: pointer;
+    color: #ef4444;
+}
+
+.setting-item.action-item:hover {
+    color: #f87171;
+}
+
+.modern-select {
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    outline: none;
+}
+
 /* Modals */
 .modal-overlay {
     position: fixed;

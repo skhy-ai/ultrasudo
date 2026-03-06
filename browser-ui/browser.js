@@ -22,9 +22,103 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookmarksModal = document.getElementById('bookmarks-modal');
     const passwordsModal = document.getElementById('passwords-modal');
 
+    // Sidebar elements
+    const globalSidebar = document.getElementById('global-sidebar');
+    const btnSettingsSidebar = document.getElementById('btn-settings-sidebar');
+    const btnCloseSidebar = document.getElementById('close-sidebar');
+
     let tabs = [];
     let currentTabId = null;
     let tabCounter = 0;
+
+    // --- Sidebar Management ---
+    btnSettingsSidebar.addEventListener('click', () => {
+        globalSidebar.classList.toggle('open');
+    });
+
+    btnCloseSidebar.addEventListener('click', () => {
+        globalSidebar.classList.remove('open');
+    });
+
+    const devToolsCheckbox = document.getElementById('setting-devtools');
+    devToolsCheckbox.addEventListener('change', (e) => {
+        // Toggle devtools for current tab natively if supported, else visual feedback
+        if (currentTabId && e.target.checked) {
+            invoke('open_devtools', { id: currentTabId }).catch(console.error);
+        }
+    });
+
+    // --- Settings Management ---
+    const searchEngineSelect = document.getElementById('setting-search-engine');
+    const trackingCheckbox = document.getElementById('setting-tracking');
+    const darkmodeCheckbox = document.getElementById('setting-darkmode');
+    const wotCheckbox = document.getElementById('setting-wot-script-blocker');
+    const btnClearData = document.getElementById('btn-clear-data');
+
+    // Load saved settings
+    if (localStorage.getItem('setting_search_engine')) searchEngineSelect.value = localStorage.getItem('setting_search_engine');
+    if (localStorage.getItem('setting_tracking') !== null) trackingCheckbox.checked = localStorage.getItem('setting_tracking') === 'true';
+    if (localStorage.getItem('setting_darkmode') !== null) darkmodeCheckbox.checked = localStorage.getItem('setting_darkmode') === 'true';
+    if (localStorage.getItem('setting_wot') !== null) wotCheckbox.checked = localStorage.getItem('setting_wot') === 'true';
+    
+    searchEngineSelect.addEventListener('change', (e) => localStorage.setItem('setting_search_engine', e.target.value));
+    trackingCheckbox.addEventListener('change', (e) => localStorage.setItem('setting_tracking', e.target.checked));
+    
+    darkmodeCheckbox.addEventListener('change', (e) => {
+        localStorage.setItem('setting_darkmode', e.target.checked);
+        if (e.target.checked) {
+            document.documentElement.style.setProperty('--bg-color', '#0f172a');
+            document.documentElement.style.setProperty('--header-bg', '#1e293b');
+        } else {
+            document.documentElement.style.setProperty('--bg-color', '#f8fafc');
+            document.documentElement.style.setProperty('--header-bg', '#e2e8f0');
+        }
+    });
+    
+    wotCheckbox.addEventListener('change', (e) => {
+        localStorage.setItem('setting_wot', e.target.checked);
+        if (e.target.checked && currentTabId) injectBlockScript(currentTabId);
+    });
+
+    btnClearData.addEventListener('click', () => {
+        if(confirm("Clear browsing data? This resets history and passwords.")) {
+            setStoredData('browser_history', '[]');
+            setStoredData('browser_passwords', '[]');
+            setStoredData('browser_bookmarks', '[]');
+            alert("Data cleared.");
+        }
+    });
+
+    function injectBlockScript(id) {
+        if (localStorage.getItem('setting_wot') !== 'true') return;
+        const blockJs = `
+            if (!window.__WOT_INJECTED) {
+                window.__WOT_INJECTED = true;
+                const _createElement = document.createElement.bind(document);
+                document.createElement = function(tagName, options) {
+                    const el = _createElement(tagName, options);
+                    if (tagName && tagName.toLowerCase() === 'script') {
+                        let originalSrc = '';
+                        Object.defineProperty(el, 'src', {
+                            set: function(val) {
+                                const blockedDomains = ['analytics', 'tracker', 'adserver', 'doubleclick', 'telemetry'];
+                                if (val && blockedDomains.some(domain => val.toLowerCase().includes(domain))) {
+                                    console.warn('WOT Blocked Script:', val);
+                                    originalSrc = ''; // Prevent loading
+                                } else {
+                                    originalSrc = val;
+                                    el.setAttribute('src', val);
+                                }
+                            },
+                            get: function() { return originalSrc; }
+                        });
+                    }
+                    return el;
+                };
+            }
+        `;
+        invoke('evaluate_js', { id, js: blockJs }).catch(console.error);
+    }
 
     // --- Tab Management ---
 
@@ -161,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkIfBookmarked(url);
             }
             autoFillPasswords(id, url);
+            injectBlockScript(id);
         }
     });
 
@@ -233,7 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (url.includes('.') && !url.includes(' ')) {
                 url = 'https://' + url;
             } else {
-                url = 'https://google.com/search?q=' + encodeURIComponent(url);
+                const searchEngine = localStorage.getItem('setting_search_engine') || 'google';
+                if (searchEngine === 'duckduckgo') {
+                    url = 'https://duckduckgo.com/?q=' + encodeURIComponent(url);
+                } else {
+                    url = 'https://google.com/search?q=' + encodeURIComponent(url);
+                }
             }
         }
 

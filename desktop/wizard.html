@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Skand Browser Setup</title>
+    <link rel="stylesheet" href="desktop.css">
+    <link rel="stylesheet" href="wizard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-card">
+            <h1>Welcome to Skand Browser</h1>
+            <p>Select the applications you want to enable on your desktop. You can always change these later in Settings.</p>
+            
+            <div class="wizard-apps-container" id="wizard-apps-list">
+                <!-- Apps injected here -->
+            </div>
+            
+            <div class="wizard-footer">
+                <button id="btn-finish-setup" class="btn-primary">Finish Setup</button>
+            </div>
+        </div>
+    </div>
+    <script src="app-classifier.js"></script>
+    <script src="wizard.js"></script>
+</body>
+</html>

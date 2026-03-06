@@ -305,8 +305,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   function moveCard(cardId, newListId) {
     doc = Automerge.change(doc, d => {
       if (!d.cards) return;
-      const c = d.cards.find(x => x.id === cardId);
-      if (c) { c.listId = newListId; c.position = Date.now(); }
+      const idx = d.cards.findIndex(x => x.id === cardId);
+      if (idx >= 0) { 
+        d.cards[idx].listId = newListId; 
+        d.cards[idx].position = Date.now(); 
+      }
     });
     persist();
     render();
@@ -437,9 +440,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   function wireDnD() {
     const cols = document.querySelectorAll('.kb-column');
     cols.forEach(col => {
-      col.addEventListener('dragover', e => e.preventDefault());
+      col.addEventListener('dragover', e => {
+        e.preventDefault();
+        col.classList.add('drag-over');
+      });
+      col.addEventListener('dragleave', e => {
+        col.classList.remove('drag-over');
+      });
       col.addEventListener('drop', e => {
         e.preventDefault();
+        col.classList.remove('drag-over');
         const id = e.dataTransfer.getData('text/plain');
         if (id) {
           const listId = col.getAttribute('data-list');
@@ -561,8 +571,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function setAssignee(cardId, memberId) {
     doc = Automerge.change(doc, d => {
-      const c = d.cards.find(x => x.id === cardId);
-      if (c) c.assigneeId = memberId || null;
+      const idx = d.cards.findIndex(x => x.id === cardId);
+      if (idx >= 0) d.cards[idx].assigneeId = memberId || null;
     });
     persist();
     render();

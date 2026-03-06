@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unified Social Feed</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h2><i class="fas fa-hashtag"></i> Unified Feed</h2>
+            <div class="header-actions">
+                <button id="btn-settings"><i class="fas fa-cog"></i> Accounts</button>
+            </div>
+        </header>
+
+        <!-- Settings View -->
+        <main id="view-settings" class="view">
+            <div class="settings-card">
+                <h3>Connect Your Accounts</h3>
+                <p class="subtitle">Authenticate to aggregate your social streams. Data is kept locally.</p>
+                
+                <div class="social-toggles">
+                    <div class="social-item" data-platform="linkedin">
+                        <div class="social-icon" style="color: #0077b5;"><i class="fab fa-linkedin"></i></div>
+                        <div class="social-info">
+                            <h4>LinkedIn</h4>
+                            <span class="status disconnected">Disconnected</span>
+                        </div>
+                        <button class="btn-connect">Connect</button>
+                    </div>
+
+                    <div class="social-item" data-platform="xtwitter">
+                        <div class="social-icon" style="color: #ffffff;"><i class="fab fa-x-twitter"></i></div>
+                        <div class="social-info">
+                            <h4>X (Twitter)</h4>
+                            <span class="status disconnected">Disconnected</span>
+                        </div>
+                        <button class="btn-connect">Connect</button>
+                    </div>
+
+                    <div class="social-item" data-platform="facebook">
+                        <div class="social-icon" style="color: #1877f2;"><i class="fab fa-facebook"></i></div>
+                        <div class="social-info">
+                            <h4>Facebook</h4>
+                            <span class="status disconnected">Disconnected</span>
+                        </div>
+                        <button class="btn-connect">Connect</button>
+                    </div>
+
+                    <div class="social-item" data-platform="instagram">
+                        <div class="social-icon" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"><i class="fab fa-instagram"></i></div>
+                        <div class="social-info">
+                            <h4>Instagram</h4>
+                            <span class="status disconnected">Disconnected</span>
+                        </div>
+                        <button class="btn-connect">Connect</button>
+                    </div>
+                </div>
+
+                <button id="btn-view-feed" class="btn-primary mt-4" style="width: 100%;">View Feed</button>
+            </div>
+        </main>
+
+        <!-- Feed View -->
+        <main id="view-feed" class="view hidden">
+            <div id="feed-container" class="feed-container">
+                <!-- Feed items rendered here -->
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
