@@ -1,5 +1,5 @@
-const { invoke } = window.__TAURI__.core;
-const { listen } = window.__TAURI__.event;
+const invoke = window.__TAURI__ ? window.__TAURI__.core.invoke : async () => { console.warn("Tauri invoke bypassed"); };
+const listen = window.__TAURI__ ? window.__TAURI__.event.listen : () => {};
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.getElementById('url-input');
@@ -226,11 +226,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const rect = getWebviewRect();
 
-        // Invoke Rust to create the native webview
-        try {
-            await invoke('create_tab', { id, url, rect });
-        } catch (e) {
-            console.error("Failed to create native tab", e);
+        // Invoke Rust to create the native webview, or fallback to iframe
+        if (window.__TAURI__) {
+            try {
+                await invoke('create_tab', { id, url, rect });
+            } catch (e) {
+                console.error("Failed to create native tab", e);
+            }
+        } else {
+            // Fallback for standard browsers
+            const iframe = document.createElement('iframe');
+            iframe.id = `iframe-${id}`;
+            iframe.src = url;
+            iframe.className = 'active'; // Just directly add class
+            webviewsContainer.appendChild(iframe);
         }
 
         const tabData = { id, title: 'New Tab', url, tabEl, titleEl };
@@ -257,19 +266,29 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTabId = id;
 
         const allIds = tabs.map(t => t.id);
-        try {
-            await invoke('switch_tab', { activeId: id, allIds });
-        } catch (e) {
-            console.error("Failed to switch native tab", e);
+        if (window.__TAURI__) {
+            try {
+                await invoke('switch_tab', { activeId: id, allIds });
+            } catch (e) {
+                console.error("Failed to switch native tab", e);
+            }
         }
 
         tabs.forEach(tab => {
             if (tab.id === id) {
                 tab.tabEl.classList.add('active');
+                if (!window.__TAURI__) {
+                    const iframe = document.getElementById(`iframe-${id}`);
+                    if (iframe) iframe.classList.add('active');
+                }
                 updateUrlBar(tab.url);
                 checkIfBookmarked(tab.url);
             } else {
                 tab.tabEl.classList.remove('active');
+                if (!window.__TAURI__) {
+                    const iframe = document.getElementById(`iframe-${tab.id}`);
+                    if (iframe) iframe.classList.remove('active');
+                }
             }
         });
     }
@@ -281,10 +300,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const tab = tabs[tabIndex];
         tab.tabEl.remove();
 
-        try {
-            await invoke('close_tab', { id });
-        } catch (e) {
-            console.error("Failed to close native tab", e);
+        if (window.__TAURI__) {
+            try {
+                await invoke('close_tab', { id });
+            } catch (e) {
+                console.error("Failed to close native tab", e);
+            }
+        } else {
+            const iframe = document.getElementById(`iframe-${id}`);
+            if (iframe) iframe.remove();
         }
 
         tabs.splice(tabIndex, 1);
@@ -455,6 +479,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Data Persistence ---
     async function getStoredData() {
+        if (!window.__TAURI__) {
+            return {
+                'browser_history': localStorage.getItem('browser_history'),
+                'browser_bookmarks': localStorage.getItem('browser_bookmarks'),
+                'browser_passwords': localStorage.getItem('browser_passwords')
+            };
+        }
         try {
             return await invoke('read_data');
         } catch (e) {
@@ -464,6 +495,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function setStoredData(key, value) {
+        if (!window.__TAURI__) {
+            localStorage.setItem(key, value);
+            return;
+        }
         try {
             await invoke('write_data', { key, value });
         } catch (e) {
@@ -494,7 +529,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tab) {
             tab.url = url;
             tab.titleEl.innerText = 'Loading...';
-            invoke('navigate_tab', { id: tab.id, url }).catch(console.error);
+            if (window.__TAURI__) {
+                invoke('navigate_tab', { id: tab.id, url }).catch(console.error);
+            } else {
+                const iframe = document.getElementById(`iframe-${tab.id}`);
+                if (iframe) {
+                    iframe.src = url;
+                    // Mock event listener for standard browser
+                    iframe.onload = () => {
+                        tab.titleEl.innerText = tab.url.substring(0, 20);
+                        updateUrlBar(tab.url);
+                        checkIfBookmarked(tab.url);
+                        saveHistory(tab.url, tab.titleEl.innerText);
+                    };
+                }
+            }
             btnReload.innerHTML = '<i class="fas fa-times"></i>';
         }
     }

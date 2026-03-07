@@ -61,6 +61,22 @@ async function init() {
     // Add event listeners
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('mousemove', onMouseMove);
+
+    // Click to show object info in sidebar
+    renderer.domElement.addEventListener('click', (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(highlightedObjects);
+        if (intersects.length > 0) {
+            const obj = intersects[0].object;
+            if (window.CosmicUI && obj.name) {
+                window.CosmicUI.showObjectInfo(obj.name);
+            }
+        }
+    });
+
     document.getElementById('viewSolarSystem').addEventListener('click', () => setView('solarSystem'));
     const openLokaBtn = document.getElementById('openLokaSimulator');
     if (openLokaBtn) openLokaBtn.addEventListener('click', () => window.open('loka-simulator.html', '_blank'));

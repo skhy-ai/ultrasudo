@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenFang AI — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="openfang-app">
+        <!-- Hero Header -->
+        <div class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <div class="hero-icon"><i class="fas fa-robot"></i></div>
+                <h1>OpenFang AI</h1>
+                <p>Your intelligent browser companion. Configure LLM models across all Skand apps.</p>
+                <div class="hero-status" id="hero-status">
+                    <span class="status-dot off"></span>
+                    <span>Not Configured</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Nav -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="models">🤖 Models</button>
+            <button class="tab-btn" data-tab="api-keys">🔑 API Keys</button>
+            <button class="tab-btn" data-tab="integrations">🔗 Integrations</button>
+            <button class="tab-btn" data-tab="usage">📊 Usage</button>
+        </div>
+
+        <!-- Models Tab -->
+        <section class="tab-panel active" id="tab-models">
+            <h2>Default AI Model</h2>
+            <p class="hint">This model will be used by default across all Skand apps that support AI features.</p>
+
+            <div class="model-grid" id="model-grid">
+                <!-- Populated by script.js -->
+            </div>
+
+            <div class="form-group" style="margin-top:20px;">
+                <label>Custom Model Endpoint</label>
+                <input type="url" id="custom-endpoint" placeholder="http://localhost:11434/api/generate (Ollama)">
+            </div>
+
+            <div class="form-group">
+                <label>Custom Model Name</label>
+                <input type="text" id="custom-model-name" placeholder="e.g. llama3, mistral, phi3">
+            </div>
+
+            <button class="btn-primary" id="btn-save-model"><i class="fas fa-save"></i> Save & Test Connection</button>
+            <div class="test-result" id="test-result" style="display:none;"></div>
+        </section>
+
+        <!-- API Keys Tab -->
+        <section class="tab-panel" id="tab-api-keys">
+            <h2>API Keys</h2>
+            <p class="hint">Keys are stored securely on this device only using AES-256-GCM encryption.</p>
+
+            <div id="api-key-list">
+                <!-- Populated by script.js -->
+            </div>
+
+            <div class="add-key-form">
+                <h3>Add / Update Key</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Provider</label>
+                        <select id="new-key-provider">
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic (Claude)</option>
+                            <option value="google">Google Gemini</option>
+                            <option value="groq">Groq</option>
+                            <option value="together">Together AI</option>
+                            <option value="mistral">Mistral AI</option>
+                            <option value="cohere">Cohere</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <div class="key-input-wrapper">
+                            <input type="password" id="new-key-value" placeholder="sk-...">
+                            <button class="btn-show-key" id="btn-show-key"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" id="btn-save-key"><i class="fas fa-lock"></i> Save Key Securely</button>
+            </div>
+        </section>
+
+        <!-- Integrations Tab -->
+        <section class="tab-panel" id="tab-integrations">
+            <h2>App Integrations</h2>
+            <p class="hint">Enable or disable AI features per app. Apps with AI support are listed below.</p>
+            <div id="integrations-list">
+                <!-- Populated by script.js -->
+            </div>
+        </section>
+
+        <!-- Usage Tab -->
+        <section class="tab-panel" id="tab-usage">
+            <h2>Usage Summary</h2>
+            <p class="hint">Local tracking only — no data is sent externally.</p>
+            <div id="usage-stats" class="usage-stats">
+                <div class="usage-card">
+                    <i class="fas fa-message"></i>
+                    <div class="usage-value" id="usage-calls">0</div>
+                    <div class="usage-label">Total API Calls</div>
+                </div>
+                <div class="usage-card">
+                    <i class="fas fa-coins"></i>
+                    <div class="usage-value" id="usage-tokens">0</div>
+                    <div class="usage-label">Est. Tokens Used</div>
+                </div>
+                <div class="usage-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="usage-value" id="usage-last">—</div>
+                    <div class="usage-label">Last Usage</div>
+                </div>
+                <div class="usage-card">
+                    <i class="fas fa-robot"></i>
+                    <div class="usage-value" id="usage-model">—</div>
+                    <div class="usage-label">Active Model</div>
+                </div>
+            </div>
+            <button class="btn-secondary" id="btn-reset-usage" style="margin-top:16px;"><i class="fas fa-trash"></i> Reset Stats</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'openfang', title: 'OpenFang AI' });
+        });
+    </script>
+</body>
+</html>

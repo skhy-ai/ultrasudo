@@ -40,6 +40,7 @@ body, html {
     flex-direction: column;
     align-items: center;
     padding: 30px 20px 20px;
+    overflow: hidden;
 }
 
 /* Progress Bar */
@@ -104,7 +105,9 @@ body, html {
     display: none;
     width: 100%;
     max-width: 800px;
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: calc(100vh - 140px);
     animation: fadeSlideIn 0.4s ease;
 }
 
@@ -124,8 +127,9 @@ body, html {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
-    padding: 40px 35px;
-    flex: 1;
+    padding: 30px 35px;
+    flex: 1 1 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -323,7 +327,8 @@ h3 {
 
 /* Step 3: Category App Grid */
 .apps-scroll-area {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0; /* bound properly */
     overflow-y: auto;
     padding-right: 8px;
     margin-bottom: 10px;

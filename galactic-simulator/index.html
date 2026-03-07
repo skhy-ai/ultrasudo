@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Explorer</title>
+    <title>Cosmic Explorer — Skand Browser</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cosmic-ui.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
     <script type="importmap">
     {
         "imports": {
@@ -22,39 +24,82 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.AppShell) {
-                AppShell.init({ appId: 'galactic-simulator', title: 'Galactic Simulator' });
+                AppShell.init({ appId: 'galactic-simulator', title: 'Cosmic Explorer' });
             }
         });
     </script>
+
     <div id="loading">
         <div class="loading-content">
+            <div class="loading-spaceship">🚀</div>
+            <div class="loading-title">Cosmic Explorer</div>
             <div class="loading-bar">
                 <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+            <div class="loading-text">Initializing universe...</div>
+        </div>
+    </div>
+
+    <!-- Top Controls -->
+    <div id="info">
+        <strong style="font-size:1.1rem;">🌌 Cosmic Explorer</strong>
+        <div style="margin-top:8px; font-size:12px; opacity:0.7;">
+            <div>🖱️ Left-drag: Rotate &nbsp; Right-drag: Pan &nbsp; Scroll: Zoom</div>
+            <div style="margin-top:3px;">🌠 Click an object for details</div>
+        </div>
+        <div id="tooltip" style="margin-top:8px; font-size:12px; color:#10b981;">Hover over an object for details.</div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div id="controls">
+        <button class="control-btn active" id="viewSolarSystem"><i class="fas fa-sun"></i> Solar System</button>
+        <button class="control-btn" id="openLokaSimulator"><i class="fas fa-dharmachakra"></i> Hindu Cosmology</button>
+        <button class="control-btn" id="viewStars"><i class="fas fa-star"></i> Nearby Stars</button>
+        <div class="control-divider"></div>
+        <span style="opacity:0.6; font-size:12px;">Scale:</span>
+        <button class="control-btn active" id="scaleEducational">Educational</button>
+        <button class="control-btn" id="scaleRealistic">Realistic</button>
+        <div class="control-divider"></div>
+        <div class="search-container">
+            <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:0.4;font-size:12px;"></i>
+            <input type="text" id="object-search" placeholder="Search objects..." >
+        </div>
+        <button class="control-btn" id="btn-toggle-sidebar"><i class="fas fa-info-circle"></i> Info</button>
+    </div>
+
+    <!-- Side Info Panel -->
+    <div id="cosmic-sidebar" class="cosmic-sidebar">
+        <div class="sidebar-header">
+            <h3 id="sidebar-title">Select an Object</h3>
+            <button id="sidebar-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="sidebar-body" class="sidebar-body">
+            <div class="sidebar-placeholder">
+                <i class="fas fa-rocket" style="font-size:2rem; opacity:0.3; display:block; text-align:center; margin-bottom:12px;"></i>
+                <p style="text-align:center; opacity:0.5; font-size:0.85rem;">Click on any celestial object to see details</p>
+            </div>
+        </div>
+
+        <!-- Nearby Stars Reference -->
+        <div class="sidebar-section">
+            <h4><i class="fas fa-star-half-stroke"></i> Nearest Stars to Sun</h4>
+            <div class="star-list">
+                <div class="star-row"><span class="star-name">Proxima Centauri</span><span class="star-dist">4.24 ly</span></div>
+                <div class="star-row"><span class="star-name">Alpha Centauri A</span><span class="star-dist">4.37 ly</span></div>
+                <div class="star-row"><span class="star-name">Alpha Centauri B</span><span class="star-dist">4.37 ly</span></div>
+                <div class="star-row"><span class="star-name">Barnard's Star</span><span class="star-dist">5.96 ly</span></div>
+                <div class="star-row"><span class="star-name">Wolf 359</span><span class="star-dist">7.78 ly</span></div>
+                <div class="star-row"><span class="star-name">Lalande 21185</span><span class="star-dist">8.29 ly</span></div>
+                <div class="star-row"><span class="star-name">Sirius A</span><span class="star-dist">8.58 ly</span></div>
+                <div class="star-row"><span class="star-name">Epsilon Eridani</span><span class="star-dist">10.52 ly</span></div>
+                <div class="star-row"><span class="star-name">Tau Ceti</span><span class="star-dist">11.89 ly</span></div>
+                <div class="star-row"><span class="star-name">61 Cygni A</span><span class="star-dist">11.41 ly</span></div>
             </div>
         </div>
     </div>
 
-    <div id="info">
-        <strong>Cosmic Explorer</strong><br>
-        <div style="margin-top: 8px; font-size: 13px; opacity: 0.8;">
-            <div>🖱️ Left-click + drag: Rotate view</div>
-            <div>🖱️ Right-click + drag: Pan</div>
-            <div>🖱️ Scroll: Zoom in/out</div>
-            <div>🌠 Click on objects for details</div>
-        </div>
-        <div id="tooltip">Hover over an object for details.</div>
-    </div>
-
-    <div id="controls">
-        <button class="control-btn active" id="viewSolarSystem">Solar System</button>
-        <button class="control-btn" id="openLokaSimulator">Hindu Cosmology</button>
-        <button class="control-btn" id="viewStars">Stars</button>
-        <span style="margin-left:12px; opacity:0.8; font-size:13px;">Scale:</span>
-        <button class="control-btn" id="scaleEducational">Educational</button>
-        <button class="control-btn" id="scaleRealistic">Realistic</button>
-    </div>
-
     <script type="module" src="main.js"></script>
+    <script src="cosmic-ui.js"></script>
 </body>
 
 </html>

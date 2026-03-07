@@ -1,0 +1,349 @@
+/* ─── Skand Widget Bar — Self-contained styles ──────────────────────────── */
+
+#skand-widget-bar {
+    position: fixed;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    color: #f8fafc;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    font-size: 13px;
+    user-select: none;
+    transition: box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+
+    /* Default position: top-center */
+    left: 50%;
+    top: 10px;
+    transform: translateX(-50%);
+}
+
+#skand-widget-bar:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+
+/* Orientation: vertical */
+#skand-widget-bar.vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#skand-widget-bar.vertical .widget-bar-widgets {
+    flex-direction: column;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+#skand-widget-bar.wb-entering {
+    animation: wbSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#skand-widget-bar.wb-leaving {
+    animation: wbSlideOut 0.25s ease forwards;
+}
+
+@keyframes wbSlideIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes wbSlideOut {
+    from { opacity: 1; }
+    to   { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* ─── Handle ─────────────────────────────────────────────────────────────── */
+.widget-bar-handle {
+    width: 20px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+
+.widget-bar-handle:hover {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.widget-bar-handle:active { cursor: grabbing; }
+
+/* ─── Widget Area ─────────────────────────────────────────────────────────── */
+.widget-bar-widgets {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+}
+
+.widget-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.widget-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Separator between widgets */
+.widget-item + .widget-item::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────────────────────── */
+.widget-bar-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 4px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wb-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s;
+}
+
+.wb-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.wb-btn-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* ─── Clock Widget ───────────────────────────────────────────────────────── */
+.wb-clock {
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: #f0f9ff;
+    letter-spacing: 0.5px;
+}
+
+/* ─── Date Widget ─────────────────────────────────────────────────────────── */
+.wb-date {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* ─── Network Widget ─────────────────────────────────────────────────────── */
+.wb-network {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.wb-network i { font-size: 13px; }
+.wb-network span { color: #94a3b8; }
+
+/* ─── Battery Widget ─────────────────────────────────────────────────────── */
+.wb-battery {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.wb-battery span { color: #94a3b8; }
+
+/* ─── Timer Widget ────────────────────────────────────────────────────────── */
+.wb-timer {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.wb-timer span {
+    font-family: monospace;
+    font-weight: 600;
+    color: #f0f9ff;
+    min-width: 38px;
+}
+
+.wb-timer-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.wb-timer-btn:hover {
+    background: rgba(59, 130, 246, 0.25);
+    color: #3b82f6;
+}
+
+/* ─── Calculator Widget ──────────────────────────────────────────────────── */
+.wb-calc {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wb-calc-display {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #f0f9ff;
+    font-size: 13px;
+    font-family: monospace;
+    text-align: right;
+    outline: none;
+}
+
+.wb-calc-keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+}
+
+.wb-calc-key {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: monospace;
+    line-height: 1;
+    transition: background 0.15s;
+}
+
+.wb-calc-key:hover { background: rgba(255, 255, 255, 0.14); }
+.wb-calc-eq { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+.wb-calc-eq:hover { background: rgba(59, 130, 246, 0.5); }
+.wb-calc-c { color: #f87171; }
+
+/* ─── Note Widget ─────────────────────────────────────────────────────────── */
+.wb-note textarea {
+    width: 160px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #f0f9ff;
+    font-size: 11px;
+    font-family: inherit;
+    padding: 6px 8px;
+    resize: none;
+    outline: none;
+}
+
+.wb-note textarea:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* ─── Add Widget Menu ─────────────────────────────────────────────────────── */
+.wb-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    min-width: 180px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 100000;
+}
+
+.wb-menu-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #94a3b8;
+    transition: background 0.2s;
+}
+
+.wb-menu-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+}
+
+.wb-menu-row input[type="checkbox"] {
+    accent-color: #3b82f6;
+}
+
+.widget-err {
+    color: #ef4444;
+    font-size: 12px;
+}
+
+/* ─── Vertical orientation adjustments ──────────────────────────────────── */
+#skand-widget-bar.vertical .widget-bar-toolbar {
+    flex-direction: column;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#skand-widget-bar.vertical .widget-item + .widget-item::before {
+    width: 100%;
+    height: 1px;
+    margin-right: 0;
+    margin-bottom: 0;
+}
+
+/* ─── Dark bar during drag ───────────────────────────────────────────────── */
+#skand-widget-bar.dragging {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    opacity: 0.95;
+}

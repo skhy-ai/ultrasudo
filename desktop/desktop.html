@@ -12,6 +12,7 @@
     <script src="../auth/config.js"></script>
     <script src="../auth/auth-check.js"></script>
     <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="widget-bar.css">
 </head>
 
 <body>
@@ -66,6 +67,9 @@
             <button id="logout-btn" class="btn-small"
                 style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: inherit;">
                 <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <button class="btn-small" id="widget-bar-toggle-btn" title="Toggle Widget Bar (Alt+W)" onclick="window.WidgetBar && window.WidgetBar.toggle()" style="margin-left:4px;">
+                <i class="fas fa-grip-horizontal"></i> Widgets
             </button>
         </div>
 
@@ -362,6 +366,7 @@
     <script src="app-classifier.js?v=2"></script>
     <script src="../news/rss_sources.js"></script>
     <script src="desktop.js?v=3"></script>
+    <script src="widget-bar.js"></script>
     <script src="../sw-register.js"></script>
 </body>
 

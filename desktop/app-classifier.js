@@ -537,9 +537,20 @@ class AppClassifier {
                 offlineCapable: false,
                 cacheableAssets: ['index.html', 'style.css', 'script.js'],
                 description: 'Virtual Private Network with global server selection'
+            },
+            {
+                id: 'openfang',
+                name: 'OpenFang AI',
+                path: '../openfang/index.html',
+                icon: 'fas fa-robot',
+                category: 'system',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: false,
+                cacheableAssets: ['index.html', 'style.css', 'script.js'],
+                description: 'AI model configuration and LLM integration hub for Skand Browser'
             }
-        ];
-        extra.forEach(app => {
+        ].forEach(app => {
             this.appRegistry.set(app.id, app);
             this.assessAppNetworkRequirements(app);
         });
