@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="vpn-app">
+        <!-- Connection Card -->
+        <div class="connection-card">
+            <div class="status-ring" id="status-ring">
+                <div class="ring-inner">
+                    <i class="fas fa-shield-halved" id="shield-icon"></i>
+                    <span class="status-text" id="status-text">Disconnected</span>
+                </div>
+            </div>
+
+            <button class="btn-connect" id="btn-connect">
+                <i class="fas fa-power-off"></i>
+                <span>Connect</span>
+            </button>
+        </div>
+
+        <!-- Server Selection -->
+        <div class="panel server-panel">
+            <h3><i class="fas fa-globe"></i> Select Server</h3>
+            <div class="server-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="server-search" placeholder="Search country or city...">
+            </div>
+            <div class="server-list" id="server-list">
+                <!-- Populated by script.js -->
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="panel stats-panel" id="stats-panel" style="display:none;">
+            <h3><i class="fas fa-chart-line"></i> Connection Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Download</span>
+                    <span class="stat-value" id="stat-download">0 KB/s</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Upload</span>
+                    <span class="stat-value" id="stat-upload">0 KB/s</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Latency</span>
+                    <span class="stat-value" id="stat-latency">— ms</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Duration</span>
+                    <span class="stat-value" id="stat-duration">00:00</span>
+                </div>
+            </div>
+            <div class="ip-display">
+                <span class="ip-label">Your IP</span>
+                <span class="ip-value" id="ip-address">—</span>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="panel settings-panel">
+            <h3><i class="fas fa-cog"></i> Settings</h3>
+            <label class="toggle-row">
+                <div class="toggle-info">
+                    <span class="toggle-label">Auto-connect on launch</span>
+                </div>
+                <input type="checkbox" id="auto-connect">
+                <div class="toggle-switch"></div>
+            </label>
+            <label class="toggle-row">
+                <div class="toggle-info">
+                    <span class="toggle-label">Kill switch</span>
+                    <span class="toggle-desc">Block internet if VPN disconnects</span>
+                </div>
+                <input type="checkbox" id="kill-switch">
+                <div class="toggle-switch"></div>
+            </label>
+            <label class="toggle-row">
+                <div class="toggle-info">
+                    <span class="toggle-label">DNS leak protection</span>
+                </div>
+                <input type="checkbox" id="dns-protection" checked>
+                <div class="toggle-switch"></div>
+            </label>
+            <div class="protocol-select">
+                <label>Protocol</label>
+                <select id="vpn-protocol">
+                    <option value="wireguard">WireGuard (Recommended)</option>
+                    <option value="openvpn-udp">OpenVPN UDP</option>
+                    <option value="openvpn-tcp">OpenVPN TCP</option>
+                    <option value="ikev2">IKEv2/IPSec</option>
+                </select>
+            </div>
+
+            <div class="integration-note">
+                <i class="fas fa-info-circle"></i>
+                <p>VPN tunneling requires Tauri backend integration. This UI is ready for connection to WireGuard/OpenVPN backends via Tauri's <code>invoke</code> API.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'vpn', title: 'VPN' });
+        });
+    </script>
+</body>
+</html>

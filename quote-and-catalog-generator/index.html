@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote & Catalog Generator — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="quote-app">
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="quotes"><i class="fas fa-file-invoice-dollar"></i> Quotes</button>
+            <button class="tab-btn" data-tab="catalog"><i class="fas fa-book-open"></i> Catalog</button>
+            <button class="tab-btn" data-tab="saved"><i class="fas fa-folder-open"></i> Saved</button>
+        </div>
+
+        <!-- Quotes Tab -->
+        <section class="tab-panel active" id="tab-quotes">
+            <h2>Create a Quote</h2>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="biz-name" placeholder="Your company name">
+                    </div>
+                    <div class="form-group">
+                        <label>Quote #</label>
+                        <input type="text" id="quote-number" placeholder="QT-001">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="client-name" placeholder="Client / Company">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="quote-date">
+                    </div>
+                </div>
+            </div>
+
+            <div class="items-section">
+                <h3>Line Items</h3>
+                <div id="line-items">
+                    <!-- Populated dynamically -->
+                </div>
+                <button class="btn-add-item" id="btn-add-item"><i class="fas fa-plus"></i> Add Item</button>
+            </div>
+
+            <div class="totals-section">
+                <div class="total-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+                <div class="total-row">
+                    <span>Tax (%)</span>
+                    <input type="number" id="tax-rate" value="0" min="0" max="100" step="0.5" style="width:60px; text-align:right;">
+                </div>
+                <div class="total-row total-final"><span>Total</span><span id="grand-total">$0.00</span></div>
+            </div>
+
+            <div class="form-group">
+                <label>Notes / Terms</label>
+                <textarea id="quote-notes" rows="3" placeholder="Payment terms, validity period, etc."></textarea>
+            </div>
+
+            <div class="action-row">
+                <button class="btn-primary" id="btn-preview-quote"><i class="fas fa-eye"></i> Preview</button>
+                <button class="btn-secondary" id="btn-save-quote"><i class="fas fa-save"></i> Save</button>
+                <button class="btn-secondary" id="btn-print-quote"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </section>
+
+        <!-- Catalog Tab -->
+        <section class="tab-panel" id="tab-catalog">
+            <h2>Product Catalog</h2>
+            <p class="hint">Build a product/service catalog. Items here can be quickly added to quotes.</p>
+
+            <div class="catalog-form">
+                <div class="form-row">
+                    <div class="form-group"><label>Item Name</label><input type="text" id="cat-item-name" placeholder="Product or service name"></div>
+                    <div class="form-group"><label>Unit Price</label><input type="number" id="cat-item-price" min="0" step="0.01" placeholder="0.00"></div>
+                </div>
+                <div class="form-group"><label>Description</label><input type="text" id="cat-item-desc" placeholder="Brief description"></div>
+                <button class="btn-primary" id="btn-add-catalog"><i class="fas fa-plus"></i> Add to Catalog</button>
+            </div>
+
+            <div id="catalog-list" class="catalog-list">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Saved Tab -->
+        <section class="tab-panel" id="tab-saved">
+            <h2>Saved Quotes</h2>
+            <div id="saved-quotes" class="saved-list">
+                <p class="empty-state">No saved quotes yet.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Print Preview Modal -->
+    <div class="modal-overlay" id="preview-modal" style="display:none;">
+        <div class="modal-content" id="preview-content">
+            <button class="modal-close" id="btn-close-preview">&times;</button>
+            <div id="quote-preview-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'quote-and-catalog-generator', title: 'Quote & Catalog Generator' });
+        });
+    </script>
+</body>
+</html>

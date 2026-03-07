@@ -1,0 +1,159 @@
+/* Birthday Card Generator — Styling */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: #0a0e1a;
+    color: #f8fafc;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse at 30% 50%, rgba(240, 147, 251, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 30%, rgba(245, 87, 108, 0.08) 0%, transparent 55%);
+}
+
+.card-app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+}
+
+.editor-panel, .preview-panel {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 28px;
+}
+
+h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+h3 { font-size: 1rem; font-weight: 600; color: #94a3b8; margin-bottom: 14px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px; }
+
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #f8fafc;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: none;
+    border-color: #f093fb;
+    box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.15);
+}
+
+/* Template Swatches */
+.template-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.template-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.template-swatch:hover { transform: scale(1.1); }
+.template-swatch.selected { border-color: white; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
+
+/* Decorations */
+.deco-options { display: flex; gap: 12px; flex-wrap: wrap; }
+.deco-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: background 0.2s;
+}
+.deco-check:hover { background: rgba(255, 255, 255, 0.1); }
+.deco-check input { accent-color: #f093fb; }
+
+/* Generate Button */
+.btn-generate {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    margin-top: 8px;
+}
+.btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(240, 147, 251, 0.35); }
+
+/* Preview */
+.preview-panel { display: flex; flex-direction: column; align-items: center; }
+
+#card-canvas {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1e293b;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.btn-download, .btn-copy-img {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.btn-copy-img {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+}
+
+.btn-download:hover, .btn-copy-img:hover { transform: translateY(-2px); }
+
+@media (max-width: 768px) {
+    .card-app { grid-template-columns: 1fr; }
+}

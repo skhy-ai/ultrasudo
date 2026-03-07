@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Card Generator — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="card-app">
+        <div class="editor-panel">
+            <h2><i class="fas fa-gift"></i> Create Birthday Card</h2>
+
+            <div class="form-group">
+                <label>Recipient Name</label>
+                <input type="text" id="recipient-name" placeholder="Who is this for?" maxlength="40">
+            </div>
+
+            <div class="form-group">
+                <label>Your Message</label>
+                <textarea id="card-message" rows="3" placeholder="Write a warm birthday message..." maxlength="200"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>From</label>
+                <input type="text" id="sender-name" placeholder="Your name" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label>Template</label>
+                <div class="template-grid" id="template-grid">
+                    <div class="template-swatch selected" data-template="gradient-sunset" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+                    <div class="template-swatch" data-template="gradient-ocean" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+                    <div class="template-swatch" data-template="gradient-forest" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"></div>
+                    <div class="template-swatch" data-template="gradient-galaxy" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);"></div>
+                    <div class="template-swatch" data-template="gradient-fire" style="background: linear-gradient(135deg, #f7971e, #ffd200);"></div>
+                    <div class="template-swatch" data-template="gradient-night" style="background: linear-gradient(135deg, #0f172a, #1e3a5f);"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Font Style</label>
+                <select id="font-select">
+                    <option value="'Georgia', serif">Classic (Georgia)</option>
+                    <option value="'Segoe UI', sans-serif">Modern (Segoe UI)</option>
+                    <option value="'Courier New', monospace">Typewriter</option>
+                    <option value="cursive">Handwritten</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Decorations</label>
+                <div class="deco-options">
+                    <label class="deco-check"><input type="checkbox" id="deco-balloons" checked> 🎈 Balloons</label>
+                    <label class="deco-check"><input type="checkbox" id="deco-confetti" checked> 🎊 Confetti</label>
+                    <label class="deco-check"><input type="checkbox" id="deco-cake" checked> 🎂 Cake</label>
+                    <label class="deco-check"><input type="checkbox" id="deco-stars"> ⭐ Stars</label>
+                </div>
+            </div>
+
+            <button class="btn-generate" id="btn-generate">
+                <i class="fas fa-wand-magic-sparkles"></i> Generate Card
+            </button>
+        </div>
+
+        <div class="preview-panel">
+            <h3>Preview</h3>
+            <canvas id="card-canvas" width="600" height="400"></canvas>
+            <div class="preview-actions" id="preview-actions" style="display:none;">
+                <button class="btn-download" id="btn-download">
+                    <i class="fas fa-download"></i> Download PNG
+                </button>
+                <button class="btn-copy-img" id="btn-copy-img">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'birthday-card-generator', title: 'Birthday Card Generator' });
+        });
+    </script>
+</body>
+</html>

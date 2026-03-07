@@ -27,20 +27,28 @@
         </div>
 
         <div class="menu-controls">
-            <button id="btn-passwords" title="Saved Passwords"><i class="fas fa-key"></i></button>
-            <button id="btn-history" title="Browsing History"><i class="fas fa-history"></i></button>
-            <button id="btn-bookmarks-menu" title="Bookmarks"><i class="fas fa-book"></i></button>
-            <button id="btn-settings-sidebar" title="Settings"><i class="fas fa-cog"></i></button>
+            <button id="btn-hamburger" title="Browser Menu"><i class="fas fa-bars"></i></button>
         </div>
     </div>
 
     <div class="main-body">
         <div class="global-sidebar" id="global-sidebar">
             <div class="sidebar-header">
-                <h3>Settings & Tools</h3>
+                <button id="btn-sidebar-back" class="close-btn hidden" title="Back"><i class="fas fa-arrow-left"></i></button>
+                <h3 id="sidebar-title">Browser Menu</h3>
                 <button id="close-sidebar" class="close-btn"><i class="fas fa-times"></i></button>
             </div>
-            <div class="sidebar-content">
+            
+            <!-- Main Menu View -->
+            <div class="sidebar-content" id="view-menu">
+                <button class="sidebar-nav-btn" data-target="view-settings"><i class="fas fa-cog"></i> Settings</button>
+                <button class="sidebar-nav-btn" data-target="view-bookmarks"><i class="fas fa-book"></i> Bookmarks</button>
+                <button class="sidebar-nav-btn" data-target="view-history"><i class="fas fa-history"></i> History</button>
+                <button class="sidebar-nav-btn" data-target="view-passwords"><i class="fas fa-key"></i> Passwords</button>
+            </div>
+            
+            <!-- Settings View -->
+            <div class="sidebar-content hidden" id="view-settings">
                 <div class="settings-group">
                     <h4>Browser Settings</h4>
                     <label class="setting-item">
@@ -71,8 +79,27 @@
                         <input type="checkbox" id="setting-devtools">
                     </label>
                 </div>
-                <!-- Dynamic sidebar injects here -->
-                <div id="sidebar-injected-apps"></div>
+            </div>
+
+            <!-- History View -->
+            <div class="sidebar-content hidden" id="view-history">
+                <div id="history-list"><div class="loading">Loading...</div></div>
+            </div>
+
+            <!-- Bookmarks View -->
+            <div class="sidebar-content hidden" id="view-bookmarks">
+                <div id="bookmarks-list"><div class="loading">Loading...</div></div>
+            </div>
+
+            <!-- Passwords View -->
+            <div class="sidebar-content hidden" id="view-passwords">
+                <div class="add-password-form">
+                    <input type="text" id="pass-site" placeholder="Website URL">
+                    <input type="text" id="pass-user" placeholder="Username">
+                    <input type="password" id="pass-pass" placeholder="Password">
+                    <button id="btn-save-password">Save Password</button>
+                </div>
+                <div id="passwords-list" style="margin-top:15px;"><div class="loading">Loading...</div></div>
             </div>
         </div>
 
@@ -90,47 +117,12 @@
         </div>
     </div>
 
-    <!-- Modals -->
-    <div id="right-sidebar" class="right-sidebar">
-        <div id="history-modal" class="modal hidden">
-            <div class="modal-header">
-                <h2>Browsing History</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body" id="history-list">
-                <div class="loading">Loading...</div>
-            </div>
-        </div>
-
-        <div id="bookmarks-modal" class="modal hidden">
-            <div class="modal-header">
-                <h2>Bookmarks</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body" id="bookmarks-list">
-                <div class="loading">Loading...</div>
-            </div>
-        </div>
-
-        <div id="passwords-modal" class="modal hidden">
-            <div class="modal-header">
-                <h2>Password Manager</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="add-password-form">
-                    <input type="text" id="pass-site" placeholder="Website URL">
-                    <input type="text" id="pass-user" placeholder="Username">
-                    <input type="password" id="pass-pass" placeholder="Password">
-                    <button id="btn-save-password">Save</button>
-                </div>
-                <div id="passwords-list" style="margin-top:15px;">
-                    <div class="loading">Loading...</div>
-                </div>
-            </div>
-        </div>
+    <!-- Apps Sidebar on Right -->
+    <div class="apps-sidebar" id="apps-sidebar">
+        <div id="apps-list-container"></div>
     </div>
 
+    <script src="../desktop/app-classifier.js"></script>
     <script src="browser.js"></script>
 </body>
 

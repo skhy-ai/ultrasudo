@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="send-money-app">
+        <!-- Country Selection -->
+        <div class="panel country-panel" id="country-panel">
+            <h2><i class="fas fa-globe"></i> Select Your Country</h2>
+            <p class="hint">We'll show the best payment platform for your region.</p>
+            <div class="country-grid" id="country-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Transfer Panel -->
+        <div class="panel transfer-panel" id="transfer-panel" style="display:none;">
+            <div class="transfer-header">
+                <button class="btn-back" id="btn-change-country"><i class="fas fa-arrow-left"></i> Change Country</button>
+                <div class="platform-badge" id="platform-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    <span id="platform-name">UPI</span>
+                </div>
+            </div>
+
+            <div class="transfer-form">
+                <h2>Send Money</h2>
+
+                <div class="form-group">
+                    <label>Recipient ID</label>
+                    <input type="text" id="recipient-id" placeholder="Enter UPI ID / Phone / Account">
+                    <span class="field-hint" id="recipient-hint">e.g. name@upi</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <div class="amount-input">
+                            <span class="currency-symbol" id="currency-symbol">₹</span>
+                            <input type="number" id="amount" min="1" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Note (optional)</label>
+                        <input type="text" id="transfer-note" placeholder="What's this for?">
+                    </div>
+                </div>
+
+                <div class="qr-section" id="qr-section" style="display:none;">
+                    <h3><i class="fas fa-qrcode"></i> QR Code</h3>
+                    <p class="hint">Scan this QR code with your banking app to pay</p>
+                    <div class="qr-container">
+                        <canvas id="qr-canvas" width="256" height="256"></canvas>
+                    </div>
+                    <div class="qr-link-row">
+                        <a href="#" id="payment-link" class="btn-pay" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Open in Payment App
+                        </a>
+                        <button class="btn-copy" id="btn-copy-link"><i class="fas fa-copy"></i> Copy Link</button>
+                    </div>
+                </div>
+
+                <button class="btn-generate" id="btn-generate">
+                    <i class="fas fa-qrcode"></i> Generate Payment QR
+                </button>
+            </div>
+
+            <!-- Quick Transfer History -->
+            <div class="history-section">
+                <h3><i class="fas fa-clock-rotate-left"></i> Recent Transfers</h3>
+                <div id="transfer-history" class="history-list">
+                    <p class="empty-state">No transfers yet. Generate a QR to start!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'send-money', title: 'Send Money' });
+        });
+    </script>
+</body>
+</html>

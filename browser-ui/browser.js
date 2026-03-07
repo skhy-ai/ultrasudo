@@ -13,19 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const webviewsContainer = document.getElementById('webviews-container');
     const btnNewTab = document.getElementById('btn-new-tab');
 
-    // Modal elements
-    const modalOverlay = document.getElementById('modal-overlay');
-    const btnHistory = document.getElementById('btn-history');
-    const btnBookmarksMenu = document.getElementById('btn-bookmarks-menu');
-    const btnPasswords = document.getElementById('btn-passwords');
-    const historyModal = document.getElementById('history-modal');
-    const bookmarksModal = document.getElementById('bookmarks-modal');
-    const passwordsModal = document.getElementById('passwords-modal');
-
     // Sidebar elements
     const globalSidebar = document.getElementById('global-sidebar');
-    const btnSettingsSidebar = document.getElementById('btn-settings-sidebar');
     const btnCloseSidebar = document.getElementById('close-sidebar');
+    const btnSidebarBack = document.getElementById('btn-sidebar-back');
+    const sidebarTitle = document.getElementById('sidebar-title');
+    const btnHamburger = document.getElementById('btn-hamburger');
+
+    const views = {
+        'view-menu': document.getElementById('view-menu'),
+        'view-settings': document.getElementById('view-settings'),
+        'view-history': document.getElementById('view-history'),
+        'view-bookmarks': document.getElementById('view-bookmarks'),
+        'view-passwords': document.getElementById('view-passwords')
+    };
 
     const TELEMETRY_SERVER = 'http://localhost:4000/ingest'; // Will be changed to production URL later
 
@@ -66,13 +67,53 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTabId = null;
     let tabCounter = 0;
 
-    // --- Sidebar Management ---
-    btnSettingsSidebar.addEventListener('click', () => {
-        globalSidebar.classList.toggle('open');
+    // --- Sidebar Routing Management ---
+    function openGlobalSidebarView(targetId, title) {
+        Object.values(views).forEach(v => v.classList.add('hidden'));
+        if (views[targetId]) views[targetId].classList.remove('hidden');
+        sidebarTitle.innerText = title;
+        
+        if (targetId === 'view-menu') {
+            btnSidebarBack.classList.add('hidden');
+        } else {
+            btnSidebarBack.classList.remove('hidden');
+        }
+        globalSidebar.classList.add('open');
+    }
+
+    btnHamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (globalSidebar.classList.contains('open') && !views['view-menu'].classList.contains('hidden')) {
+            globalSidebar.classList.remove('open');
+        } else {
+            openGlobalSidebarView('view-menu', 'Browser Menu');
+        }
+    });
+
+    btnSidebarBack.addEventListener('click', () => {
+        openGlobalSidebarView('view-menu', 'Browser Menu');
     });
 
     btnCloseSidebar.addEventListener('click', () => {
         globalSidebar.classList.remove('open');
+    });
+
+    document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-target');
+            let title = btn.innerText.trim();
+            openGlobalSidebarView(target, title);
+
+            if (target === 'view-history') loadHistory();
+            if (target === 'view-bookmarks') loadBookmarksUI();
+            if (target === 'view-passwords') {
+                try {
+                    const tab = tabs.find(t => t.id === currentTabId);
+                    if (tab) document.getElementById('pass-site').value = new URL(tab.url).hostname;
+                } catch (e) {}
+                loadPasswords();
+            }
+        });
     });
 
     const devToolsCheckbox = document.getElementById('setting-devtools');
@@ -297,6 +338,50 @@ document.addEventListener('DOMContentLoaded', () => {
             autoFillPasswords(id, url);
             injectBlockScript(id);
 
+            // Fix target="_blank" links which might be blocked by default Tauri webview settings
+            const fixLinksJs = `
+                if (!window.__LINKS_FIXED) {
+                    window.__LINKS_FIXED = true;
+                    document.addEventListener('click', (e) => {
+                        const a = e.target.closest('a');
+                        if (a && a.target === '_blank') {
+                            a.target = '_self';
+                        }
+                    }, true);
+                }
+            `;
+            invoke('evaluate_js', { id, js: fixLinksJs }).catch(()=>{});
+
+            // Inject WOT Icons into Search Results
+            if (localStorage.getItem('setting_wot') === 'true' && (url.includes('google.com/search') || url.includes('duckduckgo.com'))) {
+                const wotIconJs = `
+                    if (!window.__WOT_ICONS_INJECTED) {
+                        window.__WOT_ICONS_INJECTED = true;
+                        setInterval(() => {
+                            const links = document.querySelectorAll('a > h3, a[data-testid="result-title-a"]');
+                            links.forEach(el => {
+                                const link = el.closest('a');
+                                if (link && !link.dataset.wot) {
+                                    link.dataset.wot = 'true';
+                                    try {
+                                        const urlDomain = new URL(link.href).hostname;
+                                        const wotIcon = document.createElement('span');
+                                        const isSus = urlDomain.includes('malware') || urlDomain.includes('phishing');
+                                        wotIcon.innerHTML = isSus ? '🛑' : '🛡️';
+                                        wotIcon.style.cssText = 'margin-right: 6px; font-size: 14px; vertical-align: middle; z-index: 9999;';
+                                        wotIcon.title = isSus ? 'WOT: Suspicious Site' : 'WOT: Safe Site';
+                                        
+                                        // Insert before the wrapper or h3
+                                        el.parentNode.insertBefore(wotIcon, el);
+                                    } catch(e) {}
+                                }
+                            });
+                        }, 1000);
+                    }
+                `;
+                invoke('evaluate_js', { id, js: wotIconJs }).catch(()=>{});
+            }
+
             // Polyfill: Manually evaluate and emit the title since native hooks might miss SPA transitions
             try {
                 const js = `
@@ -498,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             container.innerHTML = history.map(item => `
-                <div class="list-item" onclick="document.getElementById('url-input').value='${item.url}'; document.getElementById('url-input').dispatchEvent(new KeyboardEvent('keydown', {'key':'Enter'})); closeModals();">
+                <div class="list-item" onclick="document.getElementById('url-input').value='${item.url}'; document.getElementById('url-input').dispatchEvent(new KeyboardEvent('keydown', {'key':'Enter'})); document.getElementById('global-sidebar').classList.remove('open');">
                     <div class="list-title">${item.title}</div>
                     <div class="list-url">${item.url}</div>
                     <div style="font-size:10px; color:#64748b;">${new Date(item.timestamp).toLocaleString()}</div>
@@ -594,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const cat in grouped) {
             html += `<h3 style="margin: 10px 0 5px 0; font-size:13px; color:#94a3b8;">${cat}</h3>`;
             html += grouped[cat].map(item => `
-                <div class="list-item" onclick="document.getElementById('url-input').value='${item.url}'; document.getElementById('url-input').dispatchEvent(new KeyboardEvent('keydown', {'key':'Enter'})); closeModals();">
+                <div class="list-item" onclick="document.getElementById('url-input').value='${item.url}'; document.getElementById('url-input').dispatchEvent(new KeyboardEvent('keydown', {'key':'Enter'})); document.getElementById('global-sidebar').classList.remove('open');">
                     <div class="list-title"><i class="fas fa-bookmark" style="margin-right:5px; color:#eab308;"></i> ${item.title}</div>
                     <div class="list-url">${item.url}</div>
                 </div>
@@ -660,52 +745,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Modal Management ---
-    const allModals = [historyModal, bookmarksModal, passwordsModal];
-    const rightSidebar = document.getElementById('right-sidebar');
-
-    function closeModals() {
-        allModals.forEach(m => m.classList.add('hidden'));
-        if (rightSidebar) rightSidebar.classList.remove('open');
-    }
-
-    function openModal(modal) {
-        closeModals();
-        if (rightSidebar) rightSidebar.classList.add('open');
-        modal.classList.remove('hidden');
-    }
-
-    btnHistory.addEventListener('click', () => { openModal(historyModal); loadHistory(); });
-    btnBookmarksMenu.addEventListener('click', () => { openModal(bookmarksModal); loadBookmarksUI(); });
-    btnPasswords.addEventListener('click', () => {
-        openModal(passwordsModal);
+    // --- App Shortcuts Generation (Right Sidebar) ---
+    function renderAppShortcuts() {
+        const appsContainer = document.getElementById('apps-list-container');
+        if (!appsContainer || !window.appClassifier) return;
+        
+        // Grab apps enabled from Desktop flow, or fallback to default offline+online array filtering.
+        let enabledApps = [];
         try {
-            const tab = tabs.find(t => t.id === currentTabId);
-            if (tab) {
-                const domain = new URL(tab.url).hostname;
-                document.getElementById('pass-site').value = domain;
+            const saved = localStorage.getItem('enabled_apps');
+            if (saved) {
+                enabledApps = JSON.parse(saved);
+            } else {
+                // If never customized, populate generic useful defaults
+                enabledApps = ['calculator', 'todo-list', 'kanban-board', 'web-browser', 'life-board'];
             }
-        } catch (e) { }
-        loadPasswords();
+        } catch(e) {}
+
+        const apps = Array.from(window.appClassifier.appRegistry.values()).filter(a => enabledApps.includes(a.id));
+        
+        appsContainer.innerHTML = apps.map(app => `
+            <button class="app-icon-btn" title="${app.name}" onclick="document.dispatchEvent(new CustomEvent('launch-app', { detail: '${app.path}' }))">
+                <i class="${app.icon}"></i>
+            </button>
+        `).join('');
+    }
+
+    document.addEventListener('launch-app', (e) => {
+        createNewTab(e.detail);
     });
 
+    // --- Click Outside Management ---
     document.addEventListener('click', (e) => {
-        if (rightSidebar && rightSidebar.classList.contains('open') && 
-            !rightSidebar.contains(e.target) && 
-            e.target !== btnHistory && 
-            e.target !== btnBookmarksMenu && 
-            e.target !== btnPasswords &&
-            !btnHistory.contains(e.target) &&
-            !btnBookmarksMenu.contains(e.target) &&
-            !btnPasswords.contains(e.target)) {
-            closeModals();
+        if (globalSidebar && globalSidebar.classList.contains('open') && 
+            !globalSidebar.contains(e.target) && 
+            e.target !== btnHamburger && 
+            !btnHamburger.contains(e.target)) {
+            globalSidebar.classList.remove('open');
         }
     });
 
-    document.querySelectorAll('.close-modal').forEach(btn => {
-        btn.addEventListener('click', closeModals);
-    });
-
     // --- Initialize ---
-    createNewTab(); // Automatically open first tab pointing to default search engine
+    if (window.appClassifier) {
+        renderAppShortcuts();
+    } else {
+        setTimeout(renderAppShortcuts, 500); // Give JS time to load if deferred
+    }
+    
+    createNewTab('desktop/desktop.html'); // Automatically open first tab pointing to desktop features
 });

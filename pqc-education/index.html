@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PQC Explorer — Skand Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+</head>
+<body>
+    <script src="../desktop/app-shell.js"></script>
+
+    <div class="pqc-app">
+        <!-- Navigation Tabs -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="learn">📚 Learn</button>
+            <button class="tab-btn" data-tab="algorithms">🔐 Algorithms</button>
+            <button class="tab-btn" data-tab="settings">⚙ Settings</button>
+            <button class="tab-btn" data-tab="demo">🧪 Demo</button>
+        </div>
+
+        <!-- Learn Tab -->
+        <section class="tab-panel active" id="tab-learn">
+            <div class="hero-card">
+                <i class="fas fa-shield-halved hero-icon"></i>
+                <h1>Post-Quantum Cryptography</h1>
+                <p>Preparing your data for the quantum computing era</p>
+            </div>
+
+            <div class="content-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-atom"></i> What is PQC?</h3>
+                    <p>Post-Quantum Cryptography (PQC) is a family of cryptographic algorithms designed to resist attacks from both classical and quantum computers. As quantum computers grow in power, current encryption (RSA, ECDSA) may become vulnerable.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-days"></i> Why Now?</h3>
+                    <p>NIST finalized its first set of PQC standards in 2024. Organizations worldwide are beginning the transition. The "harvest now, decrypt later" threat means your data encrypted today could be cracked by future quantum computers.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-browser"></i> Skand & PQC</h3>
+                    <p>Skand Browser uses AES-256-GCM encryption for local data storage. While not a full PQC implementation, this provides quantum-resistant symmetric encryption for your app data, API keys, and sync payloads.</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-road"></i> Migration Path</h3>
+                    <p>The transition to PQC is gradual. Hybrid approaches (combining classical + PQC algorithms) are recommended. Skand will adopt NIST-approved algorithms as browser engine support matures.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Algorithms Tab -->
+        <section class="tab-panel" id="tab-algorithms">
+            <h2>NIST Approved PQC Algorithms</h2>
+            <div class="algo-list" id="algo-list">
+                <!-- Populated by script.js -->
+            </div>
+        </section>
+
+        <!-- Settings Tab -->
+        <section class="tab-panel" id="tab-settings">
+            <h2>PQC Settings</h2>
+            <p class="hint">Configure how Skand Browser handles encryption.</p>
+
+            <div class="setting-group">
+                <label class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Enable PQC Local Encryption</span>
+                        <span class="toggle-desc">Encrypt app data using AES-256-GCM before storing locally</span>
+                    </div>
+                    <input type="checkbox" id="enable-pqc">
+                    <div class="toggle-switch"></div>
+                </label>
+            </div>
+
+            <div class="setting-group" id="key-section" style="display:none;">
+                <h3><i class="fas fa-key"></i> Device Key</h3>
+                <p class="hint">Your AES-256-GCM key (stored only on this device). WARNING: If you lose this key, encrypted data cannot be recovered.</p>
+                <div class="key-display">
+                    <code id="device-key">Not generated</code>
+                    <button class="btn-small" id="btn-copy-key"><i class="fas fa-copy"></i></button>
+                </div>
+                <button class="btn-secondary" id="btn-generate-key">
+                    <i class="fas fa-rotate"></i> Generate New Key
+                </button>
+            </div>
+
+            <div class="setting-group">
+                <label class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Encrypt Cloud Sync Data</span>
+                        <span class="toggle-desc">Apply PQC encryption before syncing to Supabase</span>
+                    </div>
+                    <input type="checkbox" id="enable-cloud-pqc">
+                    <div class="toggle-switch"></div>
+                </label>
+            </div>
+        </section>
+
+        <!-- Demo Tab -->
+        <section class="tab-panel" id="tab-demo">
+            <h2>Encryption Demo</h2>
+            <p class="hint">Test AES-256-GCM encryption right here.</p>
+
+            <div class="demo-section">
+                <div class="form-group">
+                    <label>Plaintext</label>
+                    <textarea id="demo-plaintext" rows="3" placeholder="Type something to encrypt..."></textarea>
+                </div>
+                <button class="btn-primary" id="btn-encrypt-demo"><i class="fas fa-lock"></i> Encrypt</button>
+
+                <div class="form-group">
+                    <label>Ciphertext</label>
+                    <textarea id="demo-ciphertext" rows="3" readonly placeholder="Encrypted output appears here"></textarea>
+                </div>
+                <button class="btn-primary" id="btn-decrypt-demo"><i class="fas fa-unlock"></i> Decrypt</button>
+
+                <div class="form-group">
+                    <label>Decrypted</label>
+                    <textarea id="demo-decrypted" rows="2" readonly placeholder="Decrypted output"></textarea>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'pqc-education', title: 'PQC Explorer' });
+        });
+    </script>
+</body>
+</html>

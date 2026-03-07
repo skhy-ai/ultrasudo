@@ -198,10 +198,10 @@ class AppClassifier {
             },
             {
                 id: 'quote-and-catalog-generator',
-                name: 'Quote and Catalog Generator',
+                name: 'Quote & Catalog Generator',
                 path: '../quote-and-catalog-generator/index.html',
                 icon: 'fas fa-quote-left',
-                category: 'business',
+                category: 'productivity',
                 type: 'offline',
                 networkDependencies: ['fontawesome-cdn'],
                 offlineCapable: true,
@@ -471,7 +471,7 @@ class AppClassifier {
                 name: 'Patent Researcher',
                 path: '../patent-researcher/index.html',
                 icon: 'fas fa-lightbulb',
-                category: 'research',
+                category: 'productivity',
                 type: 'online',
                 networkDependencies: ['fontawesome-cdn'],
                 offlineCapable: false,
@@ -501,6 +501,42 @@ class AppClassifier {
                 offlineCapable: false,
                 cacheableAssets: [],
                 description: 'Chromium-based Web Browser'
+            },
+            {
+                id: 'yoga',
+                name: 'Yoga & Wellness',
+                path: '../yoga/index.html',
+                icon: 'fas fa-spa',
+                category: 'health',
+                type: 'offline',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: true,
+                cacheableAssets: ['index.html'],
+                description: 'Guided yoga poses and wellness routines'
+            },
+            {
+                id: 'grocery',
+                name: 'Grocery List',
+                path: '../grocery/index.html',
+                icon: 'fas fa-cart-shopping',
+                category: 'lifestyle',
+                type: 'offline',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: true,
+                cacheableAssets: ['index.html'],
+                description: 'Smart grocery list manager'
+            },
+            {
+                id: 'vpn',
+                name: 'VPN',
+                path: '../vpn/index.html',
+                icon: 'fas fa-shield-virus',
+                category: 'system',
+                type: 'online',
+                networkDependencies: ['fontawesome-cdn'],
+                offlineCapable: false,
+                cacheableAssets: ['index.html', 'style.css', 'script.js'],
+                description: 'Virtual Private Network with global server selection'
             }
         ];
         extra.forEach(app => {

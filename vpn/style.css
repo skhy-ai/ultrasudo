@@ -1,0 +1,101 @@
+/* VPN App — Styling */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: #0a0e1a; color: #f8fafc; min-height: 100vh;
+    background-image: radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.1) 0%, transparent 55%);
+}
+.vpn-app { max-width: 500px; margin: 0 auto; padding: 20px; }
+.panel { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+h3 { font-size: 0.95rem; font-weight: 600; color: #94a3b8; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+/* Connection Card */
+.connection-card {
+    display: flex; flex-direction: column; align-items: center; padding: 40px 20px; margin-bottom: 16px;
+    background: rgba(15,23,42,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
+}
+.status-ring {
+    width: 160px; height: 160px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 4px solid rgba(255,255,255,0.08); margin-bottom: 24px; transition: all 0.5s ease; position: relative;
+}
+.status-ring::before {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 4px solid transparent;
+    border-top-color: #ef4444; animation: ringPulse 2s linear infinite;
+}
+.status-ring.connected { border-color: rgba(16,185,129,0.3); }
+.status-ring.connected::before { border-top-color: #10b981; }
+.status-ring.connecting::before { border-top-color: #f59e0b; animation-duration: 0.6s; }
+
+@keyframes ringPulse { to { transform: rotate(360deg); } }
+
+.ring-inner { text-align: center; }
+.ring-inner i { font-size: 2.5rem; color: #ef4444; display: block; margin-bottom: 8px; transition: color 0.5s; }
+.status-ring.connected .ring-inner i { color: #10b981; }
+.status-ring.connecting .ring-inner i { color: #f59e0b; }
+.status-text { font-size: 0.85rem; font-weight: 600; color: #94a3b8; }
+
+.btn-connect {
+    padding: 14px 48px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; transition: all 0.3s; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+}
+.btn-connect:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59,130,246,0.4); }
+.btn-connect.connected { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 20px rgba(16,185,129,0.3); }
+
+/* Server List */
+.server-search {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(15,23,42,0.5);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 12px;
+}
+.server-search i { color: #64748b; }
+.server-search input { flex: 1; background: none; border: none; color: white; font-size: 0.9rem; outline: none; }
+
+.server-list { max-height: 250px; overflow-y: auto; }
+.server-list::-webkit-scrollbar { width: 4px; }
+.server-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+.server-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    transition: background 0.2s; margin-bottom: 4px;
+}
+.server-item:hover { background: rgba(59,130,246,0.08); }
+.server-item.selected { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); }
+.server-flag { font-size: 1.5rem; }
+.server-info { flex: 1; }
+.server-name { font-weight: 600; font-size: 0.88rem; }
+.server-city { font-size: 0.72rem; color: #64748b; }
+.server-ping { font-size: 0.75rem; color: #10b981; font-weight: 600; }
+.server-load { width: 40px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.server-load-bar { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card { padding: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; text-align: center; }
+.stat-label { font-size: 0.72rem; color: #64748b; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 1.1rem; font-weight: 700; color: #10b981; }
+.ip-display { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+.ip-label { font-size: 0.8rem; color: #64748b; }
+.ip-value { font-family: monospace; font-size: 0.85rem; color: #f59e0b; }
+
+/* Settings */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; cursor: pointer; margin-bottom: 8px; }
+.toggle-info { flex: 1; }
+.toggle-label { font-weight: 600; font-size: 0.85rem; display: block; }
+.toggle-desc { font-size: 0.72rem; color: #64748b; display: block; margin-top: 2px; }
+.toggle-row input { display: none; }
+.toggle-switch { width: 40px; height: 22px; border-radius: 11px; background: rgba(255,255,255,0.15); position: relative; transition: background 0.3s; flex-shrink: 0; }
+.toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.3s; }
+.toggle-row input:checked + .toggle-switch { background: #10b981; }
+.toggle-row input:checked + .toggle-switch::after { transform: translateX(18px); }
+
+.protocol-select { margin-top: 12px; }
+.protocol-select label { display: block; font-size: 0.8rem; color: #94a3b8; font-weight: 600; margin-bottom: 6px; }
+.protocol-select select { width: 100%; padding: 10px 12px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 0.85rem; }
+
+.integration-note {
+    margin-top: 14px; padding: 12px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px; display: flex; gap: 10px; align-items: flex-start;
+}
+.integration-note i { color: #3b82f6; margin-top: 2px; }
+.integration-note p { font-size: 0.78rem; color: #94a3b8; line-height: 1.5; }
+.integration-note code { background: rgba(0,0,0,0.3); padding: 1px 4px; border-radius: 4px; font-size: 0.75rem; }

@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let enabledAppIds = savedEnabledApps ? JSON.parse(savedEnabledApps) : null;
 
         const filteredApps = Array.from(registry.values()).filter(app => {
+            if (app.comingSoon) return false; // Exclude coming soon apps
             if (enabledAppIds && app.id !== 'desktop' && !enabledAppIds.includes(app.id)) return false;
 
             const typeOk = currentType === 'all' ? true : app.type === currentType;
@@ -427,6 +428,10 @@ window.filterNews = function () {
         container.innerHTML = '<div class="empty-state" style="padding:10px;">No articles match your search.</div>';
         return;
     }
+
+    const page = window.newsPage || 0;
+    const pageSize = window.newsPageSize || 20;
+    const paginated = filtered.slice(page * pageSize, (page + 1) * pageSize);
 
     container.innerHTML = paginated.map(item => `
         <div class="news-item">
