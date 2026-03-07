@@ -1,0 +1,237 @@
+.grocery-app {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 20px;
+}
+
+.grocery-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+}
+
+.date-display {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.grocery-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+    .grocery-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f8fafc;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title i {
+    color: #2ecc71;
+}
+
+/* Quick Add */
+.quick-add-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.food-card {
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 80px;
+}
+
+.food-card:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.gi-tag {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+/* Shopping List */
+.grocery-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.grocery-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.grocery-item:hover {
+    border-color: #2ecc71;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.grocery-item.checked {
+    opacity: 0.5;
+}
+
+.grocery-item.checked .item-name {
+    text-decoration: line-through;
+}
+
+.item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    cursor: pointer;
+}
+
+.item-name {
+    font-size: 0.95rem;
+    color: #f1f5f9;
+}
+
+.item-gi-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.gi-low { background-color: #2ecc71; }
+.gi-medium { background-color: #f1c40f; }
+.gi-high { background-color: #e67e22; }
+.gi-unknown { background-color: #64748b; }
+
+.btn-remove {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.btn-remove:hover {
+    color: #ef4444;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.3;
+}
+
+/* Sidebar Elements */
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    flex: 1;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #f8fafc;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.gi-legend {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.delivery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.delivery-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delivery-btn:hover {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}

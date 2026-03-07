@@ -1,0 +1,239 @@
+/* Scoped Notebook Styles */
+.notebook-app-wrapper {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    padding-top: 24px;
+    padding-bottom: 64px;
+    overflow-y: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notebook-app-wrapper .container {
+    width: min(1200px, 94vw);
+    height: fit-content;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(23, 43, 77, 0.15);
+    padding: 32px 36px 48px;
+    border-radius: 18px;
+    border: 1px solid #d9e2ef;
+    color: #1a2332;
+}
+
+.notebook-app-wrapper h1 {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.25px;
+    text-align: center;
+    margin: 0 0 24px;
+}
+
+.notebook-app-wrapper .document-header {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.notebook-app-wrapper #document-title {
+    border: 1px solid #c7d2e2;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 16px;
+    background: transparent;
+    color: #333;
+}
+
+.notebook-app-wrapper .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(72, 118, 249, 0.08), rgba(93, 197, 253, 0.05));
+    border: 1px solid #cdd9f6;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    color: #333;
+}
+
+.notebook-app-wrapper .toolbar-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 8px;
+    border-right: 1px solid #dbe4ff;
+}
+
+.notebook-app-wrapper .toolbar button,
+.notebook-app-wrapper .toolbar select,
+.notebook-app-wrapper .color-control {
+    background: #ffffff;
+    border: 1px solid #c7d2e2;
+    border-radius: 999px;
+    cursor: pointer;
+    height: 36px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    color: #24324a;
+}
+
+.notebook-app-wrapper .toolbar select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #4876f9 50%),
+        linear-gradient(135deg, #4876f9 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 12px) calc(50% + 2px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 28px;
+}
+
+.notebook-app-wrapper .color-control input[type="color"] {
+    border: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.notebook-app-wrapper .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    background: #ffffff;
+    border: 1px solid #c7d2e2;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+    z-index: 5;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notebook-app-wrapper .dropdown-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.notebook-app-wrapper .dropdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 10px 8px;
+    margin-bottom: 16px;
+}
+
+.notebook-app-wrapper .dropdown-grid input {
+    border: 1px solid #c7d2e2;
+    border-radius: 8px;
+    padding: 6px 8px;
+    color: #333;
+}
+
+.notebook-app-wrapper .editor-shell {
+    position: relative;
+    background: #fdfdfd;
+    border: 1px solid #cfd8eb;
+    border-radius: 16px;
+    padding: 48px 48px 48px 68px;
+    overflow: hidden;
+    --margin-guide-top: 72px;
+    --margin-guide-bottom: 320px;
+    --margin-guide-left: 120px;
+    --margin-guide-right: 720px;
+}
+
+.notebook-app-wrapper .editor-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(72, 118, 249, 0.06), rgba(93, 197, 253, 0.05));
+    opacity: 0.65;
+}
+
+.notebook-app-wrapper .ruler {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    color: rgba(15, 23, 42, 0.55);
+    font-size: 10px;
+}
+
+.notebook-app-wrapper .ruler::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(to right, rgba(15, 23, 42, 0.12), transparent 10px);
+}
+
+.notebook-app-wrapper .ruler.horizontal { top: 24px; left: 64px; right: 48px; height: 20px; }
+.notebook-app-wrapper .ruler.vertical { top: 44px; left: 24px; bottom: 48px; width: 20px; }
+
+.notebook-app-wrapper .margin-guide {
+    position: absolute;
+    border: 1px dashed rgba(72, 118, 249, 0.45);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.notebook-app-wrapper .margin-guide-top { top: var(--margin-guide-top); left: var(--margin-guide-left); right: calc(100% - var(--margin-guide-right)); height: 0; }
+.notebook-app-wrapper .margin-guide-bottom { top: var(--margin-guide-bottom); left: var(--margin-guide-left); right: calc(100% - var(--margin-guide-right)); height: 0; }
+.notebook-app-wrapper .margin-guide-left { left: var(--margin-guide-left); top: var(--margin-guide-top); bottom: calc(100% - var(--margin-guide-bottom)); width: 0; }
+.notebook-app-wrapper .margin-guide-right { left: var(--margin-guide-right); top: var(--margin-guide-top); bottom: calc(100% - var(--margin-guide-bottom)); width: 0; }
+
+.notebook-app-wrapper #editor {
+    position: relative;
+    z-index: 3;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 12px;
+    padding: 2cm;
+    min-height: 27cm;
+    outline: none;
+    background: #ffffff;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #1f2933;
+    width: calc(100% - 2cm);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.notebook-app-wrapper #editor img.selected-image { box-shadow: 0 0 0 3px rgba(72, 118, 249, 0.4); }
+
+.notebook-app-wrapper .image-properties-panel {
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
+    width: 280px;
+    background: #ffffff;
+    border: 1px solid #cfd8eb;
+    border-radius: 18px;
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.27);
+    padding: 18px 20px 22px;
+    z-index: 50;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: #333;
+}
+
+.notebook-app-wrapper .image-properties-panel.hidden { opacity: 0; visibility: hidden; transform: translateY(12px); }
+
+.notebook-app-wrapper .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.notebook-app-wrapper .panel-body { display: grid; gap: 14px; font-size: 14px; }
+.notebook-app-wrapper .panel-body select, .notebook-app-wrapper .panel-body input[type="range"] { width: 100%; border: 1px solid #c7d2e2; border-radius: 10px; color: #333; }

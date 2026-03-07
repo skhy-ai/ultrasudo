@@ -1,0 +1,235 @@
+.yoga-app-container {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+    overflow-y: auto;
+}
+
+.yoga-home {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.lotus-main {
+    font-size: 4rem;
+    color: #60a5fa;
+    margin-bottom: 24px;
+}
+
+.yoga-main-title {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 8px;
+    margin: 0;
+}
+
+.yoga-subtitle {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    margin-top: 12px;
+}
+
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 60px;
+}
+
+.yoga-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yoga-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #60a5fa;
+}
+
+.yoga-card i {
+    font-size: 3rem;
+    color: #60a5fa;
+    margin-bottom: 24px;
+}
+
+.yoga-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.yoga-card p {
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+/* Session UI */
+.session-ui {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.session-card {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 40px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.session-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin-bottom: 30px;
+}
+
+.pose-image-container {
+    width: 100%;
+    height: 350px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.pose-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pose-name {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: #60a5fa;
+}
+
+.pose-instruction {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    min-height: 3em;
+}
+
+.timer-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 24px auto;
+}
+
+.timer-svg {
+    transform: rotate(-90deg);
+}
+
+.timer-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 6;
+}
+
+.timer-progress {
+    fill: none;
+    stroke: #60a5fa;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 340;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.timer-val {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.round-counter {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Breathing */
+.breathing-stage {
+    width: 300px;
+    height: 300px;
+    margin: 40px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.breathing-circle {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #60a5fa 0%, #3b82f6 100%);
+    border-radius: 50%;
+    transition: transform ease-in-out;
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+}
+
+.breathing-text {
+    position: absolute;
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.breathing-instruction {
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+/* Controls */
+.session-controls {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+}
+
+.btn-pause {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.btn-pause:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-exit {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-exit:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}

@@ -1,21 +1,23 @@
 use axum::{
-    extract::{State, Query},
+    extract::State,
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::Arc;
 use tokio::process::Child;
 use tokio::process::Command;
 use tokio::signal;
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
-use tracing::{error, info};
+use tracing::info;
 use walkdir::WalkDir;
-use sysinfo::{CpuExt, System, SystemExt};
+use sysinfo::System;
+
+mod pqc_helper;
 
 // Global App State
 #[derive(Clone)]
@@ -26,9 +28,9 @@ struct AppState {
 }
 
 struct ServiceInfo {
-    name: String,
+    _name: String,
     child: Child,
-    service_type: String, // "rust" or "python"
+    _service_type: String, // "rust" or "python"
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -55,6 +57,56 @@ struct SystemStats {
     memory_used: u64,
     memory_total: u64,
     services_active: usize,
+}
+
+#[derive(Serialize)]
+struct KeysResponse {
+    public_key: String,
+    secret_key: String,
+}
+
+#[derive(Deserialize)]
+struct EncapsulateRequest {
+    public_key: String,
+}
+
+#[derive(Serialize)]
+struct EncapsulateResponse {
+    shared_secret: String,
+    ciphertext: String,
+}
+
+#[derive(Deserialize)]
+struct DecapsulateRequest {
+    ciphertext: String,
+    secret_key: String,
+}
+
+#[derive(Serialize)]
+struct DecapsulateResponse {
+    shared_secret: String,
+}
+
+#[derive(Deserialize)]
+struct EncryptRequest {
+    data: String,
+    shared_secret: String,
+}
+
+#[derive(Serialize)]
+struct EncryptResponse {
+    ciphertext: String,
+}
+
+#[derive(Deserialize)]
+struct DecryptRequest {
+    ciphertext: String,
+    shared_secret: String,
+}
+
+#[derive(Serialize)]
+struct DecryptResponse {
+    data: String,
 }
 
 #[tokio::main]
@@ -98,7 +150,7 @@ async fn main() {
 
             info!("Discovered Rust Service: {}", service_name);
             if let Ok(child) = Command::new("cargo").arg("run").arg("--release").current_dir(service_dir).spawn() {
-                services.insert(service_name.clone(), ServiceInfo { name: service_name, child, service_type: "rust".into() });
+                services.insert(service_name.clone(), ServiceInfo { _name: service_name, child, _service_type: "rust".into() });
             }
         }
 
@@ -110,7 +162,7 @@ async fn main() {
             info!("Discovered Python Service: {}", service_name);
             // Assuming python3 is available in PATH
             if let Ok(child) = Command::new("python3").arg("python_service.py").current_dir(service_dir).spawn() {
-                services.insert(service_name.clone(), ServiceInfo { name: service_name, child, service_type: "python".into() });
+                services.insert(service_name.clone(), ServiceInfo { _name: service_name, child, _service_type: "python".into() });
             }
         }
     }
@@ -120,7 +172,12 @@ async fn main() {
         .route("/data", get(get_all_data).post(set_data))
         .route("/network", get(get_network_logs).post(add_network_log))
         .route("/stats", get(get_system_stats))
-        .route("/health", get(get_health));
+        .route("/health", get(get_health))
+        .route("/pqc/generate", get(pqc_generate))
+        .route("/pqc/encapsulate", post(pqc_encapsulate))
+        .route("/pqc/decapsulate", post(pqc_decapsulate))
+        .route("/pqc/encrypt", post(pqc_encrypt))
+        .route("/pqc/decrypt", post(pqc_decrypt));
 
     let app_router = Router::new()
         .nest("/api", api_routes)
@@ -205,6 +262,42 @@ async fn add_network_log(State(state): State<AppState>, Json(log): Json<NetworkL
     logs.push(log);
     if logs.len() > 1000 { logs.remove(0); } // Management limit
     StatusCode::OK
+}
+
+async fn pqc_generate() -> Json<KeysResponse> {
+    let keys = pqc_helper::generate_pqc_keypair();
+    Json(KeysResponse {
+        public_key: keys.public_key,
+        secret_key: keys.secret_key,
+    })
+}
+
+async fn pqc_encapsulate(Json(payload): Json<EncapsulateRequest>) -> Result<Json<EncapsulateResponse>, StatusCode> {
+    match pqc_helper::encapsulate_pqc(&payload.public_key) {
+        Ok((ss, ct)) => Ok(Json(EncapsulateResponse { shared_secret: ss, ciphertext: ct })),
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
+}
+
+async fn pqc_decapsulate(Json(payload): Json<DecapsulateRequest>) -> Result<Json<DecapsulateResponse>, StatusCode> {
+    match pqc_helper::decapsulate_pqc(&payload.ciphertext, &payload.secret_key) {
+        Ok(ss) => Ok(Json(DecapsulateResponse { shared_secret: ss })),
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
+}
+
+async fn pqc_encrypt(Json(payload): Json<EncryptRequest>) -> Result<Json<EncryptResponse>, StatusCode> {
+    match pqc_helper::encrypt_with_ss(&payload.data, &payload.shared_secret) {
+        Ok(ct) => Ok(Json(EncryptResponse { ciphertext: ct })),
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
+}
+
+async fn pqc_decrypt(Json(payload): Json<DecryptRequest>) -> Result<Json<DecryptResponse>, StatusCode> {
+    match pqc_helper::decrypt_with_ss(&payload.ciphertext, &payload.shared_secret) {
+        Ok(data) => Ok(Json(DecryptResponse { data })),
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
 }
 
 async fn shutdown_signal() {

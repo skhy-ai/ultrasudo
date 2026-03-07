@@ -1,0 +1,132 @@
+:root {
+  /* Premium Slate Palette */
+  --bg-color: #0f172a;
+  --bg-darker: #020617;
+  --header-bg: rgba(30, 41, 59, 0.7);
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --border-color: #334155;
+  --hover-bg: rgba(51, 65, 85, 0.5);
+  --text-color: #f8fafc;
+  --text-muted: #94a3b8;
+  
+  /* Vibrant Accents */
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.5);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Typography */
+  --font-main: 'Inter', 'Outfit', -apple-system, sans-serif;
+  
+  /* Shadows & Glass */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --glass-blur: blur(12px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UNIFIED BUTTON SYSTEM
+   ───────────────────────────────────────────────────────────────────────────── */
+
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px; /* Fixed missing padding */
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--hover-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  user-select: none;
+}
+
+button:hover, .btn:hover {
+  background: var(--accent);
+  box-shadow: 0 0 15px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
+  opacity: 0.8;
+}
+
+button:disabled, .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary Button */
+.btn-primary {
+  background: var(--accent);
+  border: none;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background: var(--header-bg);
+  backdrop-filter: var(--glass-blur);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   GLOBAL SCROLLBARS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   GLASS UTILITIES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+}

@@ -1,0 +1,165 @@
+.vault-container {
+    height: 100%;
+    background: #020617;
+    color: #f1f5f9;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.vault-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-badge.secure {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.vault-header h1 {
+    font-size: 3rem;
+    margin: 0;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.vault-header p {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.vault-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.add-vault-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transition: all 0.2s;
+}
+
+.add-vault-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+}
+
+.card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.add-form {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    padding: 30px;
+}
+
+.add-form h3 { margin-top: 0; }
+
+.add-form input, .add-form textarea {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: white;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+.add-form textarea { height: 120px; resize: none; }
+
+.form-btns { display: flex; gap: 15px; }
+.form-btns button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; }
+.form-btns .cancel { background: #334155; color: white; }
+.form-btns .confirm { background: #10b981; color: white; }
+
+.vault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.empty-vault {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    color: #64748b;
+}
+
+.empty-vault i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
+
+.vault-item {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.item-info strong { display: block; margin-bottom: 10px; font-size: 1.1rem; color: #3b82f6; }
+.item-info pre { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; font-size: 0.9rem; margin: 0; }
+
+.item-del {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.item-del:hover { opacity: 1; }
+
+.vault-footer {
+    margin-top: 60px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.85rem;
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vault-loading {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #020617;
+    color: #3b82f6;
+    font-weight: 700;
+    font-size: 1.2rem;
+}

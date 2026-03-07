@@ -1,0 +1,145 @@
+.calculator-app {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+}
+
+.calculator-app .container {
+    width: 90%;
+    max-width: 450px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+.calculator-app .tabs {
+    display: flex;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.calculator-app .tab-link {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.calculator-app .tab-link.active {
+    background-color: var(--hover-bg);
+    color: var(--accent);
+}
+
+.calculator-app .tab-link:hover {
+    color: var(--text-color);
+}
+
+.calculator-app .tab-content {
+    padding: 20px;
+}
+
+/* Calculator Styles */
+.calculator-app .calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.calculator-app .calculator-grid button {
+    padding: 18px; /* Fixed padding */
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    background-color: var(--hover-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calculator-app .calculator-grid button:hover {
+    background-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.calculator-app .calculator-grid .span-two {
+    grid-column: span 2;
+}
+
+.calculator-app .output {
+    grid-column: 1 / -1;
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: right;
+    margin-bottom: 10px;
+    min-height: 80px;
+}
+
+.calculator-app .previous-operand {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.calculator-app .current-operand {
+    font-size: 2.5rem;
+}
+
+/* Converter Styles */
+.calculator-app .converter-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.calculator-app .form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+}
+
+.calculator-app .form-group label {
+    font-weight: 500;
+}
+
+.calculator-app .form-group select, .calculator-app .form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    font-size: 16px;
+    color: #333;
+}
+
+.calculator-app .to-section {
+    text-align: center;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.calculator-app #outputValue {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    flex: 1;
+    text-align: center;
+    color: #333;
+}

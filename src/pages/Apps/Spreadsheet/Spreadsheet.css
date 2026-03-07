@@ -1,0 +1,141 @@
+.sheet-app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #0f172a;
+    color: #f1f5f9;
+    outline: none;
+}
+
+.sheet-toolbar {
+    padding: 12px 20px;
+    background: rgba(30, 41, 59, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.formula-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.active-cell-indicator {
+    font-weight: 700;
+    color: #3b82f6;
+    min-width: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.formula-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.grid-viewport {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+.spreadsheet-grid {
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-width: 100%;
+    font-size: 0.9rem;
+}
+
+.spreadsheet-grid th, .spreadsheet-grid td {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 100px;
+    height: 30px;
+    padding: 0;
+    position: relative;
+}
+
+.corner-header, .row-header, .col-header {
+    background: rgba(30, 41, 59, 0.9);
+    color: #94a3b8;
+    font-weight: 500;
+    text-align: center;
+    user-select: none;
+}
+
+.row-header {
+    width: 40px;
+    min-width: 40px;
+}
+
+.col-header {
+    height: 30px;
+}
+
+.sheet-cell {
+    background: transparent;
+    cursor: cell;
+    transition: background-color 0.1s;
+}
+
+.sheet-cell.selected {
+    background: rgba(59, 130, 246, 0.2);
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+    z-index: 10;
+}
+
+.sheet-cell.formula {
+    border-left: 3px solid #10b981;
+}
+
+.sheet-cell.error {
+    color: #ef4444;
+}
+
+.cell-content {
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.cell-editor {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: #1e293b;
+    color: white;
+    padding: 2px 8px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* Scrollbar styling */
+.grid-viewport::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+.grid-viewport::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+.grid-viewport::-webkit-scrollbar-thumb {
+    background: #334155;
+    border: 3px solid #0f172a;
+    border-radius: 6px;
+}
+.grid-viewport::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}

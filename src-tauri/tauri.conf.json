@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.skand.browser",
   "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build:frontend",
+    "devUrl": "http://localhost:5173",
     "frontendDist": "../dist"
   },
   "app": {
@@ -11,7 +14,7 @@
     "windows": [
       {
         "title": "Skand Browser",
-        "url": "browser-ui/browser.html",
+        "url": "/",
         "width": 1280,
         "height": 800,
         "minWidth": 800,

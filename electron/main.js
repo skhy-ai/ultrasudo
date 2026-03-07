@@ -1,66 +1,106 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURATION
+// ─────────────────────────────────────────────────────────────────────────────
+const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_DEV === '1';
+const VITE_DEV_URL = 'http://127.0.0.1:5173';
+const DIST_INDEX   = path.join(__dirname, '../dist/index.html');
+
 let mainWindow;
 let backendProcess;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// WINDOW CREATION
+// ─────────────────────────────────────────────────────────────────────────────
 function createWindow() {
+    const iconPath = path.join(__dirname, '../images/icon.png');
+    const iconExists = fs.existsSync(iconPath);
+
     mainWindow = new BrowserWindow({
-        width: 1280,
-        height: 800,
-        minWidth: 800,
+        width:     1400,
+        height:    900,
+        minWidth:  900,
         minHeight: 600,
-        title: 'Skand Browser',
-        icon: path.join(__dirname, '../images/icon.png'),
+        title:     'Skand Browser',
+        ...(iconExists && { icon: iconPath }),
         webPreferences: {
-            nodeIntegration: false, // Security best practice
-            contextIsolation: true, // Security best practice
-            sandbox: true, // Enforce Chromium sandbox for renderer
-            webviewTag: true, // Enable <webview> for Phase 3 Browser
-            preload: path.join(__dirname, 'preload.js'),
-            // Enable web security to enforce CORS/isolation, 
-            // but we might need to adjust for local file loading depending on complex app needs
-            webSecurity: true
+            nodeIntegration:  false,   // Security: no Node in renderer
+            contextIsolation: true,    // Security: isolate renderer context
+            sandbox:          false,   // Must be false to allow preload scripts with contextBridge
+            webviewTag:       true,    // Allow <webview> for in-app browser tabs
+            preload:          path.join(__dirname, 'preload.js'),
+            webSecurity:      false,   // Allow cross-origin requests for local dev (iframe apps)
         }
     });
 
-    // Wait briefly for Rust Server to boot, then load the new Browser UI
-    setTimeout(() => {
-        mainWindow.loadFile(path.join(__dirname, '../browser-ui/browser.html'));
-    }, 1500);
+    // ── Load entry point ──────────────────────────────────────────────────────
+    if (isDev) {
+        // Dev mode: connect to Vite dev server (run `npm run dev` first)
+        console.log('[Electron] Dev mode: loading from', VITE_DEV_URL);
+        mainWindow.loadURL(VITE_DEV_URL).catch(() => {
+            console.error('[Electron] Could not connect to Vite dev server. Did you run `npm run dev`?');
+            mainWindow.loadFile(DIST_INDEX); // fallback to dist
+        });
+        mainWindow.webContents.openDevTools(); // Auto-open DevTools in dev mode
+    } else {
+        // Production mode: load built Vite React app from dist/
+        console.log('[Electron] Production mode: loading from', DIST_INDEX);
+        mainWindow.loadFile(DIST_INDEX);
+    }
 
-    // Hide the default menu bar for a more "app-like" feel
     mainWindow.setMenuBarVisibility(false);
 
-    // mainWindow.webContents.openDevTools();
+    // Open external links in system browser instead of a new Electron window
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            shell.openExternal(url);
+            return { action: 'deny' };
+        }
+        return { action: 'allow' };
+    });
 }
 
-function spawnRustBackend() {
-    const isWin = process.platform === "win32";
+// ─────────────────────────────────────────────────────────────────────────────
+// OPTIONAL RUST SYSTEM BACKEND
+// ─────────────────────────────────────────────────────────────────────────────
+function tryStartRustBackend() {
+    const isWin = process.platform === 'win32';
     const binaryName = isWin ? 'system-manager.exe' : 'system-manager';
-    // When packaged with electron-builder, the structure changes
-    // But since `npm start` runs from project root `electron .` or inside `app.asar`,
-    // it's safest to assume the binary is alongside the electron folder or in resources for a production build
-    const devPath = path.join(__dirname, '../system-manager/target/release', binaryName);
+    const binaryPath = path.join(__dirname, '../system-manager/target/release', binaryName);
 
-    // Attempt to spawn the backend process
-    backendProcess = spawn(devPath, [], {
+    if (!fs.existsSync(binaryPath)) {
+        console.warn('[Electron] Rust system-manager not found at:', binaryPath);
+        console.warn('[Electron] Continuing without system backend. Build with: cd system-manager && cargo build --release');
+        return; // graceful — don't crash the app
+    }
+
+    console.log('[Electron] Starting Rust backend:', binaryPath);
+    backendProcess = spawn(binaryPath, [], {
         cwd: path.join(__dirname, '../system-manager'),
-        stdio: 'inherit' // Pipe logs to electron console
+        stdio: 'inherit'
     });
 
     backendProcess.on('error', (err) => {
-        console.error('Failed to start Rust Backend:', err);
+        console.error('[Electron] Rust backend error:', err.message);
+    });
+
+    backendProcess.on('exit', (code) => {
+        console.log('[Electron] Rust backend exited with code:', code);
     });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// APP LIFECYCLE
+// ─────────────────────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
-    spawnRustBackend();
+    tryStartRustBackend();
     createWindow();
 
-    app.on('activate', function () {
+    app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
 });
@@ -71,44 +111,66 @@ app.on('will-quit', () => {
     }
 });
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
-// --- IPC Handlers (Replacing Python Local Backend) ---
+// ─────────────────────────────────────────────────────────────────────────────
+// IPC HANDLERS — File System Bridge
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Handle saving files locally (replacing service_manager logic)
+/** Save arbitrary text content to a file chosen by the user */
 ipcMain.handle('save-file', async (event, { filename, content }) => {
     try {
         const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
             defaultPath: filename,
             title: 'Save File'
         });
-
         if (canceled || !filePath) return { ok: false, error: 'Cancelled' };
-
         fs.writeFileSync(filePath, content, 'utf-8');
         return { ok: true, filePath };
-    } catch (error) {
-        console.error('Save error:', error);
-        return { ok: false, error: error.message };
+    } catch (err) {
+        return { ok: false, error: err.message };
     }
 });
 
-// Handle reading files locally
+/** Open a file and return its text content */
 ipcMain.handle('open-file', async (event, options) => {
     try {
         const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
             properties: ['openFile'],
             filters: options?.filters || [{ name: 'All Files', extensions: ['*'] }]
         });
-
         if (canceled || filePaths.length === 0) return { ok: false, error: 'Cancelled' };
-
         const content = fs.readFileSync(filePaths[0], 'utf-8');
         return { ok: true, content, filePath: filePaths[0] };
-    } catch (error) {
-        console.error('Open error:', error);
-        return { ok: false, error: error.message };
+    } catch (err) {
+        return { ok: false, error: err.message };
+    }
+});
+
+/** Read a JSON data store from app data directory */
+ipcMain.handle('read-data', async (event, { key }) => {
+    try {
+        const dataDir = app.getPath('userData');
+        const filePath = path.join(dataDir, `${key}.json`);
+        if (!fs.existsSync(filePath)) return { ok: true, data: null };
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        return { ok: true, data: JSON.parse(raw) };
+    } catch (err) {
+        return { ok: false, error: err.message };
+    }
+});
+
+/** Write a JSON data store to app data directory */
+ipcMain.handle('write-data', async (event, { key, data }) => {
+    try {
+        const dataDir = app.getPath('userData');
+        fs.mkdirSync(dataDir, { recursive: true });
+        const filePath = path.join(dataDir, `${key}.json`);
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+        return { ok: true };
+    } catch (err) {
+        return { ok: false, error: err.message };
     }
 });

@@ -1,0 +1,45 @@
+.split-pane {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+.pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+.pane-header {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.pane-content {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+.pane-divider {
+    width: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    height: 100%;
+}
+
+.left-pane {
+    background: #1e293b;
+}
+
+.right-pane {
+    background: #0f172a;
+}
