@@ -16,7 +16,7 @@ const DEFAULT_DOC = {
     ]
 };
 
-export default function KanbanBoard() {
+export default function KanbanBoard({ embedded = false }) {
     const [doc, setDoc] = useLocalStore('kanban_board_data', DEFAULT_DOC);
     const [draggedCardId, setDraggedCardId] = useState(null);
 
@@ -80,55 +80,61 @@ export default function KanbanBoard() {
             .sort((a, b) => a.position - b.position);
     };
 
+    const content = (
+        <div className="kanban-app">
+            <div className="kanban-board">
+                {doc.lists.sort((a, b) => a.position - b.position).map(list => (
+                    <div 
+                        key={list.id} 
+                        className="kb-column"
+                        onDragOver={onDragOver}
+                        onDrop={(e) => onDrop(e, list.id)}
+                    >
+                        <div className="kb-col-header">
+                            <h2 className="kb-col-title">{list.title}</h2>
+                            <span className="kb-col-count">{cardsByList(list.id).length}</span>
+                        </div>
+                        
+                        <div className="kb-cards-container">
+                            {cardsByList(list.id).map(card => (
+                                <div 
+                                    key={card.id} 
+                                    className={`kb-card ${draggedCardId === card.id ? 'dragging' : ''}`}
+                                    draggable
+                                    onDragStart={(e) => onDragStart(e, card.id)}
+                                >
+                                    <div className="kb-card-content">{card.title}</div>
+                                    <button className="kb-card-del" onClick={() => deleteCard(card.id)}>
+                                        <i className="fas fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <button className="add-card-link" onClick={() => addCard(list.id)}>
+                            <i className="fas fa-plus"></i> Add a card
+                        </button>
+                    </div>
+                ))}
+                
+                <button className="add-column-btn" onClick={() => {
+                    const title = prompt('Enter column title:');
+                    if (title) setDoc(prev => ({
+                        ...prev, 
+                        lists: [...prev.lists, { id: `list-${Date.now()}`, title, position: prev.lists.length }]
+                    }));
+                }}>
+                    <i className="fas fa-plus"></i> Add Column
+                </button>
+            </div>
+        </div>
+    );
+
+    if (embedded) return content;
+
     return (
         <AppShell title="Kanban Board" icon="fas fa-columns">
-            <div className="kanban-app">
-                <div className="kanban-board">
-                    {doc.lists.sort((a, b) => a.position - b.position).map(list => (
-                        <div 
-                            key={list.id} 
-                            className="kb-column"
-                            onDragOver={onDragOver}
-                            onDrop={(e) => onDrop(e, list.id)}
-                        >
-                            <div className="kb-col-header">
-                                <h2 className="kb-col-title">{list.title}</h2>
-                                <span className="kb-col-count">{cardsByList(list.id).length}</span>
-                            </div>
-                            
-                            <div className="kb-cards-container">
-                                {cardsByList(list.id).map(card => (
-                                    <div 
-                                        key={card.id} 
-                                        className={`kb-card ${draggedCardId === card.id ? 'dragging' : ''}`}
-                                        draggable
-                                        onDragStart={(e) => onDragStart(e, card.id)}
-                                    >
-                                        <div className="kb-card-content">{card.title}</div>
-                                        <button className="kb-card-del" onClick={() => deleteCard(card.id)}>
-                                            <i className="fas fa-trash-can"></i>
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                            
-                            <button className="add-card-link" onClick={() => addCard(list.id)}>
-                                <i className="fas fa-plus"></i> Add a card
-                            </button>
-                        </div>
-                    ))}
-                    
-                    <button className="add-column-btn" onClick={() => {
-                        const title = prompt('Enter column title:');
-                        if (title) setDoc(prev => ({
-                            ...prev, 
-                            lists: [...prev.lists, { id: `list-${Date.now()}`, title, position: prev.lists.length }]
-                        }));
-                    }}>
-                        <i className="fas fa-plus"></i> Add Column
-                    </button>
-                </div>
-            </div>
+            {content}
         </AppShell>
     );
 }

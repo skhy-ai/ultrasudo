@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import AppShell from '../../../components/shared/AppShell/AppShell';
 import HealthyKitchen from '../HealthyKitchen/HealthyKitchen';
 import Yoga from '../Yoga/Yoga';
 import './HealthHub.css';
@@ -196,61 +197,51 @@ export default function HealthHub() {
         return { label: 'Obese', color: '#ef4444' };
     }, [bmi]);
 
+    const voiceBtn = (
+        <button className="voice-toggle-btn" onClick={() => setVoiceMuted(!voiceMuted)}>
+            <i className={`fas fa-volume-${voiceMuted ? 'xmark' : 'high'}`}></i>
+            {voiceMuted ? 'Voice Off' : 'Voice Assistant On'}
+        </button>
+    );
+
     return (
-        <div className="health-hub-container">
-            {/* Header */}
-            <div className="health-header">
-                <div className="health-header-title">
-                    <div className="health-header-icon">
-                        <i className="fas fa-heart-pulse"></i>
-                    </div>
+        <AppShell title="Health & Wellness Hub" icon="fas fa-heart-pulse" headerActions={voiceBtn} noPadding={true}>
+            <div className="health-hub-container">
+                {/* Navigation Tabs */}
+                <div className="health-tabs">
+                    <button 
+                        className={`health-tab-btn ${activeTab === 'kitchen' ? 'active' : ''}`}
+                        onClick={() => setTab('kitchen')}
+                    >
+                        <i className="fas fa-utensils"></i> Nutrition & Kitchen
+                    </button>
+                    <button 
+                        className={`health-tab-btn ${activeTab === 'yoga' ? 'active' : ''}`}
+                        onClick={() => setTab('yoga')}
+                    >
+                        <i className="fas fa-spa"></i> Yoga & Meditation
+                    </button>
+                    <button 
+                        className={`health-tab-btn ${activeTab === 'diagnostics' ? 'active' : ''}`}
+                        onClick={() => setTab('diagnostics')}
+                    >
+                        <i className="fas fa-stethoscope"></i> Diagnostics & Vitals
+                    </button>
+                </div>
+
+                {/* TAB 1: NUTRITION & KITCHEN */}
+                {activeTab === 'kitchen' && (
                     <div>
-                        <h1>Health & Wellness Hub</h1>
-                        <p>Mindful Nutrition, Yoga Workouts & Vitals Diagnostics</p>
+                        <HealthyKitchen embedded={true} />
                     </div>
-                </div>
+                )}
 
-                <button className="voice-toggle-btn" onClick={() => setVoiceMuted(!voiceMuted)}>
-                    <i className={`fas fa-volume-${voiceMuted ? 'xmark' : 'high'}`}></i>
-                    {voiceMuted ? 'Voice Off' : 'Voice Assistant On'}
-                </button>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="health-tabs">
-                <button 
-                    className={`health-tab-btn ${activeTab === 'kitchen' ? 'active' : ''}`}
-                    onClick={() => setTab('kitchen')}
-                >
-                    <i className="fas fa-utensils"></i> Nutrition & Kitchen
-                </button>
-                <button 
-                    className={`health-tab-btn ${activeTab === 'yoga' ? 'active' : ''}`}
-                    onClick={() => setTab('yoga')}
-                >
-                    <i className="fas fa-spa"></i> Yoga & Meditation
-                </button>
-                <button 
-                    className={`health-tab-btn ${activeTab === 'diagnostics' ? 'active' : ''}`}
-                    onClick={() => setTab('diagnostics')}
-                >
-                    <i className="fas fa-stethoscope"></i> Diagnostics & Vitals
-                </button>
-            </div>
-
-            {/* TAB 1: NUTRITION & KITCHEN */}
-            {activeTab === 'kitchen' && (
-                <div>
-                    <HealthyKitchen />
-                </div>
-            )}
-
-            {/* TAB 2: YOGA & MEDITATION */}
-            {activeTab === 'yoga' && (
-                <div>
-                    <Yoga />
-                </div>
-            )}
+                {/* TAB 2: YOGA & MEDITATION */}
+                {activeTab === 'yoga' && (
+                    <div>
+                        <Yoga embedded={true} />
+                    </div>
+                )}
 
             {/* TAB 3: DIAGNOSTICS & VITALS */}
             {activeTab === 'diagnostics' && (
@@ -316,5 +307,6 @@ export default function HealthHub() {
                 </div>
             )}
         </div>
+    </AppShell>
     );
 }

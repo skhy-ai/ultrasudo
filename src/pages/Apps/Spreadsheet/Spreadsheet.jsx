@@ -103,7 +103,7 @@ export default function Spreadsheet() {
     };
 
     return (
-        <AppShell title="Spreadsheets" icon="fas fa-table">
+        <AppShell title="Spreadsheets" icon="fas fa-table" noPadding>
             <div className="sheet-app" onKeyDown={handleKeyDown} tabIndex="0">
                 <div className="sheet-toolbar">
                     <div className="formula-bar">

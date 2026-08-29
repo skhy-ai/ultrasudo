@@ -2,24 +2,25 @@
     height: 100%;
     background: #020617;
     color: #f1f5f9;
-    padding: 40px;
+    padding: 24px;
+    box-sizing: border-box;
     overflow-y: auto;
 }
 
 .vault-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 100px;
     font-size: 0.8rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -37,7 +38,7 @@
 }
 
 .vault-header h1 {
-    font-size: 3rem;
+    font-size: 2.4rem;
     margin: 0;
     font-weight: 800;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
@@ -48,26 +49,30 @@
 
 .vault-header p {
     color: #94a3b8;
-    font-size: 1.1rem;
-    margin-top: 10px;
+    font-size: 1rem;
+    margin-top: 8px;
 }
 
 .vault-actions {
     display: flex;
     justify-content: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .add-vault-btn {
     background: #3b82f6;
     color: white;
     border: none;
-    padding: 12px 30px;
-    border-radius: 12px;
-    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
 .add-vault-btn:hover {
@@ -84,8 +89,8 @@
 
 .add-form {
     max-width: 600px;
-    margin: 0 auto 40px;
-    padding: 30px;
+    margin: 0 auto 30px;
+    padding: 24px;
 }
 
 .add-form h3 { margin-top: 0; }
@@ -99,19 +104,20 @@
     color: white;
     margin-bottom: 15px;
     outline: none;
+    box-sizing: border-box;
 }
 
 .add-form textarea { height: 120px; resize: none; }
 
 .form-btns { display: flex; gap: 15px; }
-.form-btns button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; }
+.form-btns button { flex: 1; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; white-space: nowrap; }
 .form-btns .cancel { background: #334155; color: white; }
 .form-btns .confirm { background: #10b981; color: white; }
 
 .vault-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    gap: 24px;
 }
 
 .empty-vault {
@@ -140,12 +146,14 @@
     cursor: pointer;
     opacity: 0.5;
     transition: opacity 0.2s;
+    padding: 4px;
+    border-radius: 4px;
 }
 
 .item-del:hover { opacity: 1; }
 
 .vault-footer {
-    margin-top: 60px;
+    margin-top: 40px;
     text-align: center;
     color: #64748b;
     font-size: 0.85rem;
@@ -154,7 +162,7 @@
 }
 
 .vault-loading {
-    height: 100vh;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -24,7 +24,7 @@ const BREATHING_CYCLE = [
     { text: 'Hold', duration: 4000, scale: 1 }
 ];
 
-export default function Yoga() {
+export default function Yoga({ embedded = false }) {
     const [view, setView] = useState('home'); // 'home', 'yoga', 'breathing'
     const [isPaused, setIsPaused] = useState(false);
     
@@ -113,92 +113,98 @@ export default function Yoga() {
         if (!isPaused) speechSynthesis.cancel();
     };
 
-    return (
-        <AppShell title="Zen Yoga" icon="fas fa-spa">
-            <div className="yoga-app-container">
-                {view === 'home' && (
-                    <div className="yoga-home">
-                        <header className="yoga-header">
-                            <i className="fas fa-lotus lotus-main"></i>
-                            <h2 className="yoga-main-title">ZEN YOGA</h2>
-                            <p className="yoga-subtitle">Breath in peace, breath out stress.</p>
-                        </header>
-                        <div className="mode-selector">
-                            <div className="yoga-card" onClick={() => startSession('yoga')}>
-                                <i className="fas fa-sun"></i>
-                                <h3>Sun Salutation</h3>
-                                <p>12 poses of Surya Namaskar to energize your body and mind.</p>
-                            </div>
-                            <div className="yoga-card" onClick={() => startSession('breathing')}>
-                                <i className="fas fa-wind"></i>
-                                <h3>Pranayama</h3>
-                                <p>Box breathing exercises for relaxation and focus.</p>
-                            </div>
+    const content = (
+        <div className="yoga-app-container">
+            {view === 'home' && (
+                <div className="yoga-home">
+                    <header className="yoga-header">
+                        <i className="fas fa-lotus lotus-main"></i>
+                        <h2 className="yoga-main-title">ZEN YOGA</h2>
+                        <p className="yoga-subtitle">Breath in peace, breath out stress.</p>
+                    </header>
+                    <div className="mode-selector">
+                        <div className="yoga-card" onClick={() => startSession('yoga')}>
+                            <i className="fas fa-sun"></i>
+                            <h3>Sun Salutation</h3>
+                            <p>12 poses of Surya Namaskar to energize your body and mind.</p>
+                        </div>
+                        <div className="yoga-card" onClick={() => startSession('breathing')}>
+                            <i className="fas fa-wind"></i>
+                            <h3>Pranayama</h3>
+                            <p>Box breathing exercises for relaxation and focus.</p>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {(view === 'yoga' || view === 'breathing') && (
-                    <div className="session-ui">
-                        <div className="session-card">
-                            <h2 className="session-title">
-                                {view === 'yoga' ? 'Sun Salutation' : 'Box Breathing'}
-                            </h2>
+            {(view === 'yoga' || view === 'breathing') && (
+                <div className="session-ui">
+                    <div className="session-card">
+                        <h2 className="session-title">
+                            {view === 'yoga' ? 'Sun Salutation' : 'Box Breathing'}
+                        </h2>
 
-                            {view === 'yoga' && (
-                                <div className="yoga-content">
-                                    <div className="pose-image-container">
-                                        <img src={SUN_SALUTATION_STEPS[yogaIdx].img} alt="Pose" />
-                                    </div>
-                                    <h3 className="pose-name">{SUN_SALUTATION_STEPS[yogaIdx].name}</h3>
-                                    <p className="pose-instruction">{SUN_SALUTATION_STEPS[yogaIdx].instruction}</p>
-
-                                    <div className="timer-wrapper">
-                                        <svg width="120" height="120" className="timer-svg">
-                                            <circle cx="60" cy="60" r="54" className="timer-bg" />
-                                            <circle 
-                                                cx="60" cy="60" r="54" 
-                                                className="timer-progress" 
-                                                style={{ 
-                                                    strokeDashoffset: 340 - (340 * (15 - yogaTimer) / 15) 
-                                                }}
-                                            />
-                                        </svg>
-                                        <span className="timer-val">{yogaTimer}</span>
-                                    </div>
-                                    <div className="round-counter">Round {yogaRound} / 3</div>
+                        {view === 'yoga' && (
+                            <div className="yoga-content">
+                                <div className="pose-image-container">
+                                    <img src={SUN_SALUTATION_STEPS[yogaIdx].img} alt="Pose" />
                                 </div>
-                            )}
+                                <h3 className="pose-name">{SUN_SALUTATION_STEPS[yogaIdx].name}</h3>
+                                <p className="pose-instruction">{SUN_SALUTATION_STEPS[yogaIdx].instruction}</p>
 
-                            {view === 'breathing' && (
-                                <div className="breathing-content">
-                                    <div className="breathing-stage">
-                                        <div 
-                                            className="breathing-circle"
+                                <div className="timer-wrapper">
+                                    <svg width="120" height="120" className="timer-svg">
+                                        <circle cx="60" cy="60" r="54" className="timer-bg" />
+                                        <circle 
+                                            cx="60" cy="60" r="54" 
+                                            className="timer-progress" 
                                             style={{ 
-                                                transform: `scale(${BREATHING_CYCLE[breathIdx].scale})`,
-                                                transitionDuration: `${BREATHING_CYCLE[breathIdx].duration}ms`
+                                                strokeDashoffset: 340 - (340 * (15 - yogaTimer) / 15) 
                                             }}
                                         />
-                                        <div className="breathing-text">{BREATHING_CYCLE[breathIdx].text}</div>
-                                    </div>
-                                    <p className="breathing-instruction">Follow the circle's pulse.</p>
+                                    </svg>
+                                    <span className="timer-val">{yogaTimer}</span>
                                 </div>
-                            )}
-
-                            <div className="session-controls">
-                                <button className="btn btn-pause" onClick={togglePause}>
-                                    <i className={`fas fa-${isPaused ? 'play' : 'pause'}`}></i>
-                                    {isPaused ? 'Resume' : 'Pause'}
-                                </button>
-                                <button className="btn btn-exit" onClick={stopSession}>
-                                    <i className="fas fa-stop"></i> Exit
-                                </button>
+                                <div className="round-counter">Round {yogaRound} / 3</div>
                             </div>
+                        )}
+
+                        {view === 'breathing' && (
+                            <div className="breathing-content">
+                                <div className="breathing-stage">
+                                    <div 
+                                        className="breathing-circle"
+                                        style={{ 
+                                            transform: `scale(${BREATHING_CYCLE[breathIdx].scale})`,
+                                            transitionDuration: `${BREATHING_CYCLE[breathIdx].duration}ms`
+                                        }}
+                                    />
+                                    <div className="breathing-text">{BREATHING_CYCLE[breathIdx].text}</div>
+                                </div>
+                                <p className="breathing-instruction">Follow the circle's pulse.</p>
+                            </div>
+                        )}
+
+                        <div className="session-controls">
+                            <button className="btn btn-pause" onClick={togglePause}>
+                                <i className={`fas fa-${isPaused ? 'play' : 'pause'}`}></i>
+                                {isPaused ? 'Resume' : 'Pause'}
+                            </button>
+                            <button className="btn btn-exit" onClick={stopSession}>
+                                <i className="fas fa-stop"></i> Exit
+                            </button>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+        </div>
+    );
+
+    if (embedded) return content;
+
+    return (
+        <AppShell title="Zen Yoga" icon="fas fa-spa">
+            {content}
         </AppShell>
     );
 }

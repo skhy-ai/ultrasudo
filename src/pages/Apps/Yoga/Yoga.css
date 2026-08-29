@@ -4,6 +4,7 @@
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     color: #f8fafc;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .yoga-home {
@@ -204,15 +205,17 @@
 }
 
 .btn {
-    padding: 12px 30px;
+    padding: 10px 24px;
     border-radius: 50px;
     border: none;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .btn-pause {

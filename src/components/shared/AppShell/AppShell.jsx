@@ -6,7 +6,7 @@ import './AppShell.css';
  * AppShell — Consistent layout wrapper for all native React apps.
  * Provides a header with back button, icon, and title.
  */
-export default function AppShell({ title, icon, children, onBack }) {
+export default function AppShell({ title, icon, children, onBack, headerActions, noPadding = false }) {
     const navigate = useNavigate();
 
     const handleBack = () => {
@@ -25,8 +25,9 @@ export default function AppShell({ title, icon, children, onBack }) {
                     <h1 className="app-title">{title}</h1>
                 </div>
                 <div className="header-spacer"></div>
+                {headerActions && <div className="app-shell-header-actions">{headerActions}</div>}
             </header>
-            <main className="app-shell-content">
+            <main className={`app-shell-content ${noPadding ? 'no-padding' : ''}`}>
                 {children}
             </main>
         </div>

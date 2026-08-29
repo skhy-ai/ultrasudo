@@ -46,26 +46,34 @@ html {
     cursor: default;
 }
 
-button {
+.browser-header button,
+.nav-controls button,
+.window-controls button {
     background: transparent;
     border: none;
     color: var(--text-color);
     height: 32px;
     width: 32px;
-    border-radius: 4px;
+    padding: 0;
+    border-radius: 6px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
     transition: background-color 0.2s;
+    flex-shrink: 0;
 }
 
-button:hover {
+.browser-header button:hover,
+.nav-controls button:hover {
     background-color: var(--hover-bg);
+    transform: none;
+    box-shadow: none;
 }
 
-button:disabled {
+.browser-header button:disabled,
+.nav-controls button:disabled {
     color: var(--border-color);
     cursor: not-allowed;
     background: transparent;
@@ -74,6 +82,7 @@ button:disabled {
 .nav-controls,
 .menu-controls {
     display: flex;
+    align-items: center;
     gap: 4px;
 }
 
@@ -83,7 +92,7 @@ button:disabled {
     align-items: center;
     background-color: #0f172a;
     border-radius: 16px;
-    padding: 0 10px;
+    padding: 0 12px;
     border: 1px solid var(--border-color);
     height: 32px;
 }
@@ -98,6 +107,7 @@ button:disabled {
     color: #10b981;
     /* Green lock by default */
     margin-right: 8px;
+    flex-shrink: 0;
 }
 
 #url-input {
@@ -107,10 +117,6 @@ button:disabled {
     color: var(--text-color);
     font-size: 13px;
     outline: none;
-}
-
-#btn-bookmark.bookmarked {
-    color: #eab308;
 }
 
 #btn-bookmark.bookmarked {
@@ -129,10 +135,11 @@ button:disabled {
 
 .tabs-container {
     display: flex;
+    align-items: center;
     flex-grow: 1;
     overflow-x: auto;
     scrollbar-width: none;
-    gap: 2px;
+    gap: 4px;
 }
 
 .tabs-container::-webkit-scrollbar {
@@ -150,13 +157,14 @@ button:disabled {
     border: 1px solid var(--border-color);
     border-bottom: none;
     border-radius: 10px 10px 0 0;
-    padding: 0 12px;
+    padding: 0 10px 0 12px;
     cursor: pointer;
     font-size: 13px;
     color: var(--text-muted);
     transition: all 0.2s ease;
     position: relative;
     user-select: none;
+    box-sizing: border-box;
 }
 
 .tab.active {
@@ -191,29 +199,34 @@ button:disabled {
 }
 
 .tab-close {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
+    width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background: transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 10px !important;
     opacity: 0.6;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .tab-close:hover {
-    background-color: rgba(248, 113, 113, 0.2);
-    color: #f87171;
+    background-color: rgba(248, 113, 113, 0.2) !important;
+    color: #f87171 !important;
     opacity: 1;
 }
 
 .btn-new-tab {
-    margin-bottom: 6px;
-    height: 28px;
-    width: 28px;
-    border-radius: 50%;
-    font-size: 12px;
+    height: 28px !important;
+    width: 28px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+    flex-shrink: 0;
 }
 
 .browser-content {

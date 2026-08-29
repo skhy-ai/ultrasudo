@@ -490,7 +490,7 @@ export default function Notebook() {
     const paperPadding = `${marginState.top}${marginState.unit} ${marginState.right}${marginState.unit} ${marginState.bottom}${marginState.unit} ${marginState.left}${marginState.unit}`;
 
     return (
-        <AppShell title="Notebook" icon="fas fa-book">
+        <AppShell title="Notebook" icon="fas fa-book" noPadding={true}>
             <div className="notebook-app-wrapper">
                 {/* Header Action Bar */}
                 <div className="notebook-header-bar">

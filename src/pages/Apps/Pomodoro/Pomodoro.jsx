@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     cyclesBeforeLongBreak: 4
 };
 
-export default function Pomodoro() {
+export default function Pomodoro({ embedded = false }) {
     const [config, setConfig] = useLocalStore('pomodoro_config', DEFAULT_CONFIG);
     const [timeLeft, setTimeLeft] = useState(config.workTime);
     const [totalTime, setTotalTime] = useState(config.workTime);
@@ -103,78 +103,84 @@ export default function Pomodoro() {
         return '#10b981'; // Green for short break
     };
 
-    return (
-        <AppShell title="Pomodoro Timer" icon="fas fa-clock">
-            <div className="pomodoro-app">
-                <div className="timer-section">
-                    <TimerDisplay 
-                        timeLeft={timeLeft} 
-                        totalTime={totalTime} 
-                        status={getStatusText()} 
-                        brandColor={getBrandColor()}
-                    />
-                    
-                    <div className="timer-controls">
-                        {!isRunning ? (
-                            <button className="control-btn start" onClick={startTimer}>
-                                <i className="fas fa-play"></i> Start
-                            </button>
-                        ) : (
-                            <button className="control-btn pause" onClick={pauseTimer}>
-                                <i className="fas fa-pause"></i> Pause
-                            </button>
-                        )}
-                        <button className="control-btn reset" onClick={resetTimer}>
-                            <i className="fas fa-undo"></i> Reset
+    const content = (
+        <div className="pomodoro-app">
+            <div className="timer-section">
+                <TimerDisplay 
+                    timeLeft={timeLeft} 
+                    totalTime={totalTime} 
+                    status={getStatusText()} 
+                    brandColor={getBrandColor()}
+                />
+                
+                <div className="timer-controls">
+                    {!isRunning ? (
+                        <button className="control-btn start" onClick={startTimer}>
+                            <i className="fas fa-play"></i> Start
                         </button>
-                        <button className="control-btn skip" onClick={skipTimer}>
-                            <i className="fas fa-forward"></i> Skip
+                    ) : (
+                        <button className="control-btn pause" onClick={pauseTimer}>
+                            <i className="fas fa-pause"></i> Pause
                         </button>
-                    </div>
+                    )}
+                    <button className="control-btn reset" onClick={resetTimer}>
+                        <i className="fas fa-undo"></i> Reset
+                    </button>
+                    <button className="control-btn skip" onClick={skipTimer}>
+                        <i className="fas fa-forward"></i> Skip
+                    </button>
                 </div>
+            </div>
 
-                <div className="settings-section">
-                    <h2 className="settings-title">Settings</h2>
-                    <div className="settings-grid">
-                        <div className="setting-item">
-                            <label>Work Duration (mins)</label>
-                            <input 
-                                type="number" 
-                                value={config.workTime / 60} 
-                                onChange={(e) => updateConfig('workTime', e.target.value)}
-                            />
-                        </div>
-                        <div className="setting-item">
-                            <label>Short Break (mins)</label>
-                            <input 
-                                type="number" 
-                                value={config.breakTime / 60} 
-                                onChange={(e) => updateConfig('breakTime', e.target.value)}
-                            />
-                        </div>
-                        <div className="setting-item">
-                            <label>Long Break (mins)</label>
-                            <input 
-                                type="number" 
-                                value={config.longBreakTime / 60} 
-                                onChange={(e) => updateConfig('longBreakTime', e.target.value)}
-                            />
-                        </div>
-                        <div className="setting-item">
-                            <label>Long Break Interval</label>
-                            <select 
-                                value={config.cyclesBeforeLongBreak}
-                                onChange={(e) => setConfig({ ...config, cyclesBeforeLongBreak: parseInt(e.target.value) })}
-                            >
-                                <option value="2">Every 2 cycles</option>
-                                <option value="3">Every 3 cycles</option>
-                                <option value="4">Every 4 cycles</option>
-                                <option value="5">Every 5 cycles</option>
-                            </select>
-                        </div>
+            <div className="settings-section">
+                <h2 className="settings-title">Settings</h2>
+                <div className="settings-grid">
+                    <div className="setting-item">
+                        <label>Work Duration (mins)</label>
+                        <input 
+                            type="number" 
+                            value={config.workTime / 60} 
+                            onChange={(e) => updateConfig('workTime', e.target.value)}
+                        />
+                    </div>
+                    <div className="setting-item">
+                        <label>Short Break (mins)</label>
+                        <input 
+                            type="number" 
+                            value={config.breakTime / 60} 
+                            onChange={(e) => updateConfig('breakTime', e.target.value)}
+                        />
+                    </div>
+                    <div className="setting-item">
+                        <label>Long Break (mins)</label>
+                        <input 
+                            type="number" 
+                            value={config.longBreakTime / 60} 
+                            onChange={(e) => updateConfig('longBreakTime', e.target.value)}
+                        />
+                    </div>
+                    <div className="setting-item">
+                        <label>Long Break Interval</label>
+                        <select 
+                            value={config.cyclesBeforeLongBreak}
+                            onChange={(e) => setConfig({ ...config, cyclesBeforeLongBreak: parseInt(e.target.value) })}
+                        >
+                            <option value="2">Every 2 cycles</option>
+                            <option value="3">Every 3 cycles</option>
+                            <option value="4">Every 4 cycles</option>
+                            <option value="5">Every 5 cycles</option>
+                        </select>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+
+    if (embedded) return content;
+
+    return (
+        <AppShell title="Pomodoro Timer" icon="fas fa-clock">
+            {content}
         </AppShell>
     );
 }

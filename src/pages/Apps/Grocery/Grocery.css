@@ -2,7 +2,10 @@
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
-    padding: 20px;
+    height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .grocery-header {
@@ -20,7 +23,7 @@
 .grocery-layout {
     display: grid;
     grid-template-columns: 1fr 350px;
-    gap: 30px;
+    gap: 24px;
 }
 
 @media (max-width: 900px) {
@@ -35,7 +38,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 24px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
 .section-title {
@@ -148,6 +151,7 @@
     color: #94a3b8;
     cursor: pointer;
     padding: 4px;
+    border-radius: 4px;
     transition: color 0.2s;
 }
 
@@ -188,10 +192,14 @@
     background: #2ecc71;
     color: white;
     border: none;
-    padding: 10px 16px;
+    padding: 10px 18px;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .gi-legend {
@@ -216,18 +224,25 @@
 }
 
 .delivery-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #e2e8f0;
-    padding: 14px;
+    padding: 12px 16px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
+    white-space: nowrap;
     transition: all 0.2s;
+}
+
+.delivery-btn:hover {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+    color: #2ecc71;
 }
 
 .delivery-btn:hover {

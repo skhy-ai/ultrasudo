@@ -114,7 +114,7 @@ export default function MarkdownEditor() {
     };
 
     return (
-        <AppShell title="Markdown Editor" icon="fas fa-file-lines">
+        <AppShell title="Markdown Editor" icon="fas fa-file-lines" noPadding>
             <div className="markdown-editor-app">
                 <div className="editor-toolbar">
                     <button onClick={handleOpen}><i className="fas fa-file-import"></i> Open</button>

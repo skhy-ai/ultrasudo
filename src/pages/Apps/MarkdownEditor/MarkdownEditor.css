@@ -1,34 +1,39 @@
 .markdown-editor-app {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 100px); /* Adjust for AppShell header */
-    margin: -20px; /* Counteract AppShell padding */
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 .editor-toolbar {
     display: flex;
-    gap: 12px;
-    padding: 12px 24px;
-    background: rgba(15, 23, 42, 0.5);
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(15, 23, 42, 0.6);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
 }
 
 .editor-toolbar button {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #cbd5e1;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
-    display: flex;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .editor-toolbar button:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
 }
 

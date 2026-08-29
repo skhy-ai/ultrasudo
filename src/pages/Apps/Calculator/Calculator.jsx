@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AppShell from '../../../components/shared/AppShell/AppShell';
 import './Calculator.css';
 
 export default function Calculator() {
@@ -106,82 +107,84 @@ export default function Calculator() {
     }, [inputValue, fromUnit, toUnit, category]);
 
     return (
-        <div className="calculator-app">
-            <div className="container">
-                <div className="tabs">
-                    <button className={`tab-link ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>Scientific Calculator</button>
-                    <button className={`tab-link ${activeTab === 'converter' ? 'active' : ''}`} onClick={() => setActiveTab('converter')}>Unit Converter</button>
+        <AppShell title="Calculator" icon="fas fa-calculator">
+            <div className="calculator-app">
+                <div className="container">
+                    <div className="tabs">
+                        <button className={`tab-link ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>Scientific Calculator</button>
+                        <button className={`tab-link ${activeTab === 'converter' ? 'active' : ''}`} onClick={() => setActiveTab('converter')}>Unit Converter</button>
+                    </div>
+
+                    {activeTab === 'calculator' && (
+                        <div className="tab-content" style={{ display: 'block' }}>
+                            <div className="calculator-grid">
+                                <div className="output">
+                                    <div className="previous-operand">{previousOperand} {operation}</div>
+                                    <div className="current-operand">{currentOperand || '0'}</div>
+                                </div>
+                                <button onClick={clear} className="span-two">AC</button>
+                                <button onClick={del}>DEL</button>
+                                <button onClick={() => chooseOperation('÷')}>÷</button>
+                                <button onClick={() => appendNumber('1')}>1</button>
+                                <button onClick={() => appendNumber('2')}>2</button>
+                                <button onClick={() => appendNumber('3')}>3</button>
+                                <button onClick={() => chooseOperation('*')}>*</button>
+                                <button onClick={() => appendNumber('4')}>4</button>
+                                <button onClick={() => appendNumber('5')}>5</button>
+                                <button onClick={() => appendNumber('6')}>6</button>
+                                <button onClick={() => chooseOperation('+')}>+</button>
+                                <button onClick={() => appendNumber('7')}>7</button>
+                                <button onClick={() => appendNumber('8')}>8</button>
+                                <button onClick={() => appendNumber('9')}>9</button>
+                                <button onClick={() => chooseOperation('-')}>-</button>
+                                <button onClick={() => appendNumber('.')}>.</button>
+                                <button onClick={() => appendNumber('0')}>0</button>
+                                <button onClick={compute} className="span-two">=</button>
+                                <button onClick={() => chooseOperation('sin')}>sin</button>
+                                <button onClick={() => chooseOperation('cos')}>cos</button>
+                                <button onClick={() => chooseOperation('tan')}>tan</button>
+                                <button onClick={() => chooseOperation('log')}>log</button>
+                                <button onClick={() => chooseOperation('sqrt')}>sqrt</button>
+                                <button onClick={() => chooseOperation('^')}>^</button>
+                                <button onClick={() => appendNumber('(')}>(</button>
+                                <button onClick={() => appendNumber(')')}>)</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'converter' && (
+                        <div className="tab-content" style={{ display: 'block' }}>
+                            <h2>Unit Converter</h2>
+                            <div className="converter-wrapper">
+                                <div className="form-group">
+                                    <label>Category:</label>
+                                    <select value={category} onChange={e => setCategory(e.target.value)}>
+                                        <option value="length">Length</option>
+                                        <option value="weight">Weight</option>
+                                        <option value="temperature">Temperature</option>
+                                         <option value="area">Area</option>
+                                        <option value="volume">Volume</option>
+                                        <option value="time">Time</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <input type="number" placeholder="Enter value" value={inputValue} onChange={e => setInputValue(e.target.value)} />
+                                    <select value={fromUnit} onChange={e => setFromUnit(e.target.value)}>
+                                        {Object.keys(units[category]).map(u => <option key={u} value={u}>{u}</option>)}
+                                    </select>
+                                </div>
+                                <div className="to-section"><p>TO</p></div>
+                                <div className="form-group">
+                                    <p id="outputValue">{outputValue}</p>
+                                    <select value={toUnit} onChange={e => setToUnit(e.target.value)}>
+                                        {Object.keys(units[category]).map(u => <option key={u} value={u}>{u}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-
-                {activeTab === 'calculator' && (
-                    <div className="tab-content" style={{ display: 'block' }}>
-                        <div className="calculator-grid">
-                            <div className="output">
-                                <div className="previous-operand">{previousOperand} {operation}</div>
-                                <div className="current-operand">{currentOperand || '0'}</div>
-                            </div>
-                            <button onClick={clear} className="span-two">AC</button>
-                            <button onClick={del}>DEL</button>
-                            <button onClick={() => chooseOperation('÷')}>÷</button>
-                            <button onClick={() => appendNumber('1')}>1</button>
-                            <button onClick={() => appendNumber('2')}>2</button>
-                            <button onClick={() => appendNumber('3')}>3</button>
-                            <button onClick={() => chooseOperation('*')}>*</button>
-                            <button onClick={() => appendNumber('4')}>4</button>
-                            <button onClick={() => appendNumber('5')}>5</button>
-                            <button onClick={() => appendNumber('6')}>6</button>
-                            <button onClick={() => chooseOperation('+')}>+</button>
-                            <button onClick={() => appendNumber('7')}>7</button>
-                            <button onClick={() => appendNumber('8')}>8</button>
-                            <button onClick={() => appendNumber('9')}>9</button>
-                            <button onClick={() => chooseOperation('-')}>-</button>
-                            <button onClick={() => appendNumber('.')}>.</button>
-                            <button onClick={() => appendNumber('0')}>0</button>
-                            <button onClick={compute} className="span-two">=</button>
-                            <button onClick={() => chooseOperation('sin')}>sin</button>
-                            <button onClick={() => chooseOperation('cos')}>cos</button>
-                            <button onClick={() => chooseOperation('tan')}>tan</button>
-                            <button onClick={() => chooseOperation('log')}>log</button>
-                            <button onClick={() => chooseOperation('sqrt')}>sqrt</button>
-                            <button onClick={() => chooseOperation('^')}>^</button>
-                            <button onClick={() => appendNumber('(')}>(</button>
-                            <button onClick={() => appendNumber(')')}>)</button>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'converter' && (
-                    <div className="tab-content" style={{ display: 'block' }}>
-                        <h2>Unit Converter</h2>
-                        <div className="converter-wrapper">
-                            <div className="form-group">
-                                <label>Category:</label>
-                                <select value={category} onChange={e => setCategory(e.target.value)}>
-                                    <option value="length">Length</option>
-                                    <option value="weight">Weight</option>
-                                    <option value="temperature">Temperature</option>
-                                     <option value="area">Area</option>
-                                    <option value="volume">Volume</option>
-                                    <option value="time">Time</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <input type="number" placeholder="Enter value" value={inputValue} onChange={e => setInputValue(e.target.value)} />
-                                <select value={fromUnit} onChange={e => setFromUnit(e.target.value)}>
-                                    {Object.keys(units[category]).map(u => <option key={u} value={u}>{u}</option>)}
-                                </select>
-                            </div>
-                            <div className="to-section"><p>TO</p></div>
-                            <div className="form-group">
-                                <p id="outputValue">{outputValue}</p>
-                                <select value={toUnit} onChange={e => setToUnit(e.target.value)}>
-                                    {Object.keys(units[category]).map(u => <option key={u} value={u}>{u}</option>)}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
-        </div>
+        </AppShell>
     );
 }

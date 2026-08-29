@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import AppShell from '../../../components/shared/AppShell/AppShell';
 import useAudioBeep from '../../../hooks/useAudioBeep';
 import TodoList from '../TodoList/TodoList';
 import KanbanBoard from '../KanbanBoard/KanbanBoard';
@@ -178,88 +179,65 @@ export default function ProductivityHub() {
 
     const badge = getBadge(score);
 
-    // Format mm:ss
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    };
-
-    // SVG Progress
-    const radius = 110;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference - ((totalTime - timeLeft) / (totalTime || 1)) * circumference;
-
-    const brandColor = isWork ? '#ec4899' : (cycle % pomoConfig.cyclesBeforeLongBreak === 0 ? '#3b82f6' : '#10b981');
+    const scoreBadge = (
+        <div className="prod-score-badge">
+            <i className="fas fa-trophy" style={{ fontSize: '1.2rem', color: '#f59e0b' }}></i>
+            <div>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase' }}>Gamification Score</div>
+                <div className="score-num">{score} pts</div>
+            </div>
+            <div className="rank-pill" style={{ color: badge.color, background: badge.bg, border: `1px solid ${badge.color}40` }}>
+                <i className={`fas ${badge.icon}`}></i> {badge.name}
+            </div>
+        </div>
+    );
 
     return (
-        <div className="prod-hub-container">
-            {/* Header */}
-            <div className="prod-header">
-                <div className="prod-header-title">
-                    <div className="prod-header-icon">
-                        <i className="fas fa-clock"></i>
+        <AppShell title="Productivity Hub" icon="fas fa-stopwatch" headerActions={scoreBadge} noPadding={true}>
+            <div className="prod-hub-container">
+                {/* Navigation Tabs */}
+                <div className="prod-tabs">
+                    <button 
+                        className={`prod-tab-btn ${activeTab === 'timers' ? 'active' : ''}`}
+                        onClick={() => setTab('timers')}
+                    >
+                        <i className="fas fa-stopwatch"></i> Focus & Timers
+                    </button>
+                    <button 
+                        className={`prod-tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
+                        onClick={() => setTab('tasks')}
+                    >
+                        <i className="fas fa-list-check"></i> Tasks & Gamification
+                    </button>
+                    <button 
+                        className={`prod-tab-btn ${activeTab === 'kanban' ? 'active' : ''}`}
+                        onClick={() => setTab('kanban')}
+                    >
+                        <i className="fas fa-columns"></i> Kanban Workspace
+                    </button>
+                </div>
+
+                {/* TAB 1: FOCUS & TIMERS */}
+                {activeTab === 'timers' && (
+                    <div style={{ maxWidth: '850px', margin: '0 auto' }}>
+                        <Pomodoro embedded={true} />
                     </div>
+                )}
+
+                {/* TAB 2: TASKS & GAMIFICATION */}
+                {activeTab === 'tasks' && (
                     <div>
-                        <h1>Productivity Hub</h1>
-                        <p>Focus Timers, Gamified Task List & Kanban Board</p>
+                        <TodoList embedded={true} />
                     </div>
-                </div>
+                )}
 
-                <div className="prod-score-badge">
-                    <i className="fas fa-trophy" style={{ fontSize: '1.5rem', color: '#f59e0b' }}></i>
+                {/* TAB 3: KANBAN WORKSPACE */}
+                {activeTab === 'kanban' && (
                     <div>
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Gamification Score</div>
-                        <div className="score-num">{score} pts</div>
+                        <KanbanBoard embedded={true} />
                     </div>
-                    <div className="rank-pill" style={{ color: badge.color, background: badge.bg, border: `1px solid ${badge.color}40` }}>
-                        <i className={`fas ${badge.icon}`}></i> {badge.name}
-                    </div>
-                </div>
+                )}
             </div>
-
-            {/* Navigation Tabs */}
-            <div className="prod-tabs">
-                <button 
-                    className={`prod-tab-btn ${activeTab === 'timers' ? 'active' : ''}`}
-                    onClick={() => setTab('timers')}
-                >
-                    <i className="fas fa-stopwatch"></i> Focus & Timers
-                </button>
-                <button 
-                    className={`prod-tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
-                    onClick={() => setTab('tasks')}
-                >
-                    <i className="fas fa-list-check"></i> Tasks & Gamification
-                </button>
-                <button 
-                    className={`prod-tab-btn ${activeTab === 'kanban' ? 'active' : ''}`}
-                    onClick={() => setTab('kanban')}
-                >
-                    <i className="fas fa-columns"></i> Kanban Workspace
-                </button>
-            </div>
-
-            {/* TAB 1: FOCUS & TIMERS */}
-            {activeTab === 'timers' && (
-                <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-                    <Pomodoro />
-                </div>
-            )}
-
-            {/* TAB 2: TASKS & GAMIFICATION */}
-            {activeTab === 'tasks' && (
-                <div>
-                    <TodoList />
-                </div>
-            )}
-
-            {/* TAB 3: KANBAN WORKSPACE */}
-            {activeTab === 'kanban' && (
-                <div>
-                    <KanbanBoard />
-                </div>
-            )}
-        </div>
+        </AppShell>
     );
 }

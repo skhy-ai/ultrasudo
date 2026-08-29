@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import AppShell from '../../../components/shared/AppShell/AppShell';
 import './TodoList.css';
 
-export default function TodoList() {
+export default function TodoList({ embedded = false }) {
     const [tasks, setTasks] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [dueDate, setDueDate] = useState('');
@@ -116,7 +117,7 @@ export default function TodoList() {
 
     const badge = getBadge(score);
 
-    return (
+    const content = (
         <div className="todo-app-wrapper">
             <div className="score-display">
                 <i className="fas fa-trophy" style={{color:'#f59e0b'}}></i> Score: {score}
@@ -159,5 +160,13 @@ export default function TodoList() {
                 </div>
             </div>
         </div>
+    );
+
+    if (embedded) return content;
+
+    return (
+        <AppShell title="To-Do List" icon="fas fa-list-check">
+            {content}
+        </AppShell>
     );
 }

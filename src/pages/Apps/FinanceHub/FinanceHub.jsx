@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import AppShell from '../../../components/shared/AppShell/AppShell';
 import './FinanceHub.css';
 
 // Default initial data stores
@@ -236,40 +237,30 @@ export default function FinanceHub() {
         return matchesCategory && matchesSearch;
     });
 
-    return (
-        <div className="finance-hub-container">
-            {/* Header */}
-            <div className="finance-header">
-                <div className="finance-header-title">
-                    <div className="finance-header-icon">
-                        <i className="fas fa-chart-line"></i>
-                    </div>
-                    <div>
-                        <h1>Finance Hub</h1>
-                        <p>Unified Markets, Portfolio Management & P2P Banking</p>
-                    </div>
-                </div>
-
-                <div className="finance-quick-stats">
-                    <div className="quick-stat-card">
-                        <span className="quick-stat-label">Net Worth</span>
-                        <span className="quick-stat-value">${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                    <div className="quick-stat-card">
-                        <span className="quick-stat-label">Portfolio Return</span>
-                        <span className={`quick-stat-value ${totalPnL >= 0 ? 'positive' : 'negative'}`}>
-                            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)} ({totalPnLPct.toFixed(2)}%)
-                        </span>
-                    </div>
-                    <div className="quick-stat-card">
-                        <span className="quick-stat-label">Wallet Balance</span>
-                        <span className="quick-stat-value">${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                </div>
+    const quickStats = (
+        <div className="finance-quick-stats">
+            <div className="quick-stat-card">
+                <span className="quick-stat-label">Net Worth</span>
+                <span className="quick-stat-value">${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
             </div>
+            <div className="quick-stat-card">
+                <span className="quick-stat-label">Portfolio Return</span>
+                <span className={`quick-stat-value ${totalPnL >= 0 ? 'positive' : 'negative'}`}>
+                    {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)} ({totalPnLPct.toFixed(2)}%)
+                </span>
+            </div>
+            <div className="quick-stat-card">
+                <span className="quick-stat-label">Wallet Balance</span>
+                <span className="quick-stat-value">${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            </div>
+        </div>
+    );
 
-            {/* Navigation Tabs */}
-            <div className="finance-tabs">
+    return (
+        <AppShell title="Finance Hub" icon="fas fa-chart-line" headerActions={quickStats} noPadding={true}>
+            <div className="finance-hub-container">
+                {/* Navigation Tabs */}
+                <div className="finance-tabs">
                 <button 
                     className={`finance-tab-btn ${activeTab === 'markets' ? 'active' : ''}`}
                     onClick={() => setTab('markets')}
@@ -777,5 +768,6 @@ export default function FinanceHub() {
                 </div>
             )}
         </div>
+    </AppShell>
     );
 }

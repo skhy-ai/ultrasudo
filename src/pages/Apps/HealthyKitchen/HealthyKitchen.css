@@ -1,9 +1,11 @@
 .kitchen-app {
     height: 100%;
+    width: 100%;
     background: #f8fafc;
     color: #1e293b;
     overflow-y: auto;
     padding-bottom: 50px;
+    box-sizing: border-box;
 }
 
 .kitchen-header {
@@ -111,14 +113,18 @@
 .close-modal {
     position: absolute;
     top: 20px; right: 20px;
-    font-size: 2rem;
+    font-size: 1.2rem;
     color: white;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     border: none;
-    width: 40px; height: 40px;
-    border-radius: 20px;
+    width: 36px; height: 36px;
+    padding: 0;
+    border-radius: 50%;
     cursor: pointer;
     z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-hero { height: 350px; background-size: cover; background-position: center; }
