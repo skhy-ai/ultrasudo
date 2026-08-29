@@ -1,0 +1,433 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import useAudioBeep from '../../../hooks/useAudioBeep';
+import './ProductivityHub.css';
+
+const DEFAULT_POMODORO = {
+    workTime: 25 * 60,
+    breakTime: 5 * 60,
+    longBreakTime: 15 * 60,
+    cyclesBeforeLongBreak: 4
+};
+
+const INITIAL_TASKS = [
+    { id: 1, text: 'Finalize Q3 Financial Report', category: 'Office', dueDate: '2026-08-30', checked: false, kanbanStatus: 'In Progress' },
+    { id: 2, text: 'Refactor Navigation Bar in React', category: 'Code', dueDate: '2026-08-29', checked: false, kanbanStatus: 'Backlog' },
+    { id: 3, text: 'Weekly Grocery Shopping', category: 'Personal', dueDate: '2026-08-31', checked: true, kanbanStatus: 'Done' },
+    { id: 4, text: 'Yoga Session & Stretches', category: 'Health', dueDate: '', checked: false, kanbanStatus: 'Review' },
+];
+
+export default function ProductivityHub() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') || 'timers';
+
+    const setTab = (tab) => {
+        setSearchParams({ tab });
+    };
+
+    const { beep } = useAudioBeep();
+
+    // ── Task Store & Gamification ──
+    const [tasks, setTasks] = useState(() => {
+        const saved = localStorage.getItem('desktop_app_todo_tasks');
+        if (saved) {
+            try { return JSON.parse(saved).value || INITIAL_TASKS; } catch { return INITIAL_TASKS; }
+        }
+        return INITIAL_TASKS;
+    });
+
+    const [score, setScore] = useState(() => {
+        const saved = localStorage.getItem('todo_gamification_score');
+        return saved ? parseInt(saved, 10) : 45;
+    });
+
+    // ── Timer State ──
+    const [pomoConfig, setPomoConfig] = useState(DEFAULT_POMODORO);
+    const [timeLeft, setTimeLeft] = useState(DEFAULT_POMODORO.workTime);
+    const [totalTime, setTotalTime] = useState(DEFAULT_POMODORO.workTime);
+    const [isRunning, setIsRunning] = useState(false);
+    const [isWork, setIsWork] = useState(true);
+    const [cycle, setCycle] = useState(1);
+    const [activeTaskId, setActiveTaskId] = useState(null);
+
+    const timerRef = useRef(null);
+
+    // Save tasks and score to localStorage
+    useEffect(() => {
+        localStorage.setItem('desktop_app_todo_tasks', JSON.stringify({ value: tasks }));
+    }, [tasks]);
+
+    useEffect(() => {
+        localStorage.setItem('todo_gamification_score', score.toString());
+    }, [score]);
+
+    // Timer phase end handler
+    const handlePhaseEnd = useCallback(() => {
+        setIsRunning(false);
+        if (timerRef.current) clearInterval(timerRef.current);
+        
+        try { beep(880, 1); } catch (e) { console.log('Audio alert', e); }
+
+        if (isWork) {
+            // Reward bonus points for completing a Pomodoro focus session!
+            setScore(prev => prev + 5);
+            const isLongBreak = cycle % pomoConfig.cyclesBeforeLongBreak === 0;
+            const nextTime = isLongBreak ? pomoConfig.longBreakTime : pomoConfig.breakTime;
+            setTimeLeft(nextTime);
+            setTotalTime(nextTime);
+            setIsWork(false);
+        } else {
+            const nextCycle = (cycle % pomoConfig.cyclesBeforeLongBreak === 0) ? 1 : cycle + 1;
+            setCycle(nextCycle);
+            setTimeLeft(pomoConfig.workTime);
+            setTotalTime(pomoConfig.workTime);
+            setIsWork(true);
+        }
+    }, [isWork, cycle, pomoConfig, beep]);
+
+    // Timer interval loop
+    useEffect(() => {
+        if (isRunning) {
+            timerRef.current = setInterval(() => {
+                setTimeLeft((prev) => {
+                    if (prev <= 1) {
+                        handlePhaseEnd();
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [isRunning, handlePhaseEnd]);
+
+    // Controls
+    const startTimer = () => setIsRunning(true);
+    const pauseTimer = () => setIsRunning(false);
+    const resetTimer = () => {
+        setIsRunning(false);
+        setIsWork(true);
+        setCycle(1);
+        setTimeLeft(pomoConfig.workTime);
+        setTotalTime(pomoConfig.workTime);
+    };
+
+    // Form inputs for new tasks
+    const [taskInput, setTaskInput] = useState('');
+    const [dueDateInput, setDueDateInput] = useState('');
+    const [categoryInput, setCategoryInput] = useState('Office');
+
+    const handleAddTask = (e) => {
+        e.preventDefault();
+        if (!taskInput.trim()) return;
+
+        const newTask = {
+            id: Date.now(),
+            text: taskInput.trim(),
+            dueDate: dueDateInput,
+            category: categoryInput,
+            checked: false,
+            kanbanStatus: 'Backlog'
+        };
+
+        setTasks([newTask, ...tasks]);
+        setTaskInput('');
+        setDueDateInput('');
+    };
+
+    const toggleTaskChecked = (id) => {
+        setTasks(tasks.map(t => {
+            if (t.id === id) {
+                const checked = !t.checked;
+                if (checked) {
+                    setScore(prev => prev + 3);
+                }
+                return { ...t, checked, kanbanStatus: checked ? 'Done' : 'In Progress' };
+            }
+            return t;
+        }));
+    };
+
+    const deleteTask = (id) => {
+        setTasks(tasks.filter(t => t.id !== id));
+    };
+
+    const updateKanbanStatus = (id, newStatus) => {
+        setTasks(tasks.map(t => {
+            if (t.id === id) {
+                return { ...t, kanbanStatus: newStatus, checked: newStatus === 'Done' };
+            }
+            return t;
+        }));
+    };
+
+    // Rank Badge logic
+    const getBadge = (s) => {
+        if (s >= 200) return { name: 'Director', icon: 'fa-crown', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' };
+        if (s >= 100) return { name: 'Manager', icon: 'fa-user-tie', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' };
+        if (s >= 50) return { name: 'Taskmaster', icon: 'fa-hammer', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' };
+        return { name: "Beginner's Luck", icon: 'fa-seedling', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' };
+    };
+
+    const badge = getBadge(score);
+
+    // Format mm:ss
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
+
+    // SVG Progress
+    const radius = 110;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - ((totalTime - timeLeft) / (totalTime || 1)) * circumference;
+
+    const brandColor = isWork ? '#ec4899' : (cycle % pomoConfig.cyclesBeforeLongBreak === 0 ? '#3b82f6' : '#10b981');
+
+    return (
+        <div className="prod-hub-container">
+            {/* Header */}
+            <div className="prod-header">
+                <div className="prod-header-title">
+                    <div className="prod-header-icon">
+                        <i className="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h1>Productivity Hub</h1>
+                        <p>Focus Timers, Gamified Task List & Kanban Board</p>
+                    </div>
+                </div>
+
+                <div className="prod-score-badge">
+                    <i className="fas fa-trophy" style={{ fontSize: '1.5rem', color: '#f59e0b' }}></i>
+                    <div>
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>Gamification Score</div>
+                        <div className="score-num">{score} pts</div>
+                    </div>
+                    <div className="rank-pill" style={{ color: badge.color, background: badge.bg, border: `1px solid ${badge.color}40` }}>
+                        <i className={`fas ${badge.icon}`}></i> {badge.name}
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="prod-tabs">
+                <button 
+                    className={`prod-tab-btn ${activeTab === 'timers' ? 'active' : ''}`}
+                    onClick={() => setTab('timers')}
+                >
+                    <i className="fas fa-stopwatch"></i> Focus & Timers
+                </button>
+                <button 
+                    className={`prod-tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
+                    onClick={() => setTab('tasks')}
+                >
+                    <i className="fas fa-list-check"></i> Tasks & Gamification
+                </button>
+                <button 
+                    className={`prod-tab-btn ${activeTab === 'kanban' ? 'active' : ''}`}
+                    onClick={() => setTab('kanban')}
+                >
+                    <i className="fas fa-columns"></i> Kanban Workspace
+                </button>
+            </div>
+
+            {/* TAB 1: FOCUS & TIMERS */}
+            {activeTab === 'timers' && (
+                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    <div className="prod-card" style={{ textAlign: 'center' }}>
+                        <div className="prod-card-title" style={{ justifyContent: 'center' }}>
+                            <span>{isWork ? `Focus Session (Cycle ${cycle})` : 'Break Time'}</span>
+                        </div>
+
+                        <div className="timer-display-box" style={{ position: 'relative' }}>
+                            <svg className="timer-circle-svg" viewBox="0 0 240 240">
+                                <circle className="timer-circle-bg" cx="120" cy="120" r={radius} />
+                                <circle 
+                                    className="timer-circle-progress" 
+                                    cx="120" 
+                                    cy="120" 
+                                    r={radius} 
+                                    stroke={brandColor}
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                />
+                            </svg>
+                            <div className="timer-text-container">
+                                <div className="timer-time-str">{formatTime(timeLeft)}</div>
+                                <div className="timer-status-str" style={{ color: brandColor }}>
+                                    {isWork ? 'Stay Focused' : 'Relax & Recharge'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="timer-controls">
+                            {!isRunning ? (
+                                <button className="prod-btn prod-btn-primary" onClick={startTimer}>
+                                    <i className="fas fa-play"></i> Start Focus
+                                </button>
+                            ) : (
+                                <button className="prod-btn prod-btn-secondary" onClick={pauseTimer}>
+                                    <i className="fas fa-pause"></i> Pause
+                                </button>
+                            )}
+                            <button className="prod-btn prod-btn-danger" onClick={resetTimer}>
+                                <i className="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Target Task Linker */}
+                    <div className="prod-card">
+                        <div className="prod-card-title">
+                            <span>Link Active Task to Session</span>
+                            <i className="fas fa-bullseye" style={{ color: '#ec4899' }}></i>
+                        </div>
+                        <select 
+                            className="prod-select" 
+                            style={{ width: '100%' }}
+                            value={activeTaskId || ''}
+                            onChange={(e) => setActiveTaskId(e.target.value)}
+                        >
+                            <option value="">-- Select a task to focus on --</option>
+                            {tasks.filter(t => !t.checked).map(t => (
+                                <option key={t.id} value={t.id}>{t.text} ({t.category})</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB 2: TASKS & GAMIFICATION */}
+            {activeTab === 'tasks' && (
+                <div>
+                    <div className="prod-card">
+                        <div className="prod-card-title">
+                            <span>Add New Task</span>
+                        </div>
+                        <form onSubmit={handleAddTask} className="task-form-row">
+                            <input 
+                                type="text"
+                                className="prod-input"
+                                placeholder="What do you need to accomplish?"
+                                style={{ flex: 2, minWidth: '240px' }}
+                                value={taskInput}
+                                onChange={(e) => setTaskInput(e.target.value)}
+                            />
+                            <input 
+                                type="date"
+                                className="prod-input"
+                                style={{ flex: 1, minWidth: '150px' }}
+                                value={dueDateInput}
+                                onChange={(e) => setDueDateInput(e.target.value)}
+                            />
+                            <select 
+                                className="prod-select"
+                                style={{ flex: 1, minWidth: '140px' }}
+                                value={categoryInput}
+                                onChange={(e) => setCategoryInput(e.target.value)}
+                            >
+                                <option value="Office">Office</option>
+                                <option value="Code">Code</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Health">Health</option>
+                                <option value="Meetings">Meetings</option>
+                            </select>
+                            <button type="submit" className="prod-btn prod-btn-primary">
+                                <i className="fas fa-plus"></i> Add Task
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="prod-card">
+                        <div className="prod-card-title">
+                            <span>Task Checklist</span>
+                            <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                                {tasks.filter(t => t.checked).length} of {tasks.length} completed
+                            </span>
+                        </div>
+
+                        <ul className="task-list">
+                            {tasks.map(t => (
+                                <li key={t.id} className={`task-item ${t.checked ? 'completed' : ''}`}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                        <input 
+                                            type="checkbox"
+                                            className="task-checkbox"
+                                            checked={t.checked}
+                                            onChange={() => toggleTaskChecked(t.id)}
+                                        />
+                                        <div>
+                                            <div style={{ fontWeight: '600', color: t.checked ? '#94a3b8' : '#ffffff' }}>{t.text}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
+                                                {t.category} {t.dueDate ? `• Due: ${t.dueDate}` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => deleteTask(t.id)}
+                                        style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', opacity: 0.7 }}
+                                    >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB 3: KANBAN WORKSPACE */}
+            {activeTab === 'kanban' && (
+                <div className="kanban-grid">
+                    {['Backlog', 'In Progress', 'Review', 'Done'].map((col, idx, arr) => {
+                        const colTasks = tasks.filter(t => (t.kanbanStatus || 'Backlog') === col);
+                        return (
+                            <div key={col} className="kanban-column">
+                                <div className="kanban-column-header">
+                                    <span>{col}</span>
+                                    <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px' }}>
+                                        {colTasks.length}
+                                    </span>
+                                </div>
+
+                                {colTasks.map(t => (
+                                    <div key={t.id} className="kanban-card">
+                                        <div className="kanban-card-title">{t.text}</div>
+                                        <div className="kanban-card-meta">
+                                            <span>{t.category}</span>
+                                            {t.dueDate && <span>{t.dueDate}</span>}
+                                        </div>
+                                        <div className="kanban-move-btns">
+                                            {idx > 0 && (
+                                                <button 
+                                                    className="kanban-move-btn"
+                                                    onClick={() => updateKanbanStatus(t.id, arr[idx - 1])}
+                                                >
+                                                    ← {arr[idx - 1]}
+                                                </button>
+                                            )}
+                                            {idx < arr.length - 1 && (
+                                                <button 
+                                                    className="kanban-move-btn"
+                                                    onClick={() => updateKanbanStatus(t.id, arr[idx + 1])}
+                                                >
+                                                    {arr[idx + 1]} →
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}

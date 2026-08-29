@@ -24,6 +24,9 @@ import Yoga from './pages/Apps/Yoga/Yoga';
 import BirthdayCard from './pages/Apps/BirthdayCard/BirthdayCard';
 import Spreadsheet from './pages/Apps/Spreadsheet/Spreadsheet';
 import QuoteGenerator from './pages/Apps/QuoteGenerator/QuoteGenerator';
+import FinanceHub from './pages/Apps/FinanceHub/FinanceHub';
+import ProductivityHub from './pages/Apps/ProductivityHub/ProductivityHub';
+import HealthHub from './pages/Apps/HealthHub/HealthHub';
 
 export default function App() {
   return (
@@ -36,6 +39,9 @@ export default function App() {
         <Route path="/browser" element={<BrowserPage />} />
 
         {/* Native React App Components */}
+        <Route path="/app/finance" element={<FinanceHub />} />
+        <Route path="/app/productivity" element={<ProductivityHub />} />
+        <Route path="/app/health" element={<HealthHub />} />
         <Route path="/app/calculator" element={<Calculator />} />
         <Route path="/app/todo-list" element={<TodoList />} />
         <Route path="/app/notebook" element={<Notebook />} />
