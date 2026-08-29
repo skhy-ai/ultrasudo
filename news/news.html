@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultrasudo — News Feed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --bg-darker: #020617;
+            --header-bg: rgba(30, 41, 59, 0.85);
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --font-main: 'Inter', -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .news-app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .news-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .news-brand i {
+            color: var(--accent);
+        }
+
+        .news-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+
+        select option {
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Layout Main */
+        .news-app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Category Sidebar */
+        .news-sidebar {
+            width: 220px;
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid var(--card-border);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 10px;
+            margin-bottom: 4px;
+        }
+
+        .cat-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .cat-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-color);
+        }
+
+        .cat-nav-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* News Cards Container */
+        .news-content-main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .news-card:hover {
+            background: rgba(51, 65, 85, 0.6);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .news-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .news-card-title {
+            font-size: 1.02rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-card-snippet {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 10px;
+        }
+
+        .news-source {
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .loading-box, .empty-box {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="news-app-header">
+        <div class="news-brand">
+            <i class="fas fa-newspaper"></i>
+            <span>Ultrasudo RSS News</span>
+        </div>
+
+        <div class="news-header-controls">
+            <input type="text" id="news-search" placeholder="Search headlines..." oninput="renderNews()">
+            
+            <select id="country-select" onchange="loadFeed()">
+                <option value="US">🇺🇸 United States</option>
+                <option value="IN">🇮🇳 India</option>
+                <option value="GB">🇬🇧 United Kingdom</option>
+                <option value="AU">🇦🇺 Australia</option>
+                <option value="CA">🇨🇦 Canada</option>
+            </select>
+
+            <button class="btn" onclick="loadFeed()"><i class="fas fa-rotate"></i> Refresh</button>
+        </div>
+    </header>
+
+    <div class="news-app-body">
+        <aside class="news-sidebar">
+            <div class="sidebar-title">Categories</div>
+            <button class="cat-nav-btn active" data-cat="general" onclick="selectCategory('general', this)"><i class="fas fa-globe"></i> General</button>
+            <button class="cat-nav-btn" data-cat="business" onclick="selectCategory('business', this)"><i class="fas fa-briefcase"></i> Business</button>
+            <button class="cat-nav-btn" data-cat="tech" onclick="selectCategory('tech', this)"><i class="fas fa-microchip"></i> Technology</button>
+            <button class="cat-nav-btn" data-cat="science" onclick="selectCategory('science', this)"><i class="fas fa-flask"></i> Science</button>
+            <button class="cat-nav-btn" data-cat="sports" onclick="selectCategory('sports', this)"><i class="fas fa-football"></i> Sports</button>
+            <button class="cat-nav-btn" data-cat="entertainment" onclick="selectCategory('entertainment', this)"><i class="fas fa-film"></i> Entertainment</button>
+            <button class="cat-nav-btn" data-cat="health" onclick="selectCategory('health', this)"><i class="fas fa-heart-pulse"></i> Health</button>
+        </aside>
+
+        <main class="news-content-main">
+            <div id="news-container">
+                <div class="loading-box"><i class="fas fa-circle-notch fa-spin"></i> Fetching latest RSS headlines...</div>
+            </div>
+
+            <div class="pagination-bar">
+                <button class="btn" id="prev-btn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Previous</button>
+                <span id="page-num" style="font-weight:600; font-size:0.9rem;">Page 1</span>
+                <button class="btn" id="next-btn" onclick="changePage(1)">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../desktop/data-manager.js"></script>
+    <script src="rss_sources.js"></script>
+    <script>
+        let currentCategory = 'general';
+        let allArticles = [];
+        let currentPage = 1;
+        const pageSize = 9;
+
+        const FALLBACK_ARTICLES = [
+            {
+                title: "Decentralized Personal OS Architectures Gain Widespread Adoption",
+                snippet: "Security-focused personal computing platforms integrating Post-Quantum Cryptography and localized data managers gain momentum.",
+                link: "https://news.ycombinator.com",
+                source: "Tech Security News",
+                pubDate: "Just now",
+                category: "tech"
+            },
+            {
+                title: "Global Tech Sector Shows Strong Quarterly Growth",
+                snippet: "Innovations in client-side storage, WebAssembly, and edge AI processing drive efficiency improvements across developer ecosystems.",
+                link: "https://news.google.com",
+                source: "Global Tech Insider",
+                pubDate: "15m ago",
+                category: "business"
+            },
+            {
+                title: "Next-Generation Web Standards Enhance Browser Multi-Tasking",
+                snippet: "Modern web standards enable zero-friction local storage synchronization across web desktop suites.",
+                link: "https://bbc.com",
+                source: "World News Daily",
+                pubDate: "1h ago",
+                category: "general"
+            }
+        ];
+
+        function selectCategory(cat, btnEl) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-nav-btn').forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            currentPage = 1;
+            loadFeed();
+        }
+
+        async function loadFeed() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '<div class="loading-box"><i class="fas fa-circle-notch fa-spin"></i> Fetching latest RSS headlines...</div>';
+
+            const country = document.getElementById('country-select').value;
+            let targetUrl = null;
+
+            if (window.RSS_SOURCES && window.RSS_SOURCES[country] && window.RSS_SOURCES[country][currentCategory]) {
+                const urls = window.RSS_SOURCES[country][currentCategory];
+                if (urls && urls.length > 0) {
+                    targetUrl = urls[Math.floor(Math.random() * urls.length)];
+                }
+            }
+
+            if (targetUrl) {
+                try {
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetUrl)}`;
+                    const res = await fetch(apiUrl);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
+                            allArticles = data.items.map(item => ({
+                                title: item.title,
+                                snippet: item.description ? item.description.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : '',
+                                link: item.link,
+                                source: data.feed?.title || 'RSS Feed',
+                                pubDate: item.pubDate ? new Date(item.pubDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today',
+                                category: currentCategory
+                            }));
+                            renderNews();
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Live RSS fetch warning:", e);
+                }
+            }
+
+            allArticles = FALLBACK_ARTICLES;
+            renderNews();
+        }
+
+        function renderNews() {
+            const container = document.getElementById('news-container');
+            const searchVal = document.getElementById('news-search').value.toLowerCase().trim();
+
+            const filtered = allArticles.filter(art => {
+                if (!searchVal) return true;
+                return art.title.toLowerCase().includes(searchVal) || (art.snippet && art.snippet.toLowerCase().includes(searchVal));
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-box">No headlines found matching your search.</div>';
+                return;
+            }
+
+            const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+
+            let html = '<div class="news-grid">';
+            paged.forEach(item => {
+                html += `
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-card" onclick="saveHistory('${item.title.replace(/'/g, "\\'")}')">
+                        <div>
+                            <span class="news-badge">${item.category}</span>
+                            <h3 class="news-card-title">${item.title}</h3>
+                            ${item.snippet ? `<p class="news-card-snippet">${item.snippet}</p>` : ''}
+                        </div>
+                        <div class="news-card-footer">
+                            <span class="news-source">${item.source}</span>
+                            <span>${item.pubDate}</span>
+                        </div>
+                    </a>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+
+            document.getElementById('page-num').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prev-btn').disabled = currentPage <= 1;
+            document.getElementById('next-btn').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            renderNews();
+        }
+
+        function saveHistory(title) {
+            if (window.saveAppHistory) {
+                window.saveAppHistory('news', { action: 'read_article', title, timestamp: Date.now() });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeed();
+        });
+    </script>
+</body>
+
+</html>

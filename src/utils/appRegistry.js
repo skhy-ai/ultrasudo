@@ -16,7 +16,7 @@ export const APP_REGISTRY = [
 
     // ── System ───────────────────────────────────────────────────────────────
     { id: 'desktop',       name: 'Desktop',            path: '/desktop',        icon: 'fas fa-desktop',            category: 'system',        type: 'react' },
-    { id: 'web-browser',   name: 'Web Browser',        path: '/browser',        icon: 'fab fa-chrome',             category: 'system',        type: 'react' },
+    // { id: 'web-browser',   name: 'Web Browser',        path: '/browser',        icon: 'fab fa-chrome',             category: 'system',        type: 'react' },
     { id: 'community-board',name:'Community Apps',     src: '/community/index.html',                             icon: 'fas fa-users-viewfinder', category: 'system',   type: 'offline' },
     { id: 'p2p-calling',   name: 'P2P Calling',        src: '/p2p-calling/index.html',                            icon: 'fas fa-phone-volume',     category: 'system',   type: 'online' },
     { id: 'api-key-manager',name:'API Key Manager',    src: '/api-key-manager/index.html',                        icon: 'fas fa-key',              category: 'system',   type: 'hybrid' },
@@ -51,8 +51,9 @@ export const APP_REGISTRY = [
     { id: 'currency-converter',name:'Currency Converter',     path: '/app/finance?tab=payments',                        icon: 'fas fa-money-bill-transfer', category: 'finance',      type: 'react'   },
 
     // ── Entertainment ────────────────────────────────────────────────────────
+    { id: 'news',              name: 'News Feed',             src: '/news/news.html',                                   icon: 'fas fa-newspaper',          category: 'entertainment', type: 'offline' },
     { id: 'music',             name: 'Music Player',          src: '/music/index.html',                                 icon: 'fas fa-music',              category: 'entertainment', type: 'offline' },
-    { id: 'galactic-simulator',name: 'Galactic Simulator',   src: '/galactic-simulator/index.html',                    icon: 'fas fa-rocket',             category: 'entertainment', type: 'offline' },
+    // { id: 'galactic-simulator',name: 'Galactic Simulator',   src: '/galactic-simulator/index.html',                    icon: 'fas fa-rocket',             category: 'entertainment', type: 'offline' },
 
     // ── Lifestyle & Health ───────────────────────────────────────────────────
     { id: 'health-hub',        name: 'Health & Wellness Hub', path: '/app/health',                                      icon: 'fas fa-heart-pulse',        category: 'lifestyle',     type: 'react'   },

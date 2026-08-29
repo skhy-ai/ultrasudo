@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { APP_REGISTRY, buildAppPath } from '../utils/appRegistry';
 import { useSystemStore } from '../store/useSystemStore';
+import { ensureDataManagerLoaded } from '../utils/dataManagerBridge';
+import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
+import AuthModal from '../components/AuthModal/AuthModal';
+import NewsFeed from '../components/NewsFeed/NewsFeed';
 import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './DesktopPage.css';
 
@@ -10,9 +14,24 @@ export default function DesktopPage() {
     const { setupComplete, enabledApps, loadFromStorage } = useSystemStore();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState(() => {
+        const savedEmail = localStorage.getItem('supabase_user_email');
+        return savedEmail ? { email: savedEmail } : null;
+    });
 
     useEffect(() => {
         loadFromStorage();
+        ensureDataManagerLoaded();
+
+        // Check active Supabase session if SDK present
+        if (window.supabaseClient) {
+            window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                if (session && session.user) {
+                    setCurrentUser(session.user);
+                }
+            }).catch(e => console.warn(e));
+        }
     }, [loadFromStorage]);
 
     useEffect(() => {
@@ -22,6 +41,15 @@ export default function DesktopPage() {
     const handleAppClick = (app) => {
         const appPath = buildAppPath(app);
         navigate(appPath);
+    };
+
+    const handleSignOut = async () => {
+        if (window.supabaseClient) {
+            await window.supabaseClient.auth.signOut().catch(() => {});
+        }
+        localStorage.removeItem('supabase_auth_token');
+        localStorage.removeItem('supabase_user_email');
+        setCurrentUser(null);
     };
 
     const categories = [
@@ -35,19 +63,13 @@ export default function DesktopPage() {
     ];
 
     const displayApps = APP_REGISTRY.filter(app => {
-        // Exclude desktop itself from list
         if (app.id === 'desktop') return false;
         
-        // Filter enabled apps if setup complete
         if (enabledApps && enabledApps.length > 0 && !enabledApps.includes(app.id)) {
-            // Keep system core apps visible
             if (app.category !== 'system' && app.type !== 'react') return false;
         }
 
-        // Filter by selected category
         if (selectedCategory !== 'all' && app.category !== selectedCategory) return false;
-
-        // Filter by search query
         if (searchQuery && !app.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
 
         return true;
@@ -63,6 +85,7 @@ export default function DesktopPage() {
                     <img src={ultrasudoLogo} alt="UltraSudo Logo" className="desktop-logo-img" />
                     <span className="brand-name">UltraSudo Home</span>
                 </div>
+
                 <div className="search-bar-container">
                     <i className="fas fa-search search-icon"></i>
                     <input
@@ -72,6 +95,59 @@ export default function DesktopPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <ThemeSelector />
+
+                    {currentUser ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    background: 'rgba(51, 65, 85, 0.5)',
+                                    padding: '6px 12px',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    fontSize: '0.85rem'
+                                }}
+                            >
+                                <div style={{
+                                    width: '26px',
+                                    height: '26px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 'bold',
+                                    color: 'white',
+                                    fontSize: '12px'
+                                }}>
+                                    {currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
+                                </div>
+                                <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {currentUser.email}
+                                </span>
+                            </div>
+                            <button
+                                className="btn btn-sm btn-danger"
+                                onClick={handleSignOut}
+                                title="Sign Out"
+                            >
+                                <i className="fas fa-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            className="btn btn-sm btn-primary"
+                            onClick={() => setIsAuthOpen(true)}
+                        >
+                            <i className="fas fa-user-plus"></i> Sign In / Sign Up
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -124,8 +200,19 @@ export default function DesktopPage() {
                             </a>
                         ))}
                     </div>
+
+                    {/* Integrated News Feed Section */}
+                    <NewsFeed />
                 </main>
             </div>
+
+            {/* Supabase Authentication Modal */}
+            <AuthModal
+                isOpen={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                onAuthSuccess={(user) => setCurrentUser(user)}
+            />
         </div>
     );
 }
+

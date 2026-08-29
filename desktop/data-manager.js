@@ -378,6 +378,68 @@ class DataManager {
         return this.getData('api_keys', {});
     }
 
+    // --- Application History Management ---
+    saveHistory(appName, entry) {
+        if (!appName) return null;
+        const key = 'history_' + appName;
+        const historyList = this.getData(key, []);
+        
+        const record = {
+            id: 'hist_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+            timestamp: Date.now(),
+            appName: appName,
+            ...(typeof entry === 'object' && entry !== null ? entry : { data: entry })
+        };
+
+        // Keep most recent first, cap at 100 items per app
+        historyList.unshift(record);
+        if (historyList.length > 100) {
+            historyList.length = 100;
+        }
+
+        this.setData(key, historyList, appName);
+        return record;
+    }
+
+    getHistory(appName, limit = 50) {
+        if (!appName) return [];
+        const historyList = this.getData('history_' + appName, []);
+        return Array.isArray(historyList) ? historyList.slice(0, limit) : [];
+    }
+
+    clearHistory(appName) {
+        if (!appName) return;
+        this.setData('history_' + appName, [], appName);
+    }
+
+    getAllHistory(limit = 100) {
+        const allHistory = [];
+        const prefix = this.storagePrefix + 'history_';
+        
+        const memoryKeys = Object.keys(this.memoryStore || {});
+        const storageKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k) storageKeys.push(k);
+        }
+
+        const keys = new Set([...memoryKeys, ...storageKeys]);
+
+        for (const fullKey of keys) {
+            if (fullKey.startsWith(prefix)) {
+                const appName = fullKey.replace(prefix, '');
+                const appHistory = this.getHistory(appName);
+                if (Array.isArray(appHistory)) {
+                    allHistory.push(...appHistory);
+                }
+            }
+        }
+
+        // Sort descending by timestamp
+        allHistory.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        return allHistory.slice(0, limit);
+    }
+
     // Event handling
     broadcastDataChange(key, value, operation, appSource) {
         const event = new CustomEvent('dataChange', {
@@ -480,3 +542,9 @@ window.trackAppUsage = (app, time) => window.dataManager.trackAppUsage(app, time
 window.setApiKey = (provider, payload, app) => window.dataManager.setApiKey(provider, payload, app);
 window.getApiKey = (provider) => window.dataManager.getApiKey(provider);
 window.getAllApiKeys = () => window.dataManager.getAllApiKeys();
+// Application history helpers
+window.saveAppHistory = (appName, entry) => window.dataManager.saveHistory(appName, entry);
+window.getAppHistory = (appName, limit) => window.dataManager.getHistory(appName, limit);
+window.clearAppHistory = (appName) => window.dataManager.clearHistory(appName);
+window.getAllAppHistory = (limit) => window.dataManager.getAllHistory(limit);
+

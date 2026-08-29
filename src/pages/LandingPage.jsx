@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import AuthModal from '../components/AuthModal/AuthModal';
 import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './LandingPage.css';
 
 export default function LandingPage() {
     const navigate = useNavigate();
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
 
     return (
         <div className="landing-page-wrapper">
@@ -16,7 +18,10 @@ export default function LandingPage() {
                 <div className="landing-nav-links">
                     <a href="#features">Features</a>
                     <a href="https://github.com/ultrasudo" target="_blank" rel="noopener noreferrer">GitHub</a>
-                    <button className="landing-btn landing-btn-secondary" onClick={() => navigate('/desktop')}>
+                    <button className="landing-btn landing-btn-secondary" onClick={() => setIsAuthOpen(true)}>
+                        <i className="fas fa-user-plus"></i> Sign In / Sign Up
+                    </button>
+                    <button className="landing-btn landing-btn-primary" onClick={() => navigate('/desktop')}>
                         Web Desktop
                     </button>
                 </div>
@@ -73,6 +78,12 @@ export default function LandingPage() {
             <footer className="landing-footer">
                 <p>&copy; 2026 Ultrasudo. Open-source and privacy-first.</p>
             </footer>
+
+            <AuthModal
+                isOpen={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                onAuthSuccess={() => navigate('/desktop')}
+            />
         </div>
     );
 }
