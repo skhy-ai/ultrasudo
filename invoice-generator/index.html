@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator — UltraSudo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="invoice-app">
+        <header class="app-header no-print">
+            <div class="header-left">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Invoice Generator</h2>
+                <span class="status-pill status-draft" id="status-pill">DRAFT</span>
+            </div>
+            <div class="header-actions">
+                <select id="status-select" class="status-select">
+                    <option value="draft">Draft</option>
+                    <option value="sent">Sent</option>
+                    <option value="paid">Paid</option>
+                </select>
+                <button class="btn btn-secondary" id="btn-print"><i class="fas fa-print"></i> Download / Print</button>
+                <button class="btn btn-primary" id="btn-save"><i class="fas fa-save"></i> Save Invoice</button>
+            </div>
+        </header>
+
+        <main class="invoice-paper">
+            <div class="invoice-top">
+                <div class="biller-info">
+                    <input type="text" id="biller-name" class="input-lg" value="UltraSudo Billing Inc.">
+                    <input type="text" id="biller-address" class="input-sm" value="789 Technology Parkway, San Francisco, CA">
+                    <input type="text" id="biller-taxid" class="input-sm" value="Tax ID: US-987654321">
+                </div>
+                <div class="invoice-title-block">
+                    <h1 class="invoice-heading">INVOICE</h1>
+                    <div class="meta-item">
+                        <span>Invoice #:</span>
+                        <input type="text" id="invoice-number" value="INV-2026-104">
+                    </div>
+                    <div class="meta-item">
+                        <span>Date:</span>
+                        <input type="date" id="invoice-date">
+                    </div>
+                    <div class="meta-item">
+                        <span>Due Date:</span>
+                        <input type="date" id="invoice-due">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bill-to-grid">
+                <div class="bill-box">
+                    <h4>BILL TO:</h4>
+                    <input type="text" id="client-name" value="Stark Industries" placeholder="Client Name">
+                    <input type="text" id="client-email" value="billing@stark.com" placeholder="Client Email">
+                    <input type="text" id="client-address" value="10880 Wilshire Blvd, Los Angeles, CA" placeholder="Client Address">
+                </div>
+                <div class="payment-box">
+                    <h4>PAYMENT INFO:</h4>
+                    <input type="text" id="pay-bank" value="Bank: Chase Manhattan">
+                    <input type="text" id="pay-acc" value="Account: 1234-5678-9012">
+                    <input type="text" id="pay-routing" value="Routing / SWIFT: CHASEUS33">
+                </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Service / Product Description</th>
+                        <th style="width: 12%;">Qty</th>
+                        <th style="width: 18%;">Rate ($)</th>
+                        <th style="width: 20%; text-align: right;">Amount</th>
+                        <th class="no-print" style="width: 40px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-items">
+                    <!-- Dynamic -->
+                </tbody>
+            </table>
+
+            <button class="btn btn-sm btn-secondary no-print" id="add-line-btn"><i class="fas fa-plus"></i> Add Line Item</button>
+
+            <!-- Bottom Totals & Notes -->
+            <div class="invoice-bottom">
+                <div class="notes-box">
+                    <h4>NOTES & INSTRUCTIONS:</h4>
+                    <textarea id="invoice-notes" rows="3">Thank you for your business! Please include Invoice # on your payment confirmation.</textarea>
+                </div>
+                <div class="totals-box">
+                    <div class="total-line">
+                        <span>Subtotal:</span>
+                        <span id="inv-subtotal">$0.00</span>
+                    </div>
+                    <div class="total-line">
+                        <span>Tax (8.5%):</span>
+                        <span id="inv-tax">$0.00</span>
+                    </div>
+                    <div class="total-line grand">
+                        <span>Balance Due:</span>
+                        <span id="inv-total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

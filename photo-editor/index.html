@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Editor — UltraSudo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="photo-app">
+        <!-- Top Control Bar -->
+        <header class="app-header">
+            <div class="header-brand">
+                <h2><i class="fas fa-image"></i> Photo Studio</h2>
+                <span class="badge">UltraSudo Media</span>
+            </div>
+            <div class="header-actions">
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+                <button class="btn btn-secondary" id="btn-upload"><i class="fas fa-upload"></i> Open Image</button>
+                <button class="btn btn-secondary" id="btn-sample"><i class="fas fa-wand-magic-sparkles"></i> Sample Image</button>
+                <button class="btn btn-secondary" id="btn-reset"><i class="fas fa-rotate-left"></i> Reset</button>
+                <button class="btn btn-primary" id="btn-download"><i class="fas fa-download"></i> Save Image</button>
+            </div>
+        </header>
+
+        <!-- Main Studio Area -->
+        <div class="studio-body">
+            <!-- Sidebar: Controls -->
+            <aside class="sidebar">
+                <!-- Filters Preset -->
+                <div class="control-group">
+                    <label class="group-title"><i class="fas fa-palette"></i> Presets</label>
+                    <div class="preset-buttons">
+                        <button class="preset-btn active" data-preset="normal">Normal</button>
+                        <button class="preset-btn" data-preset="vintage">Vintage</button>
+                        <button class="preset-btn" data-preset="noir">Noir</button>
+                        <button class="preset-btn" data-preset="cyber">Cyber</button>
+                        <button class="preset-btn" data-preset="warm">Warm</button>
+                        <button class="preset-btn" data-preset="cool">Cool</button>
+                    </div>
+                </div>
+
+                <!-- Range Adjustments -->
+                <div class="control-group">
+                    <label class="group-title"><i class="fas fa-sliders"></i> Adjustments</label>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Brightness</span><span id="val-brightness">100%</span></div>
+                        <input type="range" id="brightness" min="0" max="200" value="100">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Contrast</span><span id="val-contrast">100%</span></div>
+                        <input type="range" id="contrast" min="0" max="200" value="100">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Saturation</span><span id="val-saturate">100%</span></div>
+                        <input type="range" id="saturate" min="0" max="200" value="100">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Blur</span><span id="val-blur">0px</span></div>
+                        <input type="range" id="blur" min="0" max="10" value="0">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Hue Rotate</span><span id="val-hue">0°</span></div>
+                        <input type="range" id="hue" min="0" max="360" value="0">
+                    </div>
+
+                    <div class="slider-row">
+                        <div class="slider-label"><span>Grayscale</span><span id="val-grayscale">0%</span></div>
+                        <input type="range" id="grayscale" min="0" max="100" value="0">
+                    </div>
+                </div>
+
+                <!-- Transforms -->
+                <div class="control-group">
+                    <label class="group-title"><i class="fas fa-rotate"></i> Transform</label>
+                    <div class="tool-buttons">
+                        <button class="btn btn-secondary btn-sm" id="btn-rotate-left"><i class="fas fa-rotate-left"></i> 90°</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-rotate-right"><i class="fas fa-rotate-right"></i> 90°</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-flip-h"><i class="fas fa-arrows-left-right"></i> Flip H</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-flip-v"><i class="fas fa-arrows-up-down"></i> Flip V</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Canvas Container -->
+            <main class="canvas-viewport">
+                <div class="canvas-wrapper">
+                    <canvas id="photo-canvas"></canvas>
+                    <div class="empty-state" id="empty-state">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        <p>Drag & Drop an image here or click <strong>Open Image</strong></p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

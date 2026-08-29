@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraSudo — Dashboard</title>
+    <meta name="description" content="UltraSudo AI Command Center — your intelligent workspace dashboard.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <!-- ─── Top Bar ──────────────────────────────────────────────── -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebar-toggle-btn" title="Toggle sidebar"><i class="fas fa-bars"></i></button>
+            <a href="#" class="topbar-brand">
+                <div class="topbar-brand-icon"><i class="fas fa-bolt"></i></div>
+                UltraSudo
+            </a>
+        </div>
+        <div class="topbar-right">
+            <button class="topbar-btn" id="settings-btn" title="Settings" onclick="openApiKeyModal()">
+                <i class="fas fa-gear"></i>
+            </button>
+            <button class="topbar-btn" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <div class="badge"></div>
+            </button>
+            <div class="user-menu" id="user-menu-btn">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span class="user-email" id="user-email">loading...</span>
+                <i class="fas fa-chevron-down" style="font-size:0.6rem; color: var(--text-dim);"></i>
+            </div>
+        </div>
+        <div class="user-dropdown" id="user-dropdown">
+            <button onclick="openApiKeyModal()"><i class="fas fa-key"></i> AI API Key</button>
+            <button class="danger" id="logout-btn"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </header>
+
+    <!-- ─── Main Layout ──────────────────────────────────────────── -->
+    <div class="main-layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Workspace</div>
+                <div class="sidebar-nav">
+                    <button class="sidebar-item active" data-view="chat"><i class="fas fa-brain"></i> <span>AI Command Center</span></button>
+                    <button class="sidebar-item" data-view="security"><i class="fas fa-shield-halved"></i> <span>Security Agent</span></button>
+                </div>
+            </div>
+            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="sidebar-section-title">Applications (35+)</div>
+                <div class="sidebar-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="app-search-input" placeholder="Search apps...">
+                </div>
+                <div class="sidebar-nav" id="sidebar-apps-nav" style="flex: 1; overflow-y: auto;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            <div class="sidebar-spacer"></div>
+            <div class="sidebar-section">
+                <div class="sidebar-nav">
+                    <button class="sidebar-item" onclick="openApiKeyModal()"><i class="fas fa-gear"></i> <span>Settings</span></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center — AI Chat -->
+        <main class="center-panel">
+            <div class="chat-container" id="chat-container">
+                <!-- Welcome State -->
+                <div class="chat-welcome" id="chat-welcome">
+                    <div class="chat-welcome-icon"><i class="fas fa-bolt"></i></div>
+                    <h2>Hello! I'm your UltraSudo AI</h2>
+                    <p>I can open your apps, manage security, convert currencies, take notes, and more. Just ask!</p>
+                    <div class="suggested-prompts" id="suggested-prompts">
+                        <button class="suggested-prompt" data-prompt="Open my notebook">📝 Notebook</button>
+                        <button class="suggested-prompt" data-prompt="Create an invoice for $500">📄 Create Invoice</button>
+                        <button class="suggested-prompt" data-prompt="Generate a price quote">💼 Price Quote</button>
+                        <button class="suggested-prompt" data-prompt="Open photo studio">🖼️ Photo Studio</button>
+                        <button class="suggested-prompt" data-prompt="Open the calculator">🔢 Calculator</button>
+                        <button class="suggested-prompt" data-prompt="What's in the news today?">📰 News Feed</button>
+                        <button class="suggested-prompt" data-prompt="Show my security score">🛡️ Security Score</button>
+                        <button class="suggested-prompt" data-prompt="Convert 100 USD to EUR">💱 Convert Currency</button>
+                        <button class="suggested-prompt" data-prompt="Open my Kanban board">📋 Kanban Board</button>
+                        <button class="suggested-prompt" data-prompt="What can you do?">✨ What can you do?</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="chat-input" placeholder="Ask UltraSudo anything..." rows="1"></textarea>
+                    <button class="chat-send-btn" id="chat-send-btn" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="right-panel" id="right-panel">
+            <!-- Security Widget -->
+            <div class="security-widget">
+                <div class="security-widget-header">
+                    <div class="security-widget-title">🛡️ Security</div>
+                </div>
+                <div class="security-score">
+                    <div class="score-circle"><span>85</span></div>
+                </div>
+                <div class="security-stats">
+                    <div class="security-stat">
+                        <span class="security-stat-label"><i class="fas fa-ban"></i> Trackers blocked</span>
+                        <span class="security-stat-value">247</span>
+                    </div>
+                    <div class="security-stat">
+                        <span class="security-stat-label"><i class="fas fa-lock"></i> Connection</span>
+                        <span class="security-stat-value">Secure</span>
+                    </div>
+                    <div class="security-stat">
+                        <span class="security-stat-label"><i class="fas fa-key"></i> Vault entries</span>
+                        <span class="security-stat-value">12</span>
+                    </div>
+                    <div class="security-stat">
+                        <span class="security-stat-label"><i class="fas fa-exclamation-triangle"></i> Breaches found</span>
+                        <span class="security-stat-value warn">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Apps -->
+            <div>
+                <div class="quick-apps-title">⚡ Quick Apps</div>
+                <div class="quick-apps-grid" id="quick-apps-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ─── App Slide-Over ───────────────────────────────────────── -->
+    <div class="app-slideover" id="app-slideover">
+        <div class="app-slideover-header">
+            <span class="app-slideover-title" id="app-slideover-title">App</span>
+            <button class="app-slideover-close" id="app-slideover-close"><i class="fas fa-xmark"></i></button>
+        </div>
+        <iframe id="app-slideover-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+
+    <!-- ─── API Key Modal ────────────────────────────────────────── -->
+    <div class="api-key-modal-overlay" id="api-key-modal">
+        <div class="api-key-modal">
+            <h3>🔑 AI Configuration</h3>
+            <p>Enter your Gemini API key to enable the AI agent. You can get one free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--brand-primary);">aistudio.google.com</a>.</p>
+            <input type="password" id="api-key-input" placeholder="AIza...your-gemini-api-key" autocomplete="off">
+            <div class="api-key-modal-actions">
+                <button class="cancel-btn" onclick="closeApiKeyModal()">Cancel</button>
+                <button class="save-btn" id="save-api-key-btn">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Scripts ──────────────────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="ai/config.js"></script>
+    <script src="ai/agent.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

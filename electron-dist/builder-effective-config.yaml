@@ -1,0 +1,59 @@
+directories:
+  output: electron-dist
+  buildResources: build
+appId: com.skand.browser
+productName: Skand Browser
+asar: true
+files:
+  - filter:
+      - electron/**/*
+      - dist
+      - images
+      - node_modules
+      - '!node_modules/.cache'
+      - '!**/*.map'
+      - '!src'
+      - '!src-tauri'
+      - '!*.md'
+      - '!.git'
+      - '!.gemini'
+extraResources:
+  - from: system-manager/target/release
+    to: system-manager
+    filter:
+      - system-manager
+      - system-manager.exe
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+    - target: rpm
+      arch:
+        - x64
+  category: Utility
+  maintainer: Skand <contact@skand.io>
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: images/icon.ico
+  requestedExecutionLevel: asInvoker
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target: dmg
+  icon: images/icon.icns
+  category: public.app-category.utilities
+electronVersion: 29.4.6

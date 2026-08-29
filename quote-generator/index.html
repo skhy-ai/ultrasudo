@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote & Catalog Generator — UltraSudo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quote-app">
+        <header class="app-header no-print">
+            <div class="header-left">
+                <h2><i class="fas fa-quote-left"></i> Quote Generator</h2>
+                <span class="badge">UltraSudo Commerce</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="btn-sample"><i class="fas fa-magic"></i> Load Sample</button>
+                <button class="btn btn-secondary" id="btn-print"><i class="fas fa-print"></i> Print / PDF</button>
+                <button class="btn btn-primary" id="btn-save"><i class="fas fa-save"></i> Save Quote</button>
+            </div>
+        </header>
+
+        <main class="quote-paper" id="quote-paper">
+            <!-- Header section -->
+            <div class="quote-header">
+                <div class="company-details">
+                    <input type="text" id="company-name" class="input-title" value="UltraSudo Technologies">
+                    <input type="text" id="company-sub" class="input-sub" value="123 Innovation Way, Tech Suite 500">
+                    <input type="text" id="company-contact" class="input-sub" value="billing@ultrasudo.com | +1 (800) 555-0199">
+                </div>
+                <div class="quote-meta">
+                    <h1 class="quote-heading">PRICE QUOTE</h1>
+                    <div class="meta-row">
+                        <label>Quote #:</label>
+                        <input type="text" id="quote-number" value="QT-2026-001">
+                    </div>
+                    <div class="meta-row">
+                        <label>Date:</label>
+                        <input type="date" id="quote-date">
+                    </div>
+                    <div class="meta-row">
+                        <label>Valid Until:</label>
+                        <input type="date" id="quote-valid">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Client Info -->
+            <div class="client-section">
+                <div class="client-box">
+                    <h3>PREPARED FOR:</h3>
+                    <input type="text" id="client-name" placeholder="Client Name / Company" value="Acme Corporation">
+                    <input type="text" id="client-email" placeholder="Client Email" value="contact@acme.com">
+                    <input type="text" id="client-address" placeholder="Address" value="456 Enterprise Blvd, NY">
+                </div>
+                <div class="currency-selector no-print">
+                    <label>Currency:</label>
+                    <select id="currency-select">
+                        <option value="$">USD ($)</option>
+                        <option value="€">EUR (€)</option>
+                        <option value="£">GBP (£)</option>
+                        <option value="₹">INR (₹)</option>
+                        <option value="¥">JPY (¥)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 45%;">Description</th>
+                        <th style="width: 15%;">Qty</th>
+                        <th style="width: 20%;">Unit Price</th>
+                        <th style="width: 20%; text-align: right;">Total</th>
+                        <th class="no-print" style="width: 50px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="items-tbody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+
+            <button class="btn btn-sm btn-secondary no-print" id="add-item-btn"><i class="fas fa-plus"></i> Add Item</button>
+
+            <!-- Summary Table -->
+            <div class="quote-summary">
+                <div class="summary-notes">
+                    <h3>Terms & Conditions</h3>
+                    <textarea id="quote-terms" rows="4" placeholder="Terms and payment conditions...">• Quote valid for 30 days from date of issuance.
+• 50% deposit required upon acceptance.
+• Final payment due upon project delivery.</textarea>
+                </div>
+                <div class="summary-totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal-val">$0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Tax (<input type="number" id="tax-rate" value="10" min="0" max="100" style="width: 40px; border:none; background:none; color:inherit; font-weight:bold;">%):</span>
+                        <span id="tax-val">$0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Discount (<input type="number" id="discount-val-input" value="0" min="0" style="width: 40px; border:none; background:none; color:inherit; font-weight:bold;">%):</span>
+                        <span id="discount-val">$0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Grand Total:</span>
+                        <span id="grand-total-val">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
