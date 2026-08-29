@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Weather Dashboard</title>
-    <script src="../desktop/app-shell.js"></script>
     <script src="../desktop/data-manager.js"></script>
     <script src="../desktop/file-helper.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -56,7 +55,6 @@
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
-    <script src="../desktop/app-shell.js"></script>
     <script src="../desktop/file-helper.js"></script>
     <div id="weather-container" class="w-full max-w-4xl mx-auto">
 
@@ -457,11 +455,6 @@
             manualSearchError.textContent = message;
         }
 
-    </script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        if (window.AppShell) AppShell.init({ appId: 'weather', title: 'Weather App' });
-      });
     </script>
 </body>
 </html>

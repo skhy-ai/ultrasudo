@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
 </head>
 <body>
-    <script src="../desktop/app-shell.js"></script>
-
     <div class="send-money-app">
         <!-- Country Selection -->
         <div class="panel country-panel" id="country-panel">
@@ -83,10 +81,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AppShell) AppShell.init({ appId: 'send-money', title: 'Send Money' });
-        });
-    </script>
 </body>
 </html>

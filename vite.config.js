@@ -69,10 +69,10 @@ function copyStaticApps() {
       }
 
       // Also copy dashboard files and workers
-      const extraFiles = ['dashboard.html', 'dashboard.css', 'dashboard.js', 'sw-register.js', 'service-worker.js'];
+      const extraFiles = ['dashboard.html', 'dashboard.css', 'dashboard.js', 'sw-register.js', 'service-worker.js', 'public/ultrasudo-logo.png'];
       for (const file of extraFiles) {
         const srcFile = path.join(srcDir, file);
-        const destFile = path.join(outDir, file);
+        const destFile = path.join(outDir, path.basename(file));
         if (fs.existsSync(srcFile)) {
           await fs.copy(srcFile, destFile);
           console.log(`Copied ${file} to dist/`);
@@ -82,9 +82,9 @@ function copyStaticApps() {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: '.',
-  base: './',
+  base: command === 'build' ? './' : '/',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -110,11 +110,10 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 5173,
     strictPort: false,
-    hmr: {
-      clientPort: 5173,
-    }
+    cors: true,
+    hmr: true
   }
-});
+}));

@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
 </head>
 <body>
-    <script src="../desktop/app-shell.js"></script>
-
     <div class="quote-app">
         <div class="tab-nav">
             <button class="tab-btn active" data-tab="quotes"><i class="fas fa-file-invoice-dollar"></i> Quotes</button>
@@ -111,10 +109,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AppShell) AppShell.init({ appId: 'quote-and-catalog-generator', title: 'Quote & Catalog Generator' });
-        });
-    </script>
 </body>
 </html>

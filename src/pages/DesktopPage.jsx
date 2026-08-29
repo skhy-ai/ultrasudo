@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { APP_REGISTRY, buildAppPath } from '../utils/appRegistry';
 import { useSystemStore } from '../store/useSystemStore';
+import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './DesktopPage.css';
 
 export default function DesktopPage() {
@@ -58,9 +59,9 @@ export default function DesktopPage() {
         <div className="desktop-page-wrapper">
             {/* Top Header Bar */}
             <header className="desktop-header">
-                <div className="desktop-brand">
-                    <i className="fas fa-bolt brand-icon"></i>
-                    <span className="brand-name">UltraSudo</span>
+                <div className="desktop-brand" onClick={() => navigate('/desktop')} style={{ cursor: 'pointer' }} title="UltraSudo Home">
+                    <img src={ultrasudoLogo} alt="UltraSudo Logo" className="desktop-logo-img" />
+                    <span className="brand-name">UltraSudo Home</span>
                 </div>
                 <div className="search-bar-container">
                     <i className="fas fa-search search-icon"></i>

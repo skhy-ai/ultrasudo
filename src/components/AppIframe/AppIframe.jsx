@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ultrasudoLogo from '../../assets/ultrasudo-logo.png';
 import './AppIframe.css';
 
 /**
@@ -35,6 +36,7 @@ export default function AppIframe({ src, title = 'App', showControls = true }) {
     };
 
     const handleBack = () => navigate(-1);
+    const handleHome = () => navigate('/desktop');
 
     if (!resolvedSrc) {
         return (
@@ -50,9 +52,15 @@ export default function AppIframe({ src, title = 'App', showControls = true }) {
         <div className="app-iframe-wrapper">
             {showControls && (
                 <div className="app-iframe-toolbar">
-                    <button className="iframe-back-btn" onClick={handleBack} title="Back">
-                        <i className="fas fa-arrow-left"></i>
-                    </button>
+                    <div className="iframe-nav-controls">
+                        <button className="iframe-nav-btn iframe-back-btn" onClick={handleBack} title="Go Back">
+                            <i className="fas fa-arrow-left"></i>
+                        </button>
+                        <button className="iframe-nav-btn iframe-home-btn" onClick={handleHome} title="Go to Home">
+                            <i className="fas fa-house"></i>
+                        </button>
+                        <img src={ultrasudoLogo} alt="UltraSudo Logo" className="iframe-logo-img" onClick={handleHome} title="UltraSudo Home" />
+                    </div>
                     <span className="iframe-title">{resolvedTitle}</span>
                     <button className="iframe-refresh-btn" onClick={handleRefresh} title="Refresh">
                         <i className="fas fa-rotate-right"></i>

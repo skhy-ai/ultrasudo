@@ -76,14 +76,12 @@
     </main>
   </div>
 
-  <script src="../desktop/app-shell.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../auth/config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.AppShell) AppShell.init({ appId: 'portfolio-manager', title: 'Portfolio Manager' });
       document.getElementById('current-date').textContent = new Date().toLocaleDateString();
     });
   </script>

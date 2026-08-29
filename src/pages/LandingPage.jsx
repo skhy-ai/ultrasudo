@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './LandingPage.css';
 
 export default function LandingPage() {
@@ -9,8 +10,8 @@ export default function LandingPage() {
         <div className="landing-page-wrapper">
             <nav className="landing-nav">
                 <Link to="/" className="landing-logo">
-                    <i className="fas fa-layer-group"></i>
-                    Ultrasudo
+                    <img src={ultrasudoLogo} alt="UltraSudo Logo" className="landing-logo-img" />
+                    UltraSudo
                 </Link>
                 <div className="landing-nav-links">
                     <a href="#features">Features</a>

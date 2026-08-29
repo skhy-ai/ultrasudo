@@ -35,8 +35,12 @@
     text-decoration: none;
 }
 
-.landing-logo i {
-    color: #3b82f6;
+.landing-logo-img {
+    height: 34px;
+    width: 34px;
+    object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
 }
 
 .landing-nav-links {

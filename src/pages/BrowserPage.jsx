@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBrowserStore } from '../store/useBrowserStore';
 import { APP_REGISTRY } from '../utils/appRegistry';
+import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './BrowserPage.css';
 
 export default function BrowserPage() {
@@ -41,8 +42,8 @@ export default function BrowserPage() {
         <div style={{display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden'}}>
             {/* Apps Sidebar (Left) */}
             <div className="apps-sidebar">
-                <div className="app-shortcut" onClick={() => navigate('/desktop')} title="Desktop">
-                    <i className="fas fa-desktop"></i>
+                <div className="app-shortcut" onClick={() => navigate('/desktop')} title="Home">
+                    <img src={ultrasudoLogo} alt="UltraSudo Logo" style={{ width: '24px', height: '24px', borderRadius: '5px', objectFit: 'contain' }} />
                 </div>
                 {APP_REGISTRY.filter(a => a.type !== 'system' && a.id !== 'web-browser').slice(0, 5).map(app => (
                     <div className="app-shortcut" key={app.id} onClick={(e) => {
@@ -79,9 +80,13 @@ export default function BrowserPage() {
                     </div>
 
                     <div className="nav-controls">
-                        <button className="nav-btn"><i className="fas fa-arrow-left"></i></button>
-                        <button className="nav-btn"><i className="fas fa-arrow-right"></i></button>
-                        <button className="nav-btn"><i className="fas fa-redo"></i></button>
+                        <button className="nav-btn" onClick={() => navigate(-1)} title="Go Back"><i className="fas fa-arrow-left"></i></button>
+                        <button className="nav-btn" onClick={() => navigate(1)} title="Go Forward"><i className="fas fa-arrow-right"></i></button>
+                        <button className="nav-btn" onClick={() => navigate('/desktop')} title="Go to Home"><i className="fas fa-house"></i></button>
+                        <button className="nav-btn" onClick={() => {
+                            const currentTab = localTabs.find(t => t.id === activeLocalTabId);
+                            if (currentTab) navigateTab(activeLocalTabId, currentTab.url);
+                        }} title="Reload"><i className="fas fa-redo"></i></button>
                         <div className="url-bar-container">
                             <i className="fas fa-search search-icon"></i>
                             <input type="text" className="url-bar" value={urlInput} onChange={e => setUrlInput(e.target.value)} onKeyDown={handleUrlSubmit} />
