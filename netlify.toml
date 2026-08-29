@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build:frontend"
+  publish = "dist"
+
+# Redirect rule for SPA client-side routing (React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
