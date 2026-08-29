@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Skand Browser",
+  "productName": "Ultrasudo",
   "version": "0.1.0",
-  "identifier": "com.skand.browser",
+  "identifier": "com.ultrasudo.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build:frontend",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Skand Browser",
+        "title": "Ultrasudo",
         "url": "/",
         "width": 1280,
         "height": 800,

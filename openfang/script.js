@@ -1,5 +1,5 @@
 /**
- * OpenFang AI — AI model configuration and key management for Skand Browser
+ * OpenFang AI — AI model configuration and key management for Ultrasudo
  * Exposes window.OpenFang for other apps to call: invoke(prompt, options)
  */
 

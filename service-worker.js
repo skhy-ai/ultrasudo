@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skand-browser-cache-v1';
+const CACHE_NAME = 'ultrasudo-cache-v1';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

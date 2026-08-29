@@ -78,7 +78,7 @@ Write **Markdown** here and see the _preview_ on the right!
 
 \`\`\`javascript
 function hello() {
-    console.log("Hello, Skand!");
+    console.log("Hello, Ultrasudo!");
 }
 \`\`\`
 

@@ -1,4 +1,4 @@
-# Skand Browser: Secure & Private Workspace ✅
+# Ultrasudo: Secure & Private Workspace ✅
 
 A high-performance, secure, and purely private desktop environment. Built with **React 19**, **Rust**, **Electron**, and **Tauri**, featuring Post-Quantum Cryptography (PQC) local encryption natively bundled.
 

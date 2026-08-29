@@ -1,5 +1,5 @@
 /**
- * APP_REGISTRY — Central definition of all applications in Skand Browser.
+ * APP_REGISTRY — Central definition of all applications in Ultrasudo.
  *
  * Migration Status:
  * - type: 'react'   → Fully migrated to native React component, routed via /app/{id}

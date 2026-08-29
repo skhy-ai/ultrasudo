@@ -76,7 +76,7 @@ export default function WizardPage() {
                 <section className="wizard-step active">
                     <div className="step-content centered">
                         <div className="brand-icon"><i className="fas fa-layer-group"></i></div>
-                        <h1>Welcome to <span className="gradient-text">Skand Browser</span></h1>
+                        <h1>Welcome to <span className="gradient-text">Ultrasudo</span></h1>
                         <p className="subtitle">Your personal, secure desktop environment.<br/>Let's set things up in under a minute.</p>
                         <button className="btn-next" onClick={handleNext}>Get Started <i className="fas fa-arrow-right"></i></button>
                     </div>

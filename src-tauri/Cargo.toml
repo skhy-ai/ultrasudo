@@ -1,5 +1,5 @@
 [package]
-name = "skand-browser"
+name = "ultrasudo"
 version = "0.1.0"
 description = "A Tauri Based Browser Application"
 authors = ["Babu Priyavrat"]

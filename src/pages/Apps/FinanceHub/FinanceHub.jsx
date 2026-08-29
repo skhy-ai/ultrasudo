@@ -544,7 +544,7 @@ export default function FinanceHub() {
                                         ${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px' }}>
-                                        Account #: USD-8849-2910-SKAND
+                                        Account #: USD-8849-2910-ULTRASUDO
                                     </div>
                                 </div>
                                 <i className="fas fa-credit-card" style={{ fontSize: '3rem', opacity: '0.2', color: '#ffffff' }}></i>

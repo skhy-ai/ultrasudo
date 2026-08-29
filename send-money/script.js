@@ -16,7 +16,7 @@ const PAYMENT_PLATFORMS = {
         recipientHint: 'UPI ID like name@ybl, phone@paytm, etc.',
         // UPI deep-link spec: https://www.npci.org.in/what-we-do/upi/upi-qr-code
         generateUri: (recipient, amount, note) =>
-            `upi://pay?pa=${encodeURIComponent(recipient)}&pn=SkandPay&am=${amount}&cu=INR&tn=${encodeURIComponent(note || 'Payment via Skand')}`,
+            `upi://pay?pa=${encodeURIComponent(recipient)}&pn=UltrasudoPay&am=${amount}&cu=INR&tn=${encodeURIComponent(note || 'Payment via Ultrasudo')}`,
         validateRecipient: (id) => /^[\w.-]+@[\w]+$/.test(id)
     },
     malaysia: {
@@ -28,7 +28,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter phone number or DuitNow ID',
         recipientHint: 'Phone: +60xxxxxxxxx or NRIC/Business Reg No.',
         generateUri: (recipient, amount, note) =>
-            `https://www.duitnow.my/qr?id=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Skand')}`,
+            `https://www.duitnow.my/qr?id=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 8
     },
     singapore: {
@@ -40,7 +40,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter phone number or NRIC/UEN',
         recipientHint: '+65xxxxxxxx or UEN for businesses',
         generateUri: (recipient, amount, note) =>
-            `https://www.abs.org.sg/consumer-banking/pay-now?to=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Skand')}`,
+            `https://www.abs.org.sg/consumer-banking/pay-now?to=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 8
     },
     brazil: {
@@ -52,7 +52,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter PIX key (CPF/CNPJ/email/phone)',
         recipientHint: 'CPF, CNPJ, email, or phone number',
         generateUri: (recipient, amount, note) =>
-            `pix://pay?key=${encodeURIComponent(recipient)}&amount=${amount}&msg=${encodeURIComponent(note || 'Skand')}`,
+            `pix://pay?key=${encodeURIComponent(recipient)}&amount=${amount}&msg=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 5
     },
     usa: {
@@ -64,7 +64,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter Venmo username or email',
         recipientHint: '@username or email address',
         generateUri: (recipient, amount, note) =>
-            `https://venmo.com/?txn=pay&recipients=${encodeURIComponent(recipient)}&amount=${amount}&note=${encodeURIComponent(note || 'Skand')}`,
+            `https://venmo.com/?txn=pay&recipients=${encodeURIComponent(recipient)}&amount=${amount}&note=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 3
     },
     uk: {
@@ -76,7 +76,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter sort code & account number',
         recipientHint: 'Format: 12-34-56 / 12345678',
         generateUri: (recipient, amount, note) =>
-            `https://pay.uk/fps?account=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Skand')}`,
+            `https://pay.uk/fps?account=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 6
     },
     europe: {
@@ -92,7 +92,7 @@ const PAYMENT_PLATFORMS = {
             const epc = [
                 'BCD', '002', '1', 'SCT', '', // Service Tag, Version, Charset, ID, BIC
                 encodeURIComponent(recipient.replace(/\s/g, '')),
-                '', `EUR${amount}`, '', '', encodeURIComponent(note || 'Skand'), ''
+                '', `EUR${amount}`, '', '', encodeURIComponent(note || 'Ultrasudo'), ''
             ].join('\n');
             return epc;
         },
@@ -119,7 +119,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter PayPay ID or phone',
         recipientHint: 'PayPay registered phone or user ID',
         generateUri: (recipient, amount, note) =>
-            `paypay://pay?to=${encodeURIComponent(recipient)}&amount=${amount}&note=${encodeURIComponent(note || 'Skand')}`,
+            `paypay://pay?to=${encodeURIComponent(recipient)}&amount=${amount}&note=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 5
     },
     australia: {
@@ -131,7 +131,7 @@ const PAYMENT_PLATFORMS = {
         recipientPlaceholder: 'Enter PayID (email or phone)',
         recipientHint: 'Email or mobile linked to PayID',
         generateUri: (recipient, amount, note) =>
-            `https://payid.com.au/pay?id=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Skand')}`,
+            `https://payid.com.au/pay?id=${encodeURIComponent(recipient)}&amount=${amount}&ref=${encodeURIComponent(note || 'Ultrasudo')}`,
         validateRecipient: (id) => id.length >= 5
     }
 };
