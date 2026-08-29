@@ -7,7 +7,7 @@ export const useSystemStore = create((set) => ({
   wotScriptBlocker: localStorage.getItem('setting_wot') !== 'false',
   enabledApps: JSON.parse(localStorage.getItem('enabled_apps') || '[]'),
   userType: localStorage.getItem('user_type') || 'general',
-  setupComplete: localStorage.getItem('skand_setup_complete') === 'true',
+  setupComplete: localStorage.getItem('ultrasudo_setup_complete') !== 'false',
 
   setTheme: (theme) => {
     localStorage.setItem('desktop_theme', theme);
@@ -26,12 +26,11 @@ export const useSystemStore = create((set) => ({
     set({ userType: type });
   },
   completeSetup: () => {
-    localStorage.setItem('skand_setup_complete', 'true');
+    localStorage.setItem('ultrasudo_setup_complete', 'true');
     set({ setupComplete: true });
   },
 
   loadFromStorage: async () => {
-    // For now use localStorage, but could be async if moved to Tauri/Electron backend
     set({
         theme: localStorage.getItem('desktop_theme') || 'default',
         searchEngine: localStorage.getItem('setting_search_engine') || 'google',
@@ -39,7 +38,7 @@ export const useSystemStore = create((set) => ({
         wotScriptBlocker: localStorage.getItem('setting_wot') !== 'false',
         enabledApps: JSON.parse(localStorage.getItem('enabled_apps') || '[]'),
         userType: localStorage.getItem('user_type') || 'general',
-        setupComplete: localStorage.getItem('skand_setup_complete') === 'true'
+        setupComplete: localStorage.getItem('ultrasudo_setup_complete') !== 'false'
     });
   }
 }));

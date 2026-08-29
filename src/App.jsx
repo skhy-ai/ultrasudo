@@ -33,7 +33,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Core Navigation */}
-        <Route path="/" element={<Navigate to="/wizard" replace />} />
+        <Route path="/" element={<Navigate to="/desktop" replace />} />
         <Route path="/wizard" element={<WizardPage />} />
         <Route path="/desktop" element={<DesktopPage />} />
         <Route path="/browser" element={<BrowserPage />} />

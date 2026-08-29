@@ -1,40 +1,40 @@
-// Auth Check Script
-// Include this script on any page that requires the user to be logged in.
+// Auth Check Script - Frictionless Guest Mode Enabled
+// Automatically initializes guest user session without forcing login or redirecting.
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Ensure Supabase client is available
-    if (!window.supabaseClient) {
-        console.error('Supabase client not initialized. Make sure config.js is loaded.');
-        return;
+    // Default guest session for zero-friction access
+    const guestUser = {
+        id: 'guest-user',
+        email: 'guest@ultrasudo.local',
+        user_metadata: { full_name: 'Guest User' }
+    };
+
+    window.currentUser = guestUser;
+
+    if (window.supabaseClient) {
+        try {
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            if (session && session.user) {
+                window.currentUser = session.user;
+            }
+        } catch (e) {
+            console.warn('Supabase session check skipped, using Guest mode:', e);
+        }
     }
 
-    const supabase = window.supabaseClient;
-
-    // Check session
-    const { data: { session }, error } = await supabase.auth.getSession();
-
-    // Determine path depth relative to project root
-    // For desktop/desktop.html -> '../auth/login.html'
-    // For index.html -> 'auth/login.html'
-    const isRoot = window.location.pathname.endsWith('index.html') && !window.location.pathname.includes('/', window.location.pathname.length - 11) || window.location.pathname === '/';
-    const loginPath = isRoot ? 'auth/login.html' : '../auth/login.html';
-
-    if (!session || error) {
-        // Redirect to login if not authenticated
-        window.location.href = loginPath;
-    } else {
-        // Dispatch an event letting the app know auth is ready
-        window.currentUser = session.user;
-        const event = new CustomEvent('auth-ready', { detail: { user: session.user } });
-        document.dispatchEvent(event);
-    }
+    // Dispatch event letting apps know auth/guest status is ready
+    const event = new CustomEvent('auth-ready', { detail: { user: window.currentUser } });
+    document.dispatchEvent(event);
 });
 
-// Global logout function
+// Global logout / reset function
 window.logout = async () => {
     if (window.supabaseClient) {
-        await window.supabaseClient.auth.signOut();
-        const isRoot = window.location.pathname.endsWith('index.html') && !window.location.pathname.includes('/', window.location.pathname.length - 11) || window.location.pathname === '/';
-        window.location.href = isRoot ? 'auth/login.html' : '../auth/login.html';
+        try {
+            await window.supabaseClient.auth.signOut();
+        } catch (e) {
+            console.warn('Sign out warning:', e);
+        }
     }
+    window.location.reload();
 };
