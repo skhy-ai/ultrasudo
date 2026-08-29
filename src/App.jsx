@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Core Pages
+import LandingPage from './pages/LandingPage';
 import WizardPage from './pages/WizardPage';
 import DesktopPage from './pages/DesktopPage';
 import BrowserPage from './pages/BrowserPage';
@@ -33,7 +34,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Core Navigation */}
-        <Route path="/" element={<Navigate to="/desktop" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/wizard" element={<WizardPage />} />
         <Route path="/desktop" element={<DesktopPage />} />
         <Route path="/browser" element={<BrowserPage />} />

@@ -1,5 +1,5 @@
 /**
- * Skand Browser — Floating Widget Bar
+ * Ultrasudo — Floating Widget Bar
  * An independent, draggable, floating bar that lives on top of any page.
  * Enabled by the user via Settings. Persists position and state in localStorage.
  *
@@ -47,10 +47,10 @@ function init() {
     _loadState();
 
     // Create bar if doesn't exist
-    if (!document.getElementById('skand-widget-bar')) {
+    if (!document.getElementById('ultrasudo-widget-bar')) {
         _buildBar();
     } else {
-        _bar = document.getElementById('skand-widget-bar');
+        _bar = document.getElementById('ultrasudo-widget-bar');
     }
 
     if (_state.visible) show();
@@ -65,10 +65,10 @@ function init() {
 /* ─── DOM Build ───────────────────────────────────────────────────────────── */
 function _buildBar() {
     _bar = document.createElement('div');
-    _bar.id = 'skand-widget-bar';
+    _bar.id = 'ultrasudo-widget-bar';
     _bar.className = 'widget-bar ' + _state.orientation;
     _bar.setAttribute('role', 'toolbar');
-    _bar.setAttribute('aria-label', 'Skand Widget Bar');
+    _bar.setAttribute('aria-label', 'Ultrasudo Widget Bar');
 
     // Drag handle
     const handle = document.createElement('div');

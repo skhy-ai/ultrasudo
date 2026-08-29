@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import HealthyKitchen from '../HealthyKitchen/HealthyKitchen';
+import Yoga from '../Yoga/Yoga';
 import './HealthHub.css';
 
 const RECIPES = [
@@ -239,156 +241,14 @@ export default function HealthHub() {
             {/* TAB 1: NUTRITION & KITCHEN */}
             {activeTab === 'kitchen' && (
                 <div>
-                    <div className="recipe-grid">
-                        {RECIPES.map(r => (
-                            <div key={r.id} className="recipe-card" onClick={() => setSelectedRecipe(r)}>
-                                <div className="recipe-img" style={{ backgroundImage: `url(${r.image})` }}></div>
-                                <div className="recipe-info">
-                                    <div className="recipe-title">{r.name}</div>
-                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
-                                        <span className="recipe-tag">{r.cuisine}</span>
-                                        {r.tags.map(t => (
-                                            <span key={t} className="recipe-tag" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#38bdf8' }}>
-                                                {t}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Selected Recipe Modal */}
-                    {selectedRecipe && cookingStep === null && (
-                        <div style={{
-                            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999
-                        }}>
-                            <div style={{
-                                background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '20px', padding: '30px', maxWidth: '540px', width: '100%'
-                            }}>
-                                <h2>{selectedRecipe.name}</h2>
-                                <p style={{ color: '#34d399' }}>{selectedRecipe.cuisine} Low-GI Recipe</p>
-                                
-                                <h4>Ingredients</h4>
-                                <ul style={{ color: '#e2e8f0', paddingLeft: '20px' }}>
-                                    {selectedRecipe.ingredients.map((ing, i) => (
-                                        <li key={i}>{ing.name} — <strong>{ing.amount}</strong></li>
-                                    ))}
-                                </ul>
-
-                                <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
-                                    <button className="health-btn-primary" style={{ background: '#334155' }} onClick={() => setSelectedRecipe(null)}>Close</button>
-                                    <button className="health-btn-primary" onClick={() => startCooking(selectedRecipe)}>
-                                        <i className="fas fa-fire"></i> Start Guided Cooking
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Cooking Assistant Overlay */}
-                    {cookingStep !== null && selectedRecipe && (
-                        <div style={{
-                            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                            background: '#060913', padding: '40px', zIndex: 1000, overflowY: 'auto'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                                <button className="voice-toggle-btn" onClick={() => { setCookingStep(null); window.speechSynthesis.cancel(); }}>
-                                    ← End Cooking Session
-                                </button>
-                                <h3>Step {cookingStep + 1} of {selectedRecipe.steps.length}</h3>
-                            </div>
-
-                            <div className="health-card" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-                                <h2 style={{ color: '#34d399' }}>{selectedRecipe.name}</h2>
-                                <p style={{ fontSize: '1.4rem', margin: '30px 0', lineHeight: '1.6' }}>
-                                    "{selectedRecipe.steps[cookingStep].text}"
-                                </p>
-
-                                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-                                    <button 
-                                        className="health-btn-primary" 
-                                        disabled={cookingStep === 0} 
-                                        onClick={() => setCookingStep(c => c - 1)}
-                                    >
-                                        Previous Step
-                                    </button>
-                                    <button className="voice-toggle-btn" onClick={() => speak(selectedRecipe.steps[cookingStep].text)}>
-                                        <i className="fas fa-volume-high"></i> Speak Step
-                                    </button>
-                                    <button 
-                                        className="health-btn-primary" 
-                                        disabled={cookingStep === selectedRecipe.steps.length - 1} 
-                                        onClick={nextCookingStep}
-                                    >
-                                        Next Step
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    <HealthyKitchen />
                 </div>
             )}
 
             {/* TAB 2: YOGA & MEDITATION */}
             {activeTab === 'yoga' && (
-                <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-                    {workoutMode === 'none' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                            <div className="health-card" style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setWorkoutMode('yoga'); setYogaIdx(0); setYogaRound(1); setYogaTimer(15); }}>
-                                <i className="fas fa-sun" style={{ fontSize: '3rem', color: '#f59e0b', marginBottom: '16px' }}></i>
-                                <h3>Sun Salutation</h3>
-                                <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>12 Poses of Surya Namaskar to energize body & mind.</p>
-                            </div>
-                            <div className="health-card" style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setWorkoutMode('breathing'); setBreathIdx(0); }}>
-                                <i className="fas fa-wind" style={{ fontSize: '3rem', color: '#14b8a6', marginBottom: '16px' }}></i>
-                                <h3>Pranayama Box Breathing</h3>
-                                <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Deep breathing pulse for stress reduction and calm.</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Active Yoga Workout */}
-                    {workoutMode === 'yoga' && (
-                        <div className="health-card" style={{ textAlign: 'center' }}>
-                            <h2 style={{ color: '#f59e0b' }}>{SUN_SALUTATION_POSES[yogaIdx].name}</h2>
-                            <p style={{ fontSize: '1.2rem', margin: '20px 0', color: '#f8fafc' }}>
-                                {SUN_SALUTATION_POSES[yogaIdx].instruction}
-                            </p>
-
-                            <div style={{ fontSize: '3.5rem', fontWeight: '800', color: '#38bdf8', margin: '20px 0' }}>
-                                {yogaTimer}s
-                            </div>
-                            <div style={{ color: '#94a3b8', marginBottom: '24px' }}>Round {yogaRound} of 3</div>
-
-                            <button className="health-btn-primary" style={{ background: '#ef4444' }} onClick={() => setWorkoutMode('none')}>
-                                Exit Workout Session
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Active Box Breathing */}
-                    {workoutMode === 'breathing' && (
-                        <div className="health-card" style={{ textAlign: 'center' }}>
-                            <h2>Pranayama Box Breathing</h2>
-                            <div className="breathing-box">
-                                <div 
-                                    className="breathing-pulse-circle"
-                                    style={{
-                                        transform: `scale(${BREATHING_PHASES[breathIdx].scale})`
-                                    }}
-                                >
-                                    {BREATHING_PHASES[breathIdx].text}
-                                </div>
-                            </div>
-                            <button className="health-btn-primary" style={{ background: '#ef4444', marginTop: '20px' }} onClick={() => setWorkoutMode('none')}>
-                                End Breathing Session
-                            </button>
-                        </div>
-                    )}
+                <div>
+                    <Yoga />
                 </div>
             )}
 

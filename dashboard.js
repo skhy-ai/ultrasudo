@@ -11,16 +11,16 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ─── App Registry ───────────────────────────────────────────────
 const APPS = [
     // 📋 Productivity & Business
-    { id: 'notebook',          name: 'Notebook',          category: 'productivity', icon: 'fa-book-bookmark',  color: 'linear-gradient(135deg, #7C3AED, #3B82F6)', url: 'notebook/index.html' },
-    { id: 'markdown-editor',   name: 'Markdown Editor',   category: 'productivity', icon: 'fa-file-lines',     color: 'linear-gradient(135deg, #3B82F6, #1E40AF)', url: 'markdown-editor/index.html' },
+    { id: 'notebook',          name: 'Notebook',          category: 'productivity', icon: 'fa-book-bookmark',  color: 'linear-gradient(135deg, #7C3AED, #3B82F6)', url: '/app/notebook' },
+    { id: 'markdown-editor',   name: 'Markdown Editor',   category: 'productivity', icon: 'fa-file-lines',     color: 'linear-gradient(135deg, #3B82F6, #1E40AF)', url: '/app/markdown-editor' },
     { id: 'invoice-generator', name: 'Invoice Generator', category: 'productivity', icon: 'fa-file-invoice-dollar', color: 'linear-gradient(135deg, #10B981, #059669)', url: 'invoice-generator/index.html' },
-    { id: 'quote-generator',   name: 'Quote Generator',   category: 'productivity', icon: 'fa-quote-left',     color: 'linear-gradient(135deg, #3B82F6, #06B6D4)', url: 'quote-generator/index.html' },
-    { id: 'spreadsheet-app',   name: 'Spreadsheets',      category: 'productivity', icon: 'fa-table',          color: 'linear-gradient(135deg, #059669, #10B981)', url: 'spreadsheet-app/index.html' },
-    { id: 'kanban',            name: 'Kanban Board',      category: 'productivity', icon: 'fa-columns',        color: 'linear-gradient(135deg, #6366F1, #4F46E5)', url: 'kanban-board/kanban.html' },
-    { id: 'todo-list',         name: 'To-Do List',        category: 'productivity', icon: 'fa-list-check',     color: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', url: 'todo-list/index.html' },
+    { id: 'quote-generator',   name: 'Quote Generator',   category: 'productivity', icon: 'fa-quote-left',     color: 'linear-gradient(135deg, #3B82F6, #06B6D4)', url: '/app/quote-generator' },
+    { id: 'spreadsheet-app',   name: 'Spreadsheets',      category: 'productivity', icon: 'fa-table',          color: 'linear-gradient(135deg, #059669, #10B981)', url: '/app/spreadsheet' },
+    { id: 'kanban',            name: 'Kanban Board',      category: 'productivity', icon: 'fa-columns',        color: 'linear-gradient(135deg, #6366F1, #4F46E5)', url: '/app/kanban-board' },
+    { id: 'todo-list',         name: 'To-Do List',        category: 'productivity', icon: 'fa-list-check',     color: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', url: '/app/todo-list' },
     { id: 'calendar',          name: 'Calendar',          category: 'productivity', icon: 'fa-calendar-days',  color: 'linear-gradient(135deg, #3B82F6, #06B6D4)', url: 'calendar/calendar.html' },
-    { id: 'timer',             name: 'Timer',             category: 'productivity', icon: 'fa-stopwatch',      color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: 'timer/index.html' },
-    { id: 'pomodoro-timer',    name: 'Pomodoro Timer',    category: 'productivity', icon: 'fa-hourglass-half', color: 'linear-gradient(135deg, #EF4444, #DC2626)', url: 'pomodoro-timer/index.html' },
+    { id: 'timer',             name: 'Timer',             category: 'productivity', icon: 'fa-stopwatch',      color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: '/app/timer' },
+    { id: 'pomodoro-timer',    name: 'Pomodoro Timer',    category: 'productivity', icon: 'fa-hourglass-half', color: 'linear-gradient(135deg, #EF4444, #DC2626)', url: '/app/pomodoro-timer' },
 
     // 💻 Development & Engineering
     { id: 'python-ide',        name: 'Data Science IDE',  category: 'developer',    icon: 'fa-flask-vial',     color: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', url: 'python-IDE/index.html' },
@@ -33,23 +33,23 @@ const APPS = [
     { id: 'investment-board',  name: 'Investments',       category: 'finance',      icon: 'fa-chart-line',     color: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', url: 'investment-board/investment-board.html' },
     { id: 'stock-screener',    name: 'Stock Screener',    category: 'finance',      icon: 'fa-search-dollar',  color: 'linear-gradient(135deg, #10B981, #047857)', url: 'stock-screener/index.html' },
     { id: 'stock-ticker',      name: 'Stock Ticker',      category: 'finance',      icon: 'fa-arrow-trend-up', color: 'linear-gradient(135deg, #06B6D4, #0E7490)', url: 'stock-ticker/stock-ticker.html' },
-    { id: 'portfolio-manager', name: 'Portfolio Manager', category: 'finance',      icon: 'fa-briefcase',      color: 'linear-gradient(135deg, #6366F1, #4338CA)', url: 'portfolio-manager/index.html' },
-    { id: 'send-money',        name: 'Send Money P2P',    category: 'finance',      icon: 'fa-paper-plane',    color: 'linear-gradient(135deg, #3B82F6, #2563EB)', url: 'send-money/index.html' },
-    { id: 'currency-converter',name: 'Currency Converter',category: 'finance',      icon: 'fa-coins',          color: 'linear-gradient(135deg, #14B8A6, #0D9488)', url: 'currency-converter/currency-converter.html' },
-    { id: 'financial-service', name: 'Financial Services',category: 'finance',      icon: 'fa-landmark',       color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: 'financial-service/index.html' },
+    { id: 'portfolio-manager', name: 'Portfolio Manager', category: 'finance',      icon: 'fa-briefcase',      color: 'linear-gradient(135deg, #6366F1, #4338CA)', url: '/app/finance' },
+    { id: 'send-money',        name: 'Send Money P2P',    category: 'finance',      icon: 'fa-paper-plane',    color: 'linear-gradient(135deg, #3B82F6, #2563EB)', url: '/app/finance' },
+    { id: 'currency-converter',name: 'Currency Converter',category: 'finance',      icon: 'fa-coins',          color: 'linear-gradient(135deg, #14B8A6, #0D9488)', url: '/app/finance' },
+    { id: 'financial-service', name: 'Financial Services',category: 'finance',      icon: 'fa-landmark',       color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: '/app/finance' },
 
     // 🌿 Health & Lifestyle
-    { id: 'home-diagnostics',  name: 'Home Diagnostics',  category: 'health',       icon: 'fa-stethoscope',    color: 'linear-gradient(135deg, #EF4444, #B91C1C)', url: 'home-diagnostics/index.html' },
-    { id: 'yoga',              name: 'Yoga & Wellness',   category: 'health',       icon: 'fa-spa',            color: 'linear-gradient(135deg, #10B981, #059669)', url: 'yoga/index.html' },
-    { id: 'healthy-kitchen',   name: 'Healthy Kitchen',   category: 'health',       icon: 'fa-utensils',       color: 'linear-gradient(135deg, #EC4899, #DB2777)', url: 'Healthy-kitchen/Healthy-kitchen.html' },
-    { id: 'grocery',            name: 'Grocery List',      category: 'health',       icon: 'fa-cart-shopping',  color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: 'grocery/index.html' },
+    { id: 'home-diagnostics',  name: 'Home Diagnostics',  category: 'health',       icon: 'fa-stethoscope',    color: 'linear-gradient(135deg, #EF4444, #B91C1C)', url: '/app/health' },
+    { id: 'yoga',              name: 'Yoga & Wellness',   category: 'health',       icon: 'fa-spa',            color: 'linear-gradient(135deg, #10B981, #059669)', url: '/app/health' },
+    { id: 'healthy-kitchen',   name: 'Healthy Kitchen',   category: 'health',       icon: 'fa-utensils',       color: 'linear-gradient(135deg, #EC4899, #DB2777)', url: '/app/health' },
+    { id: 'grocery',            name: 'Grocery List',      category: 'health',       icon: 'fa-cart-shopping',  color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: '/app/grocery' },
     { id: 'life-board',        name: 'Life Board',        category: 'health',       icon: 'fa-heart-pulse',    color: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', url: 'life-board/life-board.html' },
     { id: 'weather',           name: 'Weather App',       category: 'health',       icon: 'fa-cloud-sun',      color: 'linear-gradient(135deg, #06B6D4, #0284C7)', url: 'weather/weather-dashboard.html' },
-    { id: 'birthday-card',     name: 'Birthday Cards',    category: 'health',       icon: 'fa-gift',           color: 'linear-gradient(135deg, #F43F5E, #E11D48)', url: 'birthday-card-generator/index.html' },
+    { id: 'birthday-card',     name: 'Birthday Cards',    category: 'health',       icon: 'fa-gift',           color: 'linear-gradient(135deg, #F43F5E, #E11D48)', url: '/app/birthday-card' },
 
     // 🎨 Media & Utilities
     { id: 'photo-editor',      name: 'Photo Studio',      category: 'media',        icon: 'fa-image',          color: 'linear-gradient(135deg, #EC4899, #8B5CF6)', url: 'photo-editor/index.html' },
-    { id: 'calculator',        name: 'Calculator',        category: 'media',        icon: 'fa-calculator',     color: 'linear-gradient(135deg, #6366F1, #4F46E5)', url: 'calculator/calculator.html' },
+    { id: 'calculator',        name: 'Calculator',        category: 'media',        icon: 'fa-calculator',     color: 'linear-gradient(135deg, #6366F1, #4F46E5)', url: '/app/calculator' },
     { id: 'music',             name: 'Music Player',      category: 'media',        icon: 'fa-music',          color: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', url: 'music/index.html' },
     { id: 'galactic-simulator',name: 'Galactic 3D Sim',   category: 'media',        icon: 'fa-rocket',         color: 'linear-gradient(135deg, #7C3AED, #4C1D95)', url: 'galactic-simulator/index.html' },
     { id: 'social-feed',       name: 'Social Feed',       category: 'media',        icon: 'fa-hashtag',        color: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', url: 'social-feed/index.html' },
@@ -57,7 +57,7 @@ const APPS = [
     { id: 'news',              name: 'News Feed',         category: 'media',        icon: 'fa-newspaper',      color: 'linear-gradient(135deg, #06B6D4, #0891B2)', url: 'news/news.html' },
 
     // 🛡️ System & Security
-    { id: 'vault',             name: 'Secure Vault',      category: 'system',       icon: 'fa-vault',          color: 'linear-gradient(135deg, #EF4444, #DC2626)', url: 'desktop/desktop.html' },
+    { id: 'vault',             name: 'Secure Vault',      category: 'system',       icon: 'fa-vault',          color: 'linear-gradient(135deg, #EF4444, #DC2626)', url: '/app/secure-vault' },
     { id: 'pqc-education',     name: 'PQC Explorer',      category: 'system',       icon: 'fa-shield-halved',  color: 'linear-gradient(135deg, #7C3AED, #3B82F6)', url: 'pqc-education/index.html' },
     { id: 'api-key-manager',   name: 'API Key Manager',   category: 'system',       icon: 'fa-key',            color: 'linear-gradient(135deg, #F59E0B, #D97706)', url: 'api-key-manager/index.html' },
     { id: 'vpn',               name: 'VPN Manager',       category: 'system',       icon: 'fa-shield-virus',   color: 'linear-gradient(135deg, #10B981, #059669)', url: 'vpn/index.html' },
@@ -407,6 +407,11 @@ function openApp(appId) {
 
     if (!app) {
         return { error: `App "${appId}" not found`, available_apps: APPS.map(a => a.name) };
+    }
+
+    if (app.url.startsWith('/app/') || app.url.startsWith('/desktop')) {
+        window.location.href = app.url;
+        return { opened: true, app: app.name, url: app.url };
     }
 
     const slideover = document.getElementById('app-slideover');

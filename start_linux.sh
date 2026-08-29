@@ -24,7 +24,7 @@ cargo build --release
 cd ..
 
 echo ""
-echo "Launching Skand Browser..."
+echo "Launching Ultrasudo..."
 echo ""
 
 # Run the Electron Application (which implicitly spawns the Rust Manager)

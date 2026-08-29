@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function checkSession() {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (session && !error) {
-            window.location.href = '../desktop/desktop.html';
+            window.location.href = '/desktop';
         }
     }
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) throw error;
 
             // Success, redirect to desktop
-            window.location.href = '../desktop/desktop.html';
+            window.location.href = '/desktop';
 
         } catch (error) {
             showError(error.message || 'Invalid login credentials.');

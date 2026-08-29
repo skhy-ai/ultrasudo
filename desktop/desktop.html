@@ -145,59 +145,7 @@
                 </div>
             </section>
 
-            <!-- Section 3: Favourite Websites -->
-            <section class="full-width-section favourites-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-star" style="color: #f59e0b;"></i> Favourite Sites</h2>
-                    <div class="section-actions">
-                        <button class="btn-icon" onclick="window.addFavouritePrompt()" title="Add Favourite"><i
-                                class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div id="favourites-grid" class="favourites-cards-grid">
-                    <!-- Cards are rendered dynamically -->
-                </div>
-            </section>
-
-            <!-- Section 4: Videos -->
-            <section class="full-width-section videos-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-video" style="color: #ef4444;"></i> Recommended Videos</h2>
-                    <div class="news-controls">
-                        <select id="video-topic-select" onchange="window.fetchVideos()">
-                            <option value="technology">Technology</option>
-                            <option value="science">Science</option>
-                            <option value="history">History</option>
-                            <option value="gaming">Gaming</option>
-                            <option value="music">Music</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="video-feed-container" class="video-grid">
-                    <div class="loading-state">Fetching privacy-friendly videos...</div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Add Favourite Modal -->
-    <div id="add-fav-modal" class="modal">
-        <div class="modal-content" style="max-width: 400px; padding: 20px;">
-            <span class="close-btn"
-                onclick="document.getElementById('add-fav-modal').style.display='none'">&times;</span>
-            <h3 style="margin-top: 0; color: #1e293b;">Add Favourite</h3>
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                <input type="text" id="fav-name-input" placeholder="Website Name (e.g. GitHub)"
-                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                <input type="text" id="fav-url-input" placeholder="URL (https://github.com)"
-                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                <input type="text" id="fav-icon-input" placeholder="Icon Class (e.g. fab fa-github)"
-                    style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                <button onclick="window.saveNewFavourite()"
-                    style="padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px;">Save</button>
-            </div>
-        </div>
-    </div>
+    <!-- Add Favourite Modal Removed -->
 
     <!-- System Management Modal -->
     <div id="system-modal" class="modal">

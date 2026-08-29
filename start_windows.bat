@@ -28,7 +28,7 @@ if %ERRORLEVEL% neq 0 (
 cd ..
 
 echo.
-echo Launching Skand Browser...
+echo Launching Ultrasudo...
 echo.
 
 npm start

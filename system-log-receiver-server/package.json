@@ -1,12 +1,12 @@
 {
   "name": "system-log-receiver",
   "version": "1.0.0",
-  "description": "Log sink for Skand Browser telemetry and bug reports.",
+  "description": "Log sink for Ultrasudo telemetry and bug reports.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "Skand",
+  "author": "Ultrasudo",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",

@@ -32,7 +32,7 @@ window.addEventListener('unhandledrejection', (event) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check if setup complete
-    if (!localStorage.getItem('skand_setup_complete')) {
+    if (!localStorage.getItem('ultrasudo_setup_complete')) {
         window.location.href = 'wizard.html';
         return;
     } else if (!localStorage.getItem('telemetry_install_logged')) {
@@ -180,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.newsPage = 0;
         window.newsPageSize = 20;
         if (window.fetchNews) window.fetchNews();
-        if (window.loadFavourites) window.loadFavourites();
         if (window.fetchVideos) window.fetchVideos();
 
         const categorySelect = document.getElementById('app-category-select');

@@ -112,7 +112,7 @@ struct DecryptResponse {
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    info!("Starting Skand System Manager...");
+    info!("Starting Ultrasudo System Manager...");
 
     let mut init_data = HashMap::new();
     if let Ok(data) = std::fs::read_to_string("data.json") {

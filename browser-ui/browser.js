@@ -565,18 +565,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTabId) invoke('reload_tab', { id: currentTabId }).catch(console.error);
     });
     btnHome.addEventListener('click', () => {
-        navigateTo('desktop/desktop.html');
+        navigateTo('/desktop');
     });
 
     function updateUrlBar(url) {
         urlInput.value = url;
         const sIcon = document.getElementById('security-icon');
-        const isInternal = url.includes('/desktop/desktop.html') || url.startsWith('tauri://') || url.startsWith('http://tauri.localhost') || url.startsWith('http://localhost:8000') || url.startsWith('http://localhost:8080');
+        const isInternal = url.includes('/desktop') || url.startsWith('tauri://') || url.startsWith('http://tauri.localhost') || url.startsWith('http://localhost:8000') || url.startsWith('http://localhost:8080');
 
         if (url.startsWith('https://') || isInternal) {
             sIcon.className = 'fas fa-lock security-icon';
             sIcon.style.color = '#10b981';
-        } else if (url.includes('/desktop/desktop.html')) {
+        } else if (url.includes('/desktop')) {
             sIcon.className = 'fas fa-desktop security-icon';
             sIcon.style.color = '#3b82f6';
         } else {
@@ -841,5 +841,5 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(renderAppShortcuts, 500); // Give JS time to load if deferred
     }
     
-    createNewTab('desktop/desktop.html'); // Automatically open first tab pointing to desktop features
+    createNewTab('/desktop'); // Automatically open first tab pointing to desktop features
 });

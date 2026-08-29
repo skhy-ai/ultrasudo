@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useAudioBeep from '../../../hooks/useAudioBeep';
+import TodoList from '../TodoList/TodoList';
+import KanbanBoard from '../KanbanBoard/KanbanBoard';
+import Pomodoro from '../Pomodoro/Pomodoro';
 import './ProductivityHub.css';
 
 const DEFAULT_POMODORO = {
@@ -239,193 +242,22 @@ export default function ProductivityHub() {
 
             {/* TAB 1: FOCUS & TIMERS */}
             {activeTab === 'timers' && (
-                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                    <div className="prod-card" style={{ textAlign: 'center' }}>
-                        <div className="prod-card-title" style={{ justifyContent: 'center' }}>
-                            <span>{isWork ? `Focus Session (Cycle ${cycle})` : 'Break Time'}</span>
-                        </div>
-
-                        <div className="timer-display-box" style={{ position: 'relative' }}>
-                            <svg className="timer-circle-svg" viewBox="0 0 240 240">
-                                <circle className="timer-circle-bg" cx="120" cy="120" r={radius} />
-                                <circle 
-                                    className="timer-circle-progress" 
-                                    cx="120" 
-                                    cy="120" 
-                                    r={radius} 
-                                    stroke={brandColor}
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={strokeDashoffset}
-                                />
-                            </svg>
-                            <div className="timer-text-container">
-                                <div className="timer-time-str">{formatTime(timeLeft)}</div>
-                                <div className="timer-status-str" style={{ color: brandColor }}>
-                                    {isWork ? 'Stay Focused' : 'Relax & Recharge'}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="timer-controls">
-                            {!isRunning ? (
-                                <button className="prod-btn prod-btn-primary" onClick={startTimer}>
-                                    <i className="fas fa-play"></i> Start Focus
-                                </button>
-                            ) : (
-                                <button className="prod-btn prod-btn-secondary" onClick={pauseTimer}>
-                                    <i className="fas fa-pause"></i> Pause
-                                </button>
-                            )}
-                            <button className="prod-btn prod-btn-danger" onClick={resetTimer}>
-                                <i className="fas fa-undo"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Target Task Linker */}
-                    <div className="prod-card">
-                        <div className="prod-card-title">
-                            <span>Link Active Task to Session</span>
-                            <i className="fas fa-bullseye" style={{ color: '#ec4899' }}></i>
-                        </div>
-                        <select 
-                            className="prod-select" 
-                            style={{ width: '100%' }}
-                            value={activeTaskId || ''}
-                            onChange={(e) => setActiveTaskId(e.target.value)}
-                        >
-                            <option value="">-- Select a task to focus on --</option>
-                            {tasks.filter(t => !t.checked).map(t => (
-                                <option key={t.id} value={t.id}>{t.text} ({t.category})</option>
-                            ))}
-                        </select>
-                    </div>
+                <div style={{ maxWidth: '850px', margin: '0 auto' }}>
+                    <Pomodoro />
                 </div>
             )}
 
             {/* TAB 2: TASKS & GAMIFICATION */}
             {activeTab === 'tasks' && (
                 <div>
-                    <div className="prod-card">
-                        <div className="prod-card-title">
-                            <span>Add New Task</span>
-                        </div>
-                        <form onSubmit={handleAddTask} className="task-form-row">
-                            <input 
-                                type="text"
-                                className="prod-input"
-                                placeholder="What do you need to accomplish?"
-                                style={{ flex: 2, minWidth: '240px' }}
-                                value={taskInput}
-                                onChange={(e) => setTaskInput(e.target.value)}
-                            />
-                            <input 
-                                type="date"
-                                className="prod-input"
-                                style={{ flex: 1, minWidth: '150px' }}
-                                value={dueDateInput}
-                                onChange={(e) => setDueDateInput(e.target.value)}
-                            />
-                            <select 
-                                className="prod-select"
-                                style={{ flex: 1, minWidth: '140px' }}
-                                value={categoryInput}
-                                onChange={(e) => setCategoryInput(e.target.value)}
-                            >
-                                <option value="Office">Office</option>
-                                <option value="Code">Code</option>
-                                <option value="Personal">Personal</option>
-                                <option value="Health">Health</option>
-                                <option value="Meetings">Meetings</option>
-                            </select>
-                            <button type="submit" className="prod-btn prod-btn-primary">
-                                <i className="fas fa-plus"></i> Add Task
-                            </button>
-                        </form>
-                    </div>
-
-                    <div className="prod-card">
-                        <div className="prod-card-title">
-                            <span>Task Checklist</span>
-                            <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                                {tasks.filter(t => t.checked).length} of {tasks.length} completed
-                            </span>
-                        </div>
-
-                        <ul className="task-list">
-                            {tasks.map(t => (
-                                <li key={t.id} className={`task-item ${t.checked ? 'completed' : ''}`}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                        <input 
-                                            type="checkbox"
-                                            className="task-checkbox"
-                                            checked={t.checked}
-                                            onChange={() => toggleTaskChecked(t.id)}
-                                        />
-                                        <div>
-                                            <div style={{ fontWeight: '600', color: t.checked ? '#94a3b8' : '#ffffff' }}>{t.text}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
-                                                {t.category} {t.dueDate ? `• Due: ${t.dueDate}` : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={() => deleteTask(t.id)}
-                                        style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', opacity: 0.7 }}
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <TodoList />
                 </div>
             )}
 
             {/* TAB 3: KANBAN WORKSPACE */}
             {activeTab === 'kanban' && (
-                <div className="kanban-grid">
-                    {['Backlog', 'In Progress', 'Review', 'Done'].map((col, idx, arr) => {
-                        const colTasks = tasks.filter(t => (t.kanbanStatus || 'Backlog') === col);
-                        return (
-                            <div key={col} className="kanban-column">
-                                <div className="kanban-column-header">
-                                    <span>{col}</span>
-                                    <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px' }}>
-                                        {colTasks.length}
-                                    </span>
-                                </div>
-
-                                {colTasks.map(t => (
-                                    <div key={t.id} className="kanban-card">
-                                        <div className="kanban-card-title">{t.text}</div>
-                                        <div className="kanban-card-meta">
-                                            <span>{t.category}</span>
-                                            {t.dueDate && <span>{t.dueDate}</span>}
-                                        </div>
-                                        <div className="kanban-move-btns">
-                                            {idx > 0 && (
-                                                <button 
-                                                    className="kanban-move-btn"
-                                                    onClick={() => updateKanbanStatus(t.id, arr[idx - 1])}
-                                                >
-                                                    ← {arr[idx - 1]}
-                                                </button>
-                                            )}
-                                            {idx < arr.length - 1 && (
-                                                <button 
-                                                    className="kanban-move-btn"
-                                                    onClick={() => updateKanbanStatus(t.id, arr[idx + 1])}
-                                                >
-                                                    {arr[idx + 1]} →
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        );
-                    })}
+                <div>
+                    <KanbanBoard />
                 </div>
             )}
         </div>

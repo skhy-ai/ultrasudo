@@ -226,18 +226,24 @@ class UltraSudoAgent {
             parts: parts
         });
 
-        // Execute function calls and get results
+        // Execute function calls with SecureClaw interception and get results
         if (functionCalls.length > 0 && this.onFunctionCall) {
             for (const fc of functionCalls) {
+                // SecureClaw Interception & PQC Security Verification
+                let secureClawStatus = null;
+                if (window.SecureClaw) {
+                    secureClawStatus = await window.SecureClaw.intercept(fc.name, fc.args);
+                }
+
                 const result = await this.onFunctionCall(fc.name, fc.args);
 
-                // Add function response to history
+                // Add function response and SecureClaw audit info to history
                 this.conversationHistory.push({
                     role: 'function',
                     parts: [{
                         functionResponse: {
                             name: fc.name,
-                            response: { result: result }
+                            response: { result: result, secureClaw: secureClawStatus }
                         }
                     }]
                 });

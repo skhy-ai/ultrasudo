@@ -25,7 +25,7 @@ function createWindow() {
         height:    900,
         minWidth:  900,
         minHeight: 600,
-        title:     'Skand Browser',
+        title:     'Ultrasudo',
         ...(iconExists && { icon: iconPath }),
         webPreferences: {
             nodeIntegration:  false,   // Security: no Node in renderer

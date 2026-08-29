@@ -77,7 +77,7 @@ const AppShell = (() => {
     homeBtn.className = 'app-shell-btn';
     homeBtn.innerHTML = '⌂ Desktop';
     homeBtn.title = 'Return to the main desktop view';
-    homeBtn.onclick = () => { window.location.href = '../desktop/desktop.html'; };
+    homeBtn.onclick = () => { window.location.href = '/desktop'; };
 
     const title = document.createElement('div');
     title.className = 'app-shell-title';

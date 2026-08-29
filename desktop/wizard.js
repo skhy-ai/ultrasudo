@@ -1,5 +1,5 @@
 /**
- * Skand Browser — Setup Wizard (4-Step Onboarding)
+ * Ultrasudo — Setup Wizard (4-Step Onboarding)
  * Step 1: Welcome
  * Step 2: User Type Selection → drives smart defaults
  * Step 3: App Selection (category-grouped, pre-selected by user type)
@@ -346,7 +346,7 @@ function initFinishButton() {
         localStorage.setItem('enable_cloud_sync', cloudSync && cloudSync.checked ? 'true' : 'false');
 
         // 6. Mark setup complete
-        localStorage.setItem('skand_setup_complete', 'true');
+        localStorage.setItem('ultrasudo_setup_complete', 'true');
 
         // 7. Redirect to desktop
         window.location.href = 'desktop.html';

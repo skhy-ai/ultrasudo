@@ -72,6 +72,6 @@ app.post('/ingest', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Skand Browser Telemetry Sink listening on port ${PORT}`);
+    console.log(`Ultrasudo Telemetry Sink listening on port ${PORT}`);
     logger.info(`Server started on port ${PORT}`);
 });

@@ -548,7 +548,7 @@ class AppClassifier {
                 networkDependencies: ['fontawesome-cdn'],
                 offlineCapable: false,
                 cacheableAssets: ['index.html', 'style.css', 'script.js'],
-                description: 'AI model configuration and LLM integration hub for Skand Browser'
+                description: 'AI model configuration and LLM integration hub for Ultrasudo'
             }
         ].forEach(app => {
             this.appRegistry.set(app.id, app);

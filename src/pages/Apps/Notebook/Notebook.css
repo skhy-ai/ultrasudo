@@ -1,239 +1,688 @@
-/* Scoped Notebook Styles */
+/* Scoped Notebook Styles for Ultrasudo */
+
 .notebook-app-wrapper {
-    background-color: transparent;
     display: flex;
-    justify-content: center;
-    width: 100vw;
-    height: 100vh;
-    padding-top: 24px;
-    padding-bottom: 64px;
-    overflow-y: auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.notebook-app-wrapper .container {
-    width: min(1200px, 94vw);
-    height: fit-content;
-    background: #ffffff;
-    box-shadow: 0 18px 45px rgba(23, 43, 77, 0.15);
-    padding: 32px 36px 48px;
-    border-radius: 18px;
-    border: 1px solid #d9e2ef;
-    color: #1a2332;
-}
-
-.notebook-app-wrapper h1 {
-    font-size: 32px;
-    font-weight: 600;
-    letter-spacing: -0.25px;
-    text-align: center;
-    margin: 0 0 24px;
-}
-
-.notebook-app-wrapper .document-header {
-    display: grid;
-    grid-template-columns: 130px 1fr;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.notebook-app-wrapper #document-title {
-    border: 1px solid #c7d2e2;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 16px;
-    background: transparent;
-    color: #333;
-}
-
-.notebook-app-wrapper .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(72, 118, 249, 0.08), rgba(93, 197, 253, 0.05));
-    border: 1px solid #cdd9f6;
-    border-radius: 16px;
-    margin-bottom: 28px;
+    flex-direction: column;
+    height: calc(100vh - 75px);
+    width: 100%;
+    background-color: var(--bg-primary, #0f172a);
+    color: var(--text-primary, #f8fafc);
+    box-sizing: border-box;
+    overflow: hidden;
     position: relative;
-    color: #333;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.notebook-app-wrapper .toolbar-group {
-    display: inline-flex;
+/* Top Action Header */
+.notebook-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 12px;
+    z-index: 10;
+    overflow-x: auto;
+}
+
+.notebook-title-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 240px;
+}
+
+.notebook-title-icon {
+    color: #6366f1;
+    font-size: 16px;
+}
+
+.notebook-title-input {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #f8fafc;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.notebook-title-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    background: rgba(15, 23, 42, 0.9);
+}
+
+.notebook-header-actions {
+    display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 8px;
-    border-right: 1px solid #dbe4ff;
+    margin-left: auto;
 }
 
-.notebook-app-wrapper .toolbar button,
-.notebook-app-wrapper .toolbar select,
-.notebook-app-wrapper .color-control {
-    background: #ffffff;
-    border: 1px solid #c7d2e2;
-    border-radius: 999px;
-    cursor: pointer;
-    height: 36px;
-    padding: 0 14px;
+.notebook-btn {
     display: inline-flex;
     align-items: center;
-    color: #24324a;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(30, 41, 59, 0.6);
+    color: #e2e8f0;
 }
 
-.notebook-app-wrapper .toolbar select {
-    appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, #4876f9 50%),
-        linear-gradient(135deg, #4876f9 50%, transparent 50%);
-    background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 12px) calc(50% + 2px);
-    background-size: 6px 6px, 6px 6px;
-    background-repeat: no-repeat;
-    padding-right: 28px;
+.notebook-btn:hover {
+    background: rgba(51, 65, 85, 0.9);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
-.notebook-app-wrapper .color-control input[type="color"] {
+.notebook-btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #ffffff;
     border: none;
-    width: 28px;
-    height: 28px;
-    padding: 0;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.notebook-btn-primary:hover {
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.notebook-btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.notebook-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+/* Toolbar Container */
+.notebook-toolbar-container {
+    padding: 8px 20px;
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    z-index: 9;
+}
+
+.notebook-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: max-content;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 8px;
+    margin-right: 4px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.toolbar-group:last-child {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 1px solid transparent;
     background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+}
+
+.toolbar-btn.active {
+    background: rgba(99, 102, 241, 0.25);
+    color: #818cf8;
+    border-color: rgba(99, 102, 241, 0.4);
+    font-weight: 600;
+}
+
+.toolbar-select {
+    height: 34px;
+    padding: 0 28px 0 10px;
+    border-radius: 6px;
+    background-color: rgba(30, 41, 59, 0.8);
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394A3B8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    font-size: 13px;
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.15s ease;
+}
+
+.toolbar-select:focus, .toolbar-select:hover {
+    border-color: #6366f1;
+    color: #ffffff;
+    outline: none;
+}
+
+.color-picker-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    color: #94a3b8;
+    transition: all 0.15s ease;
+}
+
+.color-picker-label:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+}
+
+.color-picker-label input[type="color"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
 }
 
-.notebook-app-wrapper .dropdown-panel {
+.color-indicator-bar {
     position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    width: 220px;
-    background: #ffffff;
-    border: 1px solid #c7d2e2;
-    border-radius: 14px;
+    bottom: 4px;
+    left: 6px;
+    right: 6px;
+    height: 3px;
+    border-radius: 2px;
+}
+
+/* Attached Dropdowns */
+.margin-dropdown-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 240px;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
     padding: 16px;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-    z-index: 5;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    animation: fadeInDown 0.15s ease-out;
 }
 
-.notebook-app-wrapper .dropdown-panel.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.notebook-app-wrapper .dropdown-grid {
+.dropdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.dropdown-grid {
     display: grid;
-    grid-template-columns: 1fr 80px;
-    gap: 10px 8px;
-    margin-bottom: 16px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
 }
 
-.notebook-app-wrapper .dropdown-grid input {
-    border: 1px solid #c7d2e2;
-    border-radius: 8px;
+.margin-input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.margin-input-field label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.margin-input-field input {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
     padding: 6px 8px;
-    color: #333;
+    color: #f8fafc;
+    font-size: 13px;
+    width: 100%;
 }
 
-.notebook-app-wrapper .editor-shell {
+.margin-input-field input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+/* Main Workspace Canvas & Paper */
+.notebook-canvas-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 40px 20px 80px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: #090d16;
+    background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
     position: relative;
-    background: #fdfdfd;
-    border: 1px solid #cfd8eb;
-    border-radius: 16px;
-    padding: 48px 48px 48px 68px;
+}
+
+.notebook-paper-outer {
+    position: relative;
+    background: #ffffff;
+    color: #1e293b;
+    border-radius: 4px;
+    box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 20px 50px rgba(0, 0, 0, 0.5);
+    width: min(850px, 92vw);
+    min-height: 1050px;
+    transition: width 0.2s ease;
+}
+
+/* Page Ruler Visualizer */
+.ruler-guide-horizontal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: #f8fafc;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    pointer-events: none;
+    display: flex;
     overflow: hidden;
-    --margin-guide-top: 72px;
-    --margin-guide-bottom: 320px;
-    --margin-guide-left: 120px;
-    --margin-guide-right: 720px;
 }
 
-.notebook-app-wrapper .editor-shell::before {
-    content: '';
+.ruler-tick-mark {
+    position: absolute;
+    bottom: 0;
+    width: 1px;
+    height: 8px;
+    background: #cbd5e1;
+}
+
+.ruler-tick-mark.major {
+    height: 14px;
+    background: #64748b;
+}
+
+.ruler-tick-number {
+    position: absolute;
+    top: 2px;
+    font-size: 9px;
+    color: #64748b;
+    transform: translateX(-50%);
+    font-family: monospace;
+}
+
+/* Margin Guides on Paper */
+.paper-margin-overlay {
     position: absolute;
     inset: 0;
-    pointer-events: none;
-    background: linear-gradient(135deg, rgba(72, 118, 249, 0.06), rgba(93, 197, 253, 0.05));
-    opacity: 0.65;
-}
-
-.notebook-app-wrapper .ruler {
-    position: absolute;
-    pointer-events: none;
-    z-index: 1;
-    color: rgba(15, 23, 42, 0.55);
-    font-size: 10px;
-}
-
-.notebook-app-wrapper .ruler::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(to right, rgba(15, 23, 42, 0.12), transparent 10px);
-}
-
-.notebook-app-wrapper .ruler.horizontal { top: 24px; left: 64px; right: 48px; height: 20px; }
-.notebook-app-wrapper .ruler.vertical { top: 44px; left: 24px; bottom: 48px; width: 20px; }
-
-.notebook-app-wrapper .margin-guide {
-    position: absolute;
-    border: 1px dashed rgba(72, 118, 249, 0.45);
     pointer-events: none;
     z-index: 2;
 }
 
-.notebook-app-wrapper .margin-guide-top { top: var(--margin-guide-top); left: var(--margin-guide-left); right: calc(100% - var(--margin-guide-right)); height: 0; }
-.notebook-app-wrapper .margin-guide-bottom { top: var(--margin-guide-bottom); left: var(--margin-guide-left); right: calc(100% - var(--margin-guide-right)); height: 0; }
-.notebook-app-wrapper .margin-guide-left { left: var(--margin-guide-left); top: var(--margin-guide-top); bottom: calc(100% - var(--margin-guide-bottom)); width: 0; }
-.notebook-app-wrapper .margin-guide-right { left: var(--margin-guide-right); top: var(--margin-guide-top); bottom: calc(100% - var(--margin-guide-bottom)); width: 0; }
+.margin-line-v {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    border-left: 1px dashed rgba(99, 102, 241, 0.35);
+}
 
-.notebook-app-wrapper #editor {
+.margin-line-h {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    border-top: 1px dashed rgba(99, 102, 241, 0.35);
+}
+
+/* Editable Document Content */
+.notebook-editor-content {
     position: relative;
     z-index: 3;
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    border-radius: 12px;
-    padding: 2cm;
-    min-height: 27cm;
+    min-height: 1000px;
     outline: none;
-    background: #ffffff;
-    font-size: 12pt;
-    line-height: 1.6;
-    color: #1f2933;
-    width: calc(100% - 2cm);
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 11pt;
+    line-height: 1.7;
+    color: #1e293b;
+    box-sizing: border-box;
 }
 
-.notebook-app-wrapper #editor img.selected-image { box-shadow: 0 0 0 3px rgba(72, 118, 249, 0.4); }
+.notebook-editor-content p {
+    margin-bottom: 1em;
+}
 
-.notebook-app-wrapper .image-properties-panel {
+.notebook-editor-content h1 { font-size: 2em; margin-bottom: 0.5em; font-weight: 700; color: #0f172a; }
+.notebook-editor-content h2 { font-size: 1.5em; margin-bottom: 0.5em; font-weight: 600; color: #1e293b; }
+.notebook-editor-content h3 { font-size: 1.25em; margin-bottom: 0.5em; font-weight: 600; color: #334155; }
+
+.notebook-editor-content blockquote {
+    border-left: 4px solid #6366f1;
+    padding: 8px 16px;
+    margin: 16px 0;
+    background: #f1f5f9;
+    color: #475569;
+    font-style: italic;
+    border-radius: 0 6px 6px 0;
+}
+
+.notebook-editor-content pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 16px 0;
+}
+
+.notebook-editor-content table.nb-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: #ffffff;
+}
+
+.notebook-editor-content table.nb-table td,
+.notebook-editor-content table.nb-table th {
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    min-width: 60px;
+}
+
+.notebook-editor-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    transition: box-shadow 0.15s ease;
+}
+
+.notebook-editor-content img.selected-image {
+    outline: 3px solid #6366f1;
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.25);
+}
+
+.notebook-editor-content hr.page-break {
+    border: none;
+    border-top: 2px dashed #94a3b8;
+    margin: 32px 0;
+    position: relative;
+}
+
+.notebook-editor-content hr.page-break::after {
+    content: 'PAGE BREAK';
+    position: absolute;
+    right: 0;
+    top: -10px;
+    background: #f8fafc;
+    padding: 0 8px;
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Floating Table & Image Toolbars */
+.floating-props-panel {
     position: fixed;
-    right: 40px;
-    bottom: 40px;
+    right: 32px;
+    bottom: 60px;
     width: 280px;
-    background: #ffffff;
-    border: 1px solid #cfd8eb;
-    border-radius: 18px;
-    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.27);
-    padding: 18px 20px 22px;
-    z-index: 50;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    color: #333;
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    padding: 16px 18px;
+    z-index: 200;
+    color: #f8fafc;
+    animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.notebook-app-wrapper .image-properties-panel.hidden { opacity: 0; visibility: hidden; transform: translateY(12px); }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-.notebook-app-wrapper .panel-header {
+.floating-props-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #f1f5f9;
+}
+
+.floating-props-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.floating-props-close:hover {
+    color: #ffffff;
+}
+
+.floating-props-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.props-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.props-row label {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.table-quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.table-action-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    cursor: pointer;
+    text-align: center;
+}
+
+.table-action-btn:hover {
+    background: #6366f1;
+    color: #ffffff;
+}
+
+/* Modals */
+.notebook-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.notebook-modal-content {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    width: min(460px, 90vw);
+    padding: 24px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    color: #f8fafc;
+}
+
+.notebook-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.notebook-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
     font-weight: 600;
 }
 
-.notebook-app-wrapper .panel-body { display: grid; gap: 14px; font-size: 14px; }
-.notebook-app-wrapper .panel-body select, .notebook-app-wrapper .panel-body input[type="range"] { width: 100%; border: 1px solid #c7d2e2; border-radius: 10px; color: #333; }
+.notebook-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notebook-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.notebook-field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+.notebook-field input, .notebook-field select {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #f8fafc;
+    font-size: 14px;
+}
+
+.notebook-field input:focus, .notebook-field select:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.notebook-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Status Bar */
+.notebook-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 24px;
+    background: #0f172a;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    color: #94a3b8;
+    z-index: 10;
+}
+
+.status-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.status-stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-stat-value {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-badge.saving {
+    background: rgba(234, 179, 8, 0.15);
+    color: #fde047;
+    border-color: rgba(234, 179, 8, 0.3);
+}
