@@ -14,14 +14,16 @@ A high-performance, secure, and purely private desktop environment. Built with *
 
 ---
 
-## 📦 Bundled Native Applications (14+)
+## 📦 Consolidated Native Application Hubs
 
-Skand Browser includes 14 fully-migrated native React applications:
+Ultrasudo Browser consolidates fragmented legacy applications into unified, state-of-the-art native React Application Hubs:
 
+- **Finance Hub** (`/app/finance`): Unified suite combining Stock Ticker, Stock Screener, Investment Board, Portfolio Manager, P2P Money Transfers, and Multi-Currency Converter into 4 interactive tabs.
+- **Productivity Hub** (`/app/productivity`): Unified focus workspace combining Pomodoro sessions, Stopwatch timers, Gamified To-Do List, and 4-column sync Kanban Board into 3 interactive tabs.
+- **Health & Wellness Hub** (`/app/health`): Mindful health suite combining low-GI Recipe Kitchen, Surya Namaskar Yoga workouts, Pranayama box breathing, BMI calculators, and Hydration trackers into 3 interactive tabs.
 - **Secure Vault**: Quantum-resistant credential and secret management.
 - **Spreadsheets**: Advanced grid with formula engine and Chart.js integration.
-- **Healthy Kitchen**: Recipe browser and nutrition tracker.
-- **...plus**: Calculator, To-Do List, Notebook, Pomodoro, Kanban, Markdown Editor, and more!
+- **...plus**: Calculator, Notebook, Markdown Editor, and more!
 
 ---
 
@@ -49,4 +51,4 @@ npm run build:frontend
 npm start
 ```
 
-For a deep dive into the inner compilation processes, please refer to the detailed breakdown in [architecture.md](file:///d:/skand-browser/architecture.md) and the [Build Guide](file:///d:/skand-browser/BUILD.md).
+For a deep dive into the inner compilation processes, please refer to the detailed breakdown in [architecture.md](file:///c:/Projects/ultrasudo/architecture.md) and the [BUILD.md](file:///c:/Projects/ultrasudo/BUILD.md).

@@ -22,7 +22,7 @@ Skand Browser is a mission-critical desktop environment featuring a custom brows
 ## Project Structure
 
 ```
-d:/skand-browser/
+c:/Projects/ultrasudo/
 ├── system-manager/                    # Rust backend (Orchestrator & PQC Provider)
 │   ├── src/
 │   │   ├── main.rs                   # Axum API routes, service discovery
@@ -35,19 +35,21 @@ d:/skand-browser/
 │   ├── pages/
 │   │   ├── WizardPage.jsx            # Setup & theme configuration
 │   │   ├── DesktopPage.jsx           # Premium app grid launcher
-│   │   ├── BrowserPage.jsx           # Multi-tab web browser
-│   │   └── Apps/                     # 14 Native React Applications
+      ├── BrowserPage.jsx           # Multi-tab web browser
+│   │   └── Apps/                     # Native React Application Hubs
+│   │       ├── FinanceHub/           # 🚀 Consolidated Finance Hub (Markets, Portfolio, P2P Payments, FX)
+│   │       ├── ProductivityHub/      # ⏱️ Consolidated Productivity Hub (Timers, Tasks, Kanban)
+│   │       ├── HealthHub/            # 🌿 Consolidated Health & Wellness Hub (Kitchen, Yoga, Vitals)
 │   │       ├── SecureVault/          # ✅ PQC-secured credential manager
 │   │       ├── Spreadsheet/          # ✅ Native Grid + Formula Engine
-│   │       ├── HealthyKitchen/       # ✅ Recipe & Nutrition Dashboard
-│   │       └── ...                   # (Calculator, Notebook, Kanban, etc.)
+│   │       └── ...                   # (Calculator, Notebook, etc.)
 │   │
 │   ├── components/
 │   │   ├── shared/                   # AppShell, SplitPane, Modal wrappers
 │   │   └── AppIframe/                # Legacy/Online app container
 │   │
 │   ├── store/                        # Zustand global state (IPC integrated)
-│   └── utils/                        # appRegistry.js (Central routing logic)
+│   └── utils/                        # appRegistry.js (Central routing & deep links)
 │
 ├── electron/                         # Electron main process & IPC handlers
 ├── src-tauri/                         # Tauri configuration & Rust bridge
