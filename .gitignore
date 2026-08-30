@@ -8,3 +8,8 @@ target/
 *.bak
 *.csv
 tmp/
+skand-browser-master/
+skand-browser-win/
+electron-dist/
+src-tauri/target/
+

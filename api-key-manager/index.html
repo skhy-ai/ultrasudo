@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Key Manager & AI Quota Engine</title>
+  <title>API Key Manager & AI Provider Discovery Engine</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,245 +11,137 @@
 <body>
   <script src="../desktop/data-manager.js"></script>
   <script src="../desktop/file-helper.js"></script>
+  <script src="../ai/config.js"></script>
   <script src="../openfang/script.js"></script>
 
-  <div class="akm-container">
-    <div class="akm-header">
-      <div class="akm-header-icon"><i class="fas fa-key"></i></div>
-      <div>
-        <h1>API Key Manager & AI Engine</h1>
-        <p class="akm-subtitle">Configure AI model providers, OpenRouter modalities, token quotas, and automatic 429 failover limits.</p>
-      </div>
-    </div>
-
-    <div class="provider-grid">
-
-      <!-- OpenRouter Card -->
-      <div class="provider-card" data-provider="openrouter" data-color="#7c3aed">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #7c3aed, #6366f1);">
-            <i class="fas fa-route"></i>
-          </div>
-          <div class="provider-info">
-            <h2>OpenRouter <span class="badge free">Free Tier</span> <span class="quota-badge active" id="openrouter-quota-badge">🟢 Active</span></h2>
-            <p class="provider-desc">Access 100+ models (Gemini, Claude, Llama, GPT-4) via a single key with multi-modality support.</p>
-          </div>
-          <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="get-key-link">
-            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
-          </a>
+  <div class="akm-app-layout">
+    
+    <!-- ── Sidebar Provider Navigation ── -->
+    <aside class="akm-sidebar">
+      <div class="sidebar-header">
+        <div class="akm-logo-icon"><i class="fas fa-key"></i></div>
+        <div class="sidebar-title-group">
+          <h2>AI Provider Hub</h2>
+          <span class="sub-label">Priority &amp; Model Routing</span>
         </div>
+      </div>
 
-        <div class="provider-fields">
-          <label>API Key <span class="key-hint">sk-or-v1-...</span>
-            <div class="key-input-row">
-              <input id="openrouter-key" type="password" placeholder="sk-or-v1-..." autocomplete="off"/>
-              <button class="btn-eye" data-target="openrouter-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
-            </div>
-          </label>
+      <div class="sidebar-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="provider-search" placeholder="Search providers..." />
+      </div>
+
+      <!-- Priority Action Banner -->
+      <div class="sidebar-section-title">
+        <span>PROVIDERS &amp; PRIORITY</span>
+        <span class="hint-tag" title="Higher priority providers are attempted first">Priority Rank</span>
+      </div>
+
+      <nav class="provider-sidebar-list" id="provider-sidebar-list">
+        <!-- Dynamically populated provider items -->
+      </nav>
+    </aside>
+
+    <!-- ── Main Configuration Panel ── -->
+    <main class="akm-main-content">
+      <header class="akm-top-bar">
+        <div>
+          <h1 id="selected-provider-title">Anthropic Claude</h1>
+          <p class="akm-subtitle" id="selected-provider-desc">Configure Anthropic Claude API key, priority failover rank, and discover models.</p>
+        </div>
+        <div class="top-bar-controls">
+          <div class="priority-rank-display">
+            <span class="rank-label">Priority Rank:</span>
+            <span class="rank-badge" id="current-priority-badge">#1</span>
+            <button class="rank-btn" id="btn-rank-up" title="Increase priority rank (move up)"><i class="fas fa-chevron-up"></i></button>
+            <button class="rank-btn" id="btn-rank-down" title="Lower priority rank (move down)"><i class="fas fa-chevron-down"></i></button>
+          </div>
           
-          <label>Selected Model
-            <input id="openrouter-model" type="text" value="google/gemini-2.0-flash-exp:free"/>
+          <label class="toggle-switch-label" title="Enable or disable this provider for AI requests">
+            <input type="checkbox" id="provider-enable-toggle" checked />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text" id="toggle-state-text">Enabled</span>
           </label>
-
-          <!-- Dynamic OpenRouter Model Explorer -->
-          <div style="margin-top: 10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:12.5px; font-weight:600; color:#94a3b8;">Discover OpenRouter Models</span>
-              <button id="btn-fetch-openrouter-models" class="btn-test" style="padding:4px 10px; font-size:11px;"><i class="fas fa-rotate"></i> Fetch Models</button>
-            </div>
-
-            <!-- Modality Filter Tabs -->
-            <div class="modality-tabs">
-              <button class="modality-tab active" data-modality="all" onclick="filterOpenRouterModality('all', this)"><i class="fas fa-layer-group"></i> All Models</button>
-              <button class="modality-tab" data-modality="text" onclick="filterOpenRouterModality('text', this)"><i class="fas fa-font"></i> Text Only</button>
-              <button class="modality-tab" data-modality="image" onclick="filterOpenRouterModality('image', this)"><i class="fas fa-image"></i> Image Gen</button>
-              <button class="modality-tab" data-modality="text,image" onclick="filterOpenRouterModality('text,image', this)"><i class="fas fa-photo-film"></i> Multimodal</button>
-            </div>
-
-            <!-- Explorer Model List -->
-            <div class="model-explorer-list" id="openrouter-model-list">
-              <div style="font-size:12px; color:#64748b; text-align:center; padding:15px;">Click "Fetch Models" to load models via OpenRouter API.</div>
-            </div>
-          </div>
         </div>
+      </header>
 
-        <details class="guide-section">
-          <summary><i class="fas fa-circle-info"></i> How to get your OpenRouter key</summary>
-          <ol class="guide-steps">
-            <li>Visit <a href="https://openrouter.ai" target="_blank">openrouter.ai</a> and click <strong>Sign In</strong></li>
-            <li>After signing in, go to <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></li>
-            <li>Click <strong>Create Key</strong> — give it a name like "Ultrasudo"</li>
-            <li>Copy the key (starts with <code>sk-or-v1-</code>) and paste it above</li>
-          </ol>
-        </details>
-
-        <div class="provider-actions">
-          <button id="save-openrouter" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
-          <button id="test-openrouter" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
-          <button id="reset-openrouter-quota" class="btn-test" onclick="resetQuota('openrouter')"><i class="fas fa-arrows-rotate"></i> Reset Quota</button>
-        </div>
-        <div id="openrouter-status" class="status-msg"></div>
-      </div>
-
-      <!-- Gemini Card -->
-      <div class="provider-card" data-provider="gemini" data-color="#4285f4">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #4285f4, #0f9d58);">
-            <i class="fab fa-google"></i>
-          </div>
-          <div class="provider-info">
-            <h2>Google Gemini <span class="badge free">Free Tier</span> <span class="quota-badge active" id="gemini-quota-badge">🟢 Active</span></h2>
-            <p class="provider-desc">Google's multimodal AI. Gemini 2.0 Flash is free with high rate limits.</p>
-          </div>
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="get-key-link">
-            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
-          </a>
-        </div>
-
-        <div class="provider-fields">
-          <label>API Key <span class="key-hint">AIza...</span>
+      <!-- Main Provider Form Container -->
+      <div class="provider-form-card" id="provider-form-card">
+        
+        <!-- Standard API Fields -->
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>API Key 
+              <span class="key-hint" id="key-hint-text">sk-ant-...</span>
+              <a href="#" target="_blank" rel="noopener" class="get-key-link" id="get-key-link">
+                Get key <i class="fas fa-arrow-up-right-from-square"></i>
+              </a>
+            </label>
             <div class="key-input-row">
-              <input id="gemini-key" type="password" placeholder="AIzaSy..." autocomplete="off"/>
-              <button class="btn-eye" data-target="gemini-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+              <input id="provider-key-input" type="password" placeholder="Enter API key..." autocomplete="off"/>
+              <button class="btn-eye" data-target="provider-key-input" title="Show/hide key"><i class="fas fa-eye"></i></button>
             </div>
-          </label>
-          <label>Model
-            <input id="gemini-model" type="text" value="gemini-2.0-flash"/>
-          </label>
-        </div>
-
-        <div class="provider-actions">
-          <button id="save-gemini" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
-          <button id="test-gemini" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
-          <button id="reset-gemini-quota" class="btn-test" onclick="resetQuota('gemini')"><i class="fas fa-arrows-rotate"></i> Reset Quota</button>
-        </div>
-        <div id="gemini-status" class="status-msg"></div>
-      </div>
-
-      <!-- OpenAI Card -->
-      <div class="provider-card" data-provider="openai" data-color="#10a37f">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #10a37f, #0d8a6c);">
-            <i class="fas fa-brain"></i>
           </div>
-          <div class="provider-info">
-            <h2>OpenAI <span class="badge paid">Paid</span> <span class="quota-badge active" id="openai-quota-badge">🟢 Active</span></h2>
-            <p class="provider-desc">GPT-4o, GPT-4o-mini and custom OpenAI compatible endpoints.</p>
+
+          <div class="form-group">
+            <label>Active Model Name
+              <span class="key-hint">Model identifier used for completions</span>
+            </label>
+            <input id="provider-model-input" type="text" placeholder="e.g. claude-3-5-sonnet-20241022" />
           </div>
-          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="get-key-link">
-            Get API key <i class="fas fa-arrow-up-right-from-square"></i>
-          </a>
+
+          <div class="form-group">
+            <label>Custom Base URL / Endpoint
+              <span class="key-hint">Optional proxy or custom endpoint</span>
+            </label>
+            <input id="provider-baseurl-input" type="text" placeholder="Default endpoint" />
+          </div>
         </div>
 
-        <div class="provider-fields">
-          <label>API Key <span class="key-hint">sk-...</span>
-            <div class="key-input-row">
-              <input id="openai-key" type="password" placeholder="sk-..." autocomplete="off"/>
-              <button class="btn-eye" data-target="openai-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+        <!-- Dynamic Model Discovery Engine -->
+        <div class="model-discovery-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-network-wired"></i> Live Model Discovery
+              <span class="badge free" id="discovery-badge">API Live</span>
             </div>
-          </label>
-          <label>Model
-            <input id="openai-model" type="text" value="gpt-4o-mini"/>
-          </label>
-          <label>Base URL <span class="key-hint">Custom endpoint (optional)</span>
-            <input id="openai-base" type="text" value="https://api.openai.com/v1"/>
-          </label>
-        </div>
-
-        <div class="provider-actions">
-          <button id="save-openai" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
-          <button id="test-openai" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
-          <button id="reset-openai-quota" class="btn-test" onclick="resetQuota('openai')"><i class="fas fa-arrows-rotate"></i> Reset Quota</button>
-        </div>
-        <div id="openai-status" class="status-msg"></div>
-      </div>
-
-      <!-- LMStudio (Local) Card -->
-      <div class="provider-card" data-provider="lmstudio" data-color="#f97316">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">
-            <i class="fas fa-server"></i>
+            <button id="btn-discover-models" class="btn-action btn-secondary">
+              <i class="fas fa-rotate"></i> Discover Models
+            </button>
           </div>
-          <div class="provider-info">
-            <h2>LM Studio <span class="badge local">Local</span> <span class="quota-badge active" id="lmstudio-quota-badge">🟢 Active</span></h2>
-            <p class="provider-desc">Run AI models locally on your machine — completely private and offline.</p>
+
+          <div class="modality-tabs" id="modality-tabs">
+            <button class="modality-tab active" data-modality="all"><i class="fas fa-layer-group"></i> All Models</button>
+            <button class="modality-tab" data-modality="chat"><i class="fas fa-comments"></i> Chat / Instruct</button>
+            <button class="modality-tab" data-modality="code"><i class="fas fa-code"></i> Code / Reasoning</button>
+            <button class="modality-tab" data-modality="free"><i class="fas fa-gift"></i> Free Tier</button>
           </div>
-          <a href="https://lmstudio.ai" target="_blank" rel="noopener" class="get-key-link">
-            Download free <i class="fas fa-arrow-up-right-from-square"></i>
-          </a>
-        </div>
 
-        <div class="provider-fields">
-          <label>Local Server URL
-            <input id="lmstudio-base" type="text" value="http://localhost:1234"/>
-          </label>
-          <label>Model Name <span class="key-hint">Optional</span>
-            <input id="lmstudio-model" type="text" placeholder="e.g. llama-3.2-3b-instruct"/>
-          </label>
-        </div>
-
-        <div class="provider-actions">
-          <button id="save-lmstudio" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
-          <button id="test-lmstudio" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
-        </div>
-        <div id="lmstudio-status" class="status-msg"></div>
-      </div>
-
-      <!-- Alpha Vantage Card -->
-      <div class="provider-card" data-provider="alphavantage" data-color="#14b8a6">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="provider-info">
-            <h2>Alpha Vantage <span class="badge free">Free Tier</span></h2>
-            <p class="provider-desc">Real-time and historical stock, forex, and crypto market data.</p>
-          </div>
-          <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener" class="get-key-link">
-            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
-          </a>
-        </div>
-
-        <div class="provider-fields">
-          <label>API Key
-            <div class="key-input-row">
-              <input id="av-key" type="password" placeholder="Your Alpha Vantage key" autocomplete="off"/>
-              <button class="btn-eye" data-target="av-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+          <!-- Explorer Model List -->
+          <div class="model-explorer-list" id="model-discovery-list">
+            <div class="empty-explorer-state">
+              <i class="fas fa-compass"></i>
+              <p>Click <strong>"Discover Models"</strong> to query live models directly from this provider's API.</p>
             </div>
-          </label>
+          </div>
         </div>
 
+        <!-- Footer Action Controls -->
         <div class="provider-actions">
-          <button id="save-av" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
-          <button id="test-av" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
-        </div>
-        <div id="av-status" class="status-msg"></div>
-      </div>
-
-      <!-- Integrated OpenFang Agent OS Card -->
-      <div class="provider-card" data-provider="openfang" data-color="#8b5cf6">
-        <div class="provider-card-header">
-          <div class="provider-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
-            <i class="fas fa-robot"></i>
-          </div>
-          <div class="provider-info">
-            <h2>OpenFang Agent Runtime &amp; Auto-Failover <span class="badge free">Integrated</span></h2>
-            <p class="provider-desc">Centralized AI runtime bridge powering background tasks, sentiment NLP, and automatic 429 quota failover across all suite apps.</p>
-          </div>
+          <button id="btn-save-provider" class="btn-action btn-primary"><i class="fas fa-floppy-disk"></i> Save Settings</button>
+          <button id="btn-test-provider" class="btn-action btn-secondary"><i class="fas fa-flask"></i> Test Connection</button>
+          <button id="btn-reset-quota" class="btn-action btn-secondary"><i class="fas fa-arrows-rotate"></i> Reset Quota Status</button>
         </div>
 
-        <div class="provider-fields">
-          <label>Fallback Priority Order
-            <input id="openfang-priority-input" type="text" value="openrouter, gemini, lmstudio, openai" readonly/>
-          </label>
-          <div style="font-size:12px; color:#64748b;">When an active AI key hits a 429 rate limit or credit limit, requests auto-failover down this list seamlessly.</div>
-        </div>
-      </div>
+        <div id="provider-status-msg" class="status-msg"></div>
 
-    </div><!-- /provider-grid -->
+      </div><!-- /provider-form-card -->
+    </main>
+
   </div>
 
   <script src="../desktop/data-manager.js"></script>
+  <script src="../ai/config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

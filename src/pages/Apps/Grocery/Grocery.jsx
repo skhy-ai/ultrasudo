@@ -1,27 +1,13 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
 import useLocalStore from '../../../hooks/useLocalStore';
+import { GLYCEMIC_FOODS, DELIVERY_SERVICES_BY_COUNTRY } from '../../../data/groceryData';
 import './Grocery.css';
 
-const GLYCEMIC_FOODS = [
-    { name: "Rolled Oats", type: "low", gi: 55, color: "#e0c8b0" },
-    { name: "Quinoa", type: "low", gi: 53, color: "#95a5a6" },
-    { name: "Lentils", type: "low", gi: 32, color: "#bdc3c7" },
-    { name: "Apples", type: "low", gi: 36, color: "#ff4d4d" },
-    { name: "Berries", type: "low", gi: 40, color: "#9b59b6" },
-    { name: "Broccoli", type: "low", gi: 15, color: "#27ae60" },
-    { name: "Spinach", type: "low", gi: 15, color: "#2ecc71" },
-    { name: "Avocado", type: "low", gi: 15, color: "#16a085" },
-    { name: "Salmon", type: "low", gi: 0, color: "#fa8072" },
-    { name: "Tofu", type: "low", gi: 15, color: "#ecf0f1" },
-    { name: "Greek Yogurt", type: "low", gi: 11, color: "#f9f9f9" },
-    { name: "Almonds", type: "low", gi: 0, color: "#d2b48c" },
-    { name: "Sweet Potato", type: "medium", gi: 63, color: "#e67e22" },
-    { name: "Banana", type: "medium", gi: 62, color: "#f1c40f" }
-];
 
 export default function Grocery() {
     const [list, setList] = useLocalStore('smart_shop_list', []);
+    const [country, setCountry] = useLocalStore('smart_shop_country', 'us');
     const [customItem, setCustomItem] = useState('');
 
     const addItem = (item) => {
@@ -55,18 +41,17 @@ export default function Grocery() {
         ));
     };
 
-    const openStore = (store) => {
+    const openDeliveryService = (service) => {
         const items = list.filter(i => !i.checked).map(i => i.name).join(' ');
-        if (!items) return;
-        
-        let url = '';
-        if (store === 'Instacart') url = `https://www.instacart.com/store/search/${encodeURIComponent(items)}`;
-        else if (store === 'Walmart') url = `https://www.walmart.com/search?q=${encodeURIComponent(items)}`;
-        else if (store === 'Amazon Fresh') url = `https://www.amazon.com/s?k=${encodeURIComponent(items)}&i=amazonfresh`;
-
+        if (!items) {
+            alert('Your active shopping list is empty. Add items first!');
+            return;
+        }
+        const url = service.getUrl(items);
         window.open(url, '_blank');
     };
 
+    const activeCountryData = DELIVERY_SERVICES_BY_COUNTRY[country] || DELIVERY_SERVICES_BY_COUNTRY.us;
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
     return (
@@ -74,6 +59,21 @@ export default function Grocery() {
             <div className="grocery-app">
                 <header className="grocery-header">
                     <div className="date-display">{today}</div>
+                    <div className="country-selector-wrapper">
+                        <label htmlFor="grocery-country"><i className="fas fa-globe"></i> Location: </label>
+                        <select 
+                            id="grocery-country" 
+                            className="country-select"
+                            value={country} 
+                            onChange={(e) => setCountry(e.target.value)}
+                        >
+                            {Object.entries(DELIVERY_SERVICES_BY_COUNTRY).map(([key, data]) => (
+                                <option key={key} value={key}>
+                                    {data.flag} {data.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </header>
 
                 <div className="grocery-layout">
@@ -144,17 +144,20 @@ export default function Grocery() {
                         </section>
 
                         <section className="card card-delivery">
-                            <h2 className="section-title"><i className="fas fa-truck"></i> Order Online</h2>
+                            <h2 className="section-title">
+                                <i className="fas fa-truck"></i> Order Online ({activeCountryData.flag} {activeCountryData.label})
+                            </h2>
                             <div className="delivery-grid">
-                                <button className="delivery-btn" onClick={() => openStore('Instacart')}>
-                                    <i className="fas fa-shipping-fast"></i> Instacart
-                                </button>
-                                <button className="delivery-btn" onClick={() => openStore('Walmart')}>
-                                    <i className="fas fa-store"></i> Walmart
-                                </button>
-                                <button className="delivery-btn" onClick={() => openStore('Amazon Fresh')}>
-                                    <i className="fab fa-amazon"></i> Amazon Fresh
-                                </button>
+                                {activeCountryData.services.map(svc => (
+                                    <button 
+                                        key={svc.name} 
+                                        className="delivery-btn" 
+                                        onClick={() => openDeliveryService(svc)}
+                                        title={`Search shopping list on ${svc.name}`}
+                                    >
+                                        <i className={svc.icon}></i> {svc.name}
+                                    </button>
+                                ))}
                             </div>
                         </section>
                     </aside>
@@ -163,3 +166,4 @@ export default function Grocery() {
         </AppShell>
     );
 }
+

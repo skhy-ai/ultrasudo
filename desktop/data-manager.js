@@ -171,10 +171,17 @@ class DataManager {
         // Initialize centralized API keys object
         if (!this.getData('api_keys')) {
             this.setData('api_keys', {
-                openai: { apiKey: '', model: 'gpt-4o-mini', baseUrl: 'https://api.openai.com/v1' },
-                gemini: { apiKey: '', model: 'gemini-1.5-flash', baseUrl: 'https://generativelanguage.googleapis.com' },
-                lmstudio: { baseUrl: 'http://localhost:1234', model: '' },
-                alphavantage: { apiKey: '' }
+                anthropic: { enabled: true, priority: 1, apiKey: '', model: 'claude-3-5-sonnet-20241022', baseUrl: 'https://api.anthropic.com/v1' },
+                gemini: { enabled: true, priority: 2, apiKey: '', model: 'gemini-2.0-flash', baseUrl: 'https://generativelanguage.googleapis.com' },
+                openai: { enabled: true, priority: 3, apiKey: '', model: 'gpt-4o-mini', baseUrl: 'https://api.openai.com/v1' },
+                openrouter: { enabled: true, priority: 4, apiKey: '', model: 'google/gemini-2.0-flash-exp:free', baseUrl: 'https://openrouter.ai/api/v1' },
+                nvidia: { enabled: true, priority: 5, apiKey: '', model: 'meta/llama-3.1-70b-instruct', baseUrl: 'https://integrate.api.nvidia.com/v1' },
+                kimi: { enabled: true, priority: 6, apiKey: '', model: 'moonshot-v1-8k', baseUrl: 'https://api.moonshot.cn/v1' },
+                deepseek: { enabled: true, priority: 7, apiKey: '', model: 'deepseek-chat', baseUrl: 'https://api.deepseek.com/v1' },
+                groq: { enabled: true, priority: 8, apiKey: '', model: 'llama-3.3-70b-versatile', baseUrl: 'https://api.groq.com/openai/v1' },
+                mistral: { enabled: true, priority: 9, apiKey: '', model: 'mistral-small-latest', baseUrl: 'https://api.mistral.ai/v1' },
+                lmstudio: { enabled: true, priority: 10, baseUrl: 'http://localhost:1234', model: '' },
+                alphavantage: { enabled: true, priority: 11, apiKey: '' }
             });
         }
     }

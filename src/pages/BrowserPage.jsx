@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBrowserStore } from '../store/useBrowserStore';
+import { useVpnStore } from '../store/useVpnStore';
 import { APP_REGISTRY } from '../utils/appRegistry';
 import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './BrowserPage.css';
@@ -8,6 +9,8 @@ import './BrowserPage.css';
 export default function BrowserPage() {
     const navigate = useNavigate();
     const { bookmarks, history, addBookmark, removeBookmark, addHistory } = useBrowserStore();
+    const { isConnected: vpnConnected, activeServer: vpnServer } = useVpnStore();
+
     
     const [urlInput, setUrlInput] = useState('');
     const [sidebarActive, setSidebarActive] = useState('');
@@ -92,11 +95,46 @@ export default function BrowserPage() {
                             <input type="text" className="url-bar" value={urlInput} onChange={e => setUrlInput(e.target.value)} onKeyDown={handleUrlSubmit} />
                             <div className="bookmark-btn"><i className="far fa-star"></i></div>
                         </div>
+
+                        {vpnConnected ? (
+                            <div 
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '4px 10px',
+                                    borderRadius: '20px',
+                                    background: 'rgba(16, 185, 129, 0.15)',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                                    color: '#34d399',
+                                    fontSize: '11px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap'
+                                }}
+                                onClick={() => navigate('/vpn/index.html')}
+                                title="Connected to VPN. Click to manage."
+                            >
+                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }}></span>
+                                <span>{vpnServer?.flag || '🛡️'} VPN: {vpnServer?.city || 'Encrypted'} ({vpnServer?.ip || '104.28.14.88'})</span>
+                            </div>
+                        ) : (
+                            <button 
+                                className="nav-btn" 
+                                onClick={() => navigate('/vpn/index.html')} 
+                                title="VPN Disconnected. Click to enable."
+                                style={{ opacity: 0.6 }}
+                            >
+                                <i className="fas fa-shield-halved"></i>
+                            </button>
+                        )}
+
                         <button className="nav-btn" onClick={() => toggleSidebar('settings')}><i className="fas fa-cog"></i></button>
                         <button className="nav-btn" onClick={() => toggleSidebar('history')}><i className="fas fa-history"></i></button>
                         <button className="nav-btn" onClick={() => toggleSidebar('bookmarks')}><i className="fas fa-bookmark"></i></button>
                         <button className="nav-btn" onClick={() => toggleSidebar('passwords')}><i className="fas fa-key"></i></button>
                     </div>
+
                 </header>
 
                 <div className="content-area" style={{flex: 1, position: 'relative', display: 'flex'}}>

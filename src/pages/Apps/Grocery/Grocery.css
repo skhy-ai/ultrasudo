@@ -10,7 +10,8 @@
 
 .grocery-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
 }
 
@@ -19,6 +20,31 @@
     color: #94a3b8;
     font-weight: 500;
 }
+
+.country-selector-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.country-select {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+.country-select:focus {
+    border-color: #2ecc71;
+}
+
 
 .grocery-layout {
     display: grid;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
-import { RECIPES } from './recipeData';
+import { RECIPES } from '../../../data/recipes';
 import './HealthyKitchen.css';
+
 
 export default function HealthyKitchen({ embedded = false }) {
     const [filter, setFilter] = useState({ cuisine: 'all', dietary: [] });

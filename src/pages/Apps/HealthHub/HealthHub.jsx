@@ -3,7 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import AppShell from '../../../components/shared/AppShell/AppShell';
 import HealthyKitchen from '../HealthyKitchen/HealthyKitchen';
 import Yoga from '../Yoga/Yoga';
+import HealthDiagnosticsAgent from './HealthDiagnosticsAgent';
 import './HealthHub.css';
+
 
 const RECIPES = [
     {
@@ -245,62 +247,68 @@ export default function HealthHub() {
 
             {/* TAB 3: DIAGNOSTICS & VITALS */}
             {activeTab === 'diagnostics' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    {/* BMI Calculator */}
-                    <div className="health-card">
-                        <div className="health-card-title">
-                            <span>BMI & Calorie Assessment</span>
-                            <i className="fas fa-calculator" style={{ color: '#10b981' }}></i>
-                        </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '24px', alignItems: 'start' }}>
+                    {/* Interactive AI Health Diagnostics Agent */}
+                    <HealthDiagnosticsAgent speak={speak} />
 
-                        <div style={{ marginBottom: '16px' }}>
-                            <label style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Height (cm)</label>
-                            <input 
-                                type="number" 
-                                className="health-input"
-                                value={heightCm}
-                                onChange={(e) => setHeightCm(parseFloat(e.target.value) || 0)}
-                            />
-                        </div>
+                    {/* Vitals & Trackers Column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        {/* BMI Calculator */}
+                        <div className="health-card">
+                            <div className="health-card-title">
+                                <span>BMI & Body Mass Assessment</span>
+                                <i className="fas fa-calculator" style={{ color: '#10b981' }}></i>
+                            </div>
 
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Weight (kg)</label>
-                            <input 
-                                type="number" 
-                                className="health-input"
-                                value={weightKg}
-                                onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
-                            />
-                        </div>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Height (cm)</label>
+                                <input 
+                                    type="number" 
+                                    className="health-input"
+                                    value={heightCm}
+                                    onChange={(e) => setHeightCm(parseFloat(e.target.value) || 0)}
+                                />
+                            </div>
 
-                        <div style={{ background: 'rgba(15,23,42,0.6)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                            <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Calculated Body Mass Index</div>
-                            <div style={{ fontSize: '2.2rem', fontWeight: '800', color: bmiCategory.color, marginTop: '4px' }}>
-                                {bmi} <span style={{ fontSize: '1rem', fontWeight: '600' }}>({bmiCategory.label})</span>
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Weight (kg)</label>
+                                <input 
+                                    type="number" 
+                                    className="health-input"
+                                    value={weightKg}
+                                    onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
+                                />
+                            </div>
+
+                            <div style={{ background: 'rgba(15,23,42,0.6)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Calculated Body Mass Index</div>
+                                <div style={{ fontSize: '2.2rem', fontWeight: '800', color: bmiCategory.color, marginTop: '4px' }}>
+                                    {bmi} <span style={{ fontSize: '1rem', fontWeight: '600' }}>({bmiCategory.label})</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Hydration Tracker */}
-                    <div className="health-card">
-                        <div className="health-card-title">
-                            <span>Daily Hydration Tracker</span>
-                            <i className="fas fa-glass-water" style={{ color: '#38bdf8' }}></i>
-                        </div>
-
-                        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                            <div style={{ fontSize: '3rem', fontWeight: '800', color: '#38bdf8' }}>
-                                {waterGlasses} / 8 <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>Glasses</span>
+                        {/* Hydration Tracker */}
+                        <div className="health-card">
+                            <div className="health-card-title">
+                                <span>Daily Hydration Tracker</span>
+                                <i className="fas fa-glass-water" style={{ color: '#38bdf8' }}></i>
                             </div>
-                            <p style={{ color: '#94a3b8', margin: '6px 0 20px' }}>Target: 2.0 Liters Daily</p>
 
-                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                                <button className="health-btn-primary" style={{ background: '#334155' }} onClick={() => setWaterGlasses(g => Math.max(0, g - 1))}>
-                                    - 1 Glass
-                                </button>
-                                <button className="health-btn-primary" onClick={() => setWaterGlasses(g => g + 1)}>
-                                    + 1 Glass
-                                </button>
+                            <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                                <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#38bdf8' }}>
+                                    {waterGlasses} / 8 <span style={{ fontSize: '1.1rem', color: '#94a3b8' }}>Glasses</span>
+                                </div>
+                                <p style={{ color: '#94a3b8', margin: '4px 0 16px', fontSize: '0.85rem' }}>Target: 2.0 Liters Daily</p>
+
+                                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                                    <button className="health-btn-primary" style={{ background: '#334155' }} onClick={() => setWaterGlasses(g => Math.max(0, g - 1))}>
+                                        - 1 Glass
+                                    </button>
+                                    <button className="health-btn-primary" onClick={() => setWaterGlasses(g => g + 1)}>
+                                        + 1 Glass
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -309,4 +317,5 @@ export default function HealthHub() {
         </div>
     </AppShell>
     );
+
 }

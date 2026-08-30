@@ -1,6 +1,6 @@
 /**
  * UltraSudo — AI Agent Engine
- * Gemini-powered agent with function calling to control workspace apps
+ * Multi-Provider AI Agent with Function Calling, Anthropic/OpenAI/Gemini Adapters, and Priority Failover
  */
 
 const ULTRASUDO_SYSTEM_PROMPT = `You are UltraSudo AI, an intelligent assistant built into the UltraSudo workspace.
@@ -21,7 +21,7 @@ When a user asks to open an app, use the open_app function. When they ask about 
 
 Always respond naturally and briefly. Don't over-explain.`;
 
-// Function declarations for Gemini function calling
+// Function declarations for function calling
 const FUNCTION_DECLARATIONS = [
     {
         name: 'open_app',
@@ -83,50 +83,18 @@ const FUNCTION_DECLARATIONS = [
         }
     },
     {
-        name: 'create_invoice',
-        description: 'Create and open an invoice for a client with billing items',
-        parameters: {
-            type: 'OBJECT',
-            properties: {
-                client_name: { type: 'STRING', description: 'Client or customer company name' },
-                amount: { type: 'NUMBER', description: 'Total invoice amount' }
-            },
-            required: ['client_name']
-        }
-    },
-    {
-        name: 'generate_quote',
-        description: 'Generate and open a price quote for a client',
-        parameters: {
-            type: 'OBJECT',
-            properties: {
-                client_name: { type: 'STRING', description: 'Client or project name' }
-            },
-            required: ['client_name']
-        }
-    },
-    {
-        name: 'edit_photo',
-        description: 'Open the Photo Studio to edit, crop, or apply filters to an image',
-        parameters: {
-            type: 'OBJECT',
-            properties: {},
-            required: []
-        }
-    },
-    {
         name: 'edit_notebook',
-        description: 'Generate or improve content in the Notebook app using AI. Opens the notebook AI panel to write a paragraph, improve selected text, summarize the document, or check grammar.',
+        description: 'Generate or improve content in the Notebook app using AI.',
         parameters: {
             type: 'OBJECT',
             properties: {
                 action: {
                     type: 'STRING',
-                    description: 'The AI action to perform. One of: write (generate a paragraph), improve (improve selected text), summarize (summarize the document), grammar (check and fix grammar)'
+                    description: 'The AI action to perform: write, improve, summarize, grammar'
                 },
                 prompt: {
                     type: 'STRING',
-                    description: 'The user\'s writing request, topic, or the text to improve/check'
+                    description: 'The user request or text'
                 }
             },
             required: ['action', 'prompt']
@@ -134,26 +102,42 @@ const FUNCTION_DECLARATIONS = [
     }
 ];
 
-/**
- * UltraSudo AI Agent Class
- */
 class UltraSudoAgent {
     constructor() {
         this.conversationHistory = [];
-        this.onFunctionCall = null; // callback: (name, args) => result
+        this.onFunctionCall = null;
     }
 
     /**
-     * Send a message and get a response from the AI
+     * Send a chat message with priority failover support across enabled providers
      */
-    async chat(userMessage) {
-        const apiKey = getApiKey();
-        const provider = getActiveProvider();
-        const config = getProviderConfig();
+    async chat(userMessage, preferredProviderId = null) {
+        let providersToTry = [];
 
-        if (!apiKey) {
+        if (preferredProviderId && window.getProviderConfig) {
+            const prefConfig = window.getProviderConfig(preferredProviderId);
+            if (prefConfig && prefConfig.apiKey) {
+                providersToTry.push(prefConfig);
+            }
+        }
+
+        // Get prioritized list of active providers
+        const activeOrdered = window.getEnabledProvidersOrderedByPriority ? window.getEnabledProvidersOrderedByPriority() : [];
+        for (const item of activeOrdered) {
+            const pConfig = window.getProviderConfig(item.id);
+            if (!providersToTry.some(p => p.id === pConfig.id)) {
+                providersToTry.push(pConfig);
+            }
+        }
+
+        // Fallback to active provider if list is empty
+        if (providersToTry.length === 0 && window.getProviderConfig) {
+            providersToTry.push(window.getProviderConfig());
+        }
+
+        if (providersToTry.length === 0 || (!providersToTry[0].apiKey && providersToTry[0].id !== 'lmstudio' && providersToTry[0].id !== 'vidur')) {
             return {
-                text: "🔑 I need an API key to work! Click the **Settings** icon (⚙️) in the top bar to add your Gemini API key. You can get one free at [aistudio.google.com](https://aistudio.google.com/apikey).",
+                text: "🔑 No valid AI provider API key found! Please open **API Key Manager** from the launcher or header to configure Anthropic, Gemini, OpenAI, NVIDIA, Kimi, or OpenRouter keys.",
                 functionCalls: []
             };
         }
@@ -164,30 +148,92 @@ class UltraSudoAgent {
             parts: [{ text: userMessage }]
         });
 
-        try {
-            if (provider === 'gemini') {
-                return await this._callGemini(apiKey, config);
-            } else {
-                return await this._callOpenAI(apiKey, config);
-            }
-        } catch (error) {
-            console.error('[UltraSudo Agent] Error:', error);
+        let lastError = null;
 
-            // Remove failed message from history
-            this.conversationHistory.pop();
+        // Try providers in priority order
+        for (const config of providersToTry) {
+            try {
+                let response;
+                if (config.type === 'anthropic') {
+                    response = await this._callAnthropic(config);
+                } else if (config.type === 'gemini') {
+                    response = await this._callGemini(config);
+                } else {
+                    response = await this._callOpenAI(config);
+                }
 
-            if (error.message?.includes('API key')) {
-                return { text: "🔑 Invalid API key. Please check your key in Settings.", functionCalls: [] };
+                // Attach provider metadata to response
+                response.providerUsed = config.name;
+                response.modelUsed = config.model;
+                return response;
+
+            } catch (error) {
+                console.warn(`[UltraSudo Agent] Provider '${config.name}' failed (${error.message}). Attempting failover...`);
+                lastError = error;
+                // Mark quota status if rate-limited
+                if (error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('exceeded')) {
+                    if (window.aiProviderEngine && window.aiProviderEngine.reportQuotaExhausted) {
+                        window.aiProviderEngine.reportQuotaExhausted(config.id);
+                    }
+                }
             }
-            return { text: `⚠️ Something went wrong: ${error.message || 'Unknown error'}. Please try again.`, functionCalls: [] };
         }
+
+        // Remove failed message from history if all failed
+        this.conversationHistory.pop();
+
+        return {
+            text: `⚠️ All AI providers failed. Last error (${providersToTry[0]?.name || 'API'}): ${lastError?.message || 'Connection failed'}. Please check your API keys in the API Key Manager.`,
+            functionCalls: []
+        };
     }
 
     /**
-     * Call Gemini API with function calling
+     * Call Anthropic Messages API (/v1/messages)
      */
-    async _callGemini(apiKey, config) {
-        const url = `${config.endpoint}${config.model}:generateContent?key=${apiKey}`;
+    async _callAnthropic(config) {
+        const messages = this.conversationHistory.map(msg => ({
+            role: msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : 'user',
+            content: msg.parts ? msg.parts.map(p => p.text || '').join('') : (typeof msg.content === 'string' ? msg.content : '')
+        }));
+
+        const response = await fetch(config.endpoint || 'https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': config.apiKey,
+                'anthropic-version': '2023-06-01',
+                'dangerously-allow-browser': 'true'
+            },
+            body: JSON.stringify({
+                model: config.model || 'claude-3-5-sonnet-20241022',
+                max_tokens: 1024,
+                system: ULTRASUDO_SYSTEM_PROMPT,
+                messages: messages
+            })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => ({}));
+            throw new Error(errBody.error?.message || `Anthropic HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = data.content?.[0]?.text || '';
+
+        this.conversationHistory.push({
+            role: 'assistant',
+            parts: [{ text }]
+        });
+
+        return { text, functionCalls: [] };
+    }
+
+    /**
+     * Call Google Gemini API (/v1beta/models/...:generateContent)
+     */
+    async _callGemini(config) {
+        const url = `${config.endpoint}${config.model}:generateContent?key=${config.apiKey}`;
 
         const requestBody = {
             contents: this.conversationHistory,
@@ -212,14 +258,14 @@ class UltraSudoAgent {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API error: ${response.status}`);
+            throw new Error(errorData.error?.message || `Gemini HTTP ${response.status}`);
         }
 
         const data = await response.json();
         const candidate = data.candidates?.[0];
 
         if (!candidate?.content?.parts) {
-            throw new Error('No response from AI');
+            throw new Error('No response content from Gemini');
         }
 
         const parts = candidate.content.parts;
@@ -227,9 +273,7 @@ class UltraSudoAgent {
         let functionCalls = [];
 
         for (const part of parts) {
-            if (part.text) {
-                text += part.text;
-            }
+            if (part.text) text += part.text;
             if (part.functionCall) {
                 functionCalls.push({
                     name: part.functionCall.name,
@@ -238,24 +282,18 @@ class UltraSudoAgent {
             }
         }
 
-        // Add assistant response to history
         this.conversationHistory.push({
             role: 'model',
             parts: parts
         });
 
-        // Execute function calls with SecureClaw interception and get results
         if (functionCalls.length > 0 && this.onFunctionCall) {
             for (const fc of functionCalls) {
-                // SecureClaw Interception & PQC Security Verification
                 let secureClawStatus = null;
                 if (window.SecureClaw) {
                     secureClawStatus = await window.SecureClaw.intercept(fc.name, fc.args);
                 }
-
                 const result = await this.onFunctionCall(fc.name, fc.args);
-
-                // Add function response and SecureClaw audit info to history
                 this.conversationHistory.push({
                     role: 'function',
                     parts: [{
@@ -267,8 +305,7 @@ class UltraSudoAgent {
                 });
             }
 
-            // Get follow-up response after function execution
-            const followUp = await this._callGemini(apiKey, config);
+            const followUp = await this._callGemini(config);
             return {
                 text: followUp.text || text,
                 functionCalls: functionCalls
@@ -279,14 +316,14 @@ class UltraSudoAgent {
     }
 
     /**
-     * Call OpenAI-compatible API (OpenRouter, Skhy Vidur)
+     * Call OpenAI-compatible API (OpenAI, OpenRouter, NVIDIA, Kimi, DeepSeek, Groq, Mistral, LM Studio)
      */
-    async _callOpenAI(apiKey, config) {
+    async _callOpenAI(config) {
         const messages = [
             { role: 'system', content: ULTRASUDO_SYSTEM_PROMPT },
             ...this.conversationHistory.map(msg => ({
-                role: msg.role === 'model' ? 'assistant' : msg.role,
-                content: msg.parts.map(p => p.text || '').join('')
+                role: msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : 'user',
+                content: msg.parts ? msg.parts.map(p => p.text || '').join('') : (typeof msg.content === 'string' ? msg.content : '')
             }))
         ];
 
@@ -305,17 +342,27 @@ class UltraSudoAgent {
             }
         }));
 
-        const response = await fetch(config.endpoint, {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (config.apiKey) {
+            headers['Authorization'] = `Bearer ${config.apiKey}`;
+        }
+        if (config.id === 'openrouter') {
+            headers['HTTP-Referer'] = window.location.origin;
+            headers['X-Title'] = 'UltraSudo';
+        }
+
+        const endpoint = config.endpoint.includes('/chat/completions') ? config.endpoint : `${config.endpoint.replace(/\/+$/, '')}/chat/completions`;
+
+        const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                ...(config.name === 'OpenRouter' ? { 'HTTP-Referer': window.location.origin, 'X-Title': 'UltraSudo' } : {})
-            },
+            headers: headers,
             body: JSON.stringify({
                 model: config.model,
                 messages,
-                tools,
+                tools: tools.length > 0 ? tools : undefined,
                 temperature: 0.7,
                 max_tokens: 1024
             })
@@ -323,7 +370,7 @@ class UltraSudoAgent {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API error: ${response.status}`);
+            throw new Error(errorData.error?.message || `API HTTP ${response.status}`);
         }
 
         const data = await response.json();
@@ -339,7 +386,6 @@ class UltraSudoAgent {
             parts: [{ text }]
         });
 
-        // Execute function calls
         if (functionCalls.length > 0 && this.onFunctionCall) {
             for (const fc of functionCalls) {
                 await this.onFunctionCall(fc.name, fc.args);
@@ -349,13 +395,13 @@ class UltraSudoAgent {
         return { text, functionCalls };
     }
 
-    /**
-     * Clear conversation history
-     */
     clearHistory() {
         this.conversationHistory = [];
     }
 }
 
-// Global agent instance
 const ultrasudoAgent = new UltraSudoAgent();
+
+if (typeof window !== 'undefined') {
+    window.ultrasudoAgent = ultrasudoAgent;
+}

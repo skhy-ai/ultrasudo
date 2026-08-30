@@ -3,7 +3,6 @@ import AppShell from '../../../components/shared/AppShell/AppShell';
 import './Notebook.css';
 
 const DEFAULT_DOC_TITLE = 'Untitled Document';
-const SIDES = ['top', 'right', 'bottom', 'left'];
 
 const TEMPLATES = {
     blank: {
@@ -48,10 +47,12 @@ const TEMPLATES = {
 export default function Notebook() {
     const editorRef = useRef(null);
     const paperRef = useRef(null);
-    const fileInputRef = useRef(null);
+    const docxImportRef = useRef(null);
+    const odsImportRef = useRef(null);
+    const mdImportRef = useRef(null);
     const jsonImportRef = useRef(null);
 
-    // States
+    // Core States
     const [docTitle, setDocTitle] = useState(DEFAULT_DOC_TITLE);
     const [stats, setStats] = useState({ words: 0, chars: 0, paragraphs: 0, readingTime: 0 });
     const [saveStatus, setSaveStatus] = useState('saved');
@@ -84,6 +85,25 @@ export default function Notebook() {
         left: 2
     });
     const [marginMenuOpen, setMarginMenuOpen] = useState(false);
+    const marginMenuRef = useRef(null);
+
+    // AI Chat Assistant State
+    const [aiPanelOpen, setAiPanelOpen] = useState(false);
+    const [selectedModel, setSelectedModel] = useState('gemini');
+    const [aiProvidersList, setAiProvidersList] = useState([]);
+    const [aiMessages, setAiMessages] = useState([
+        { role: 'assistant', text: 'Hello! I am your AI writing assistant. Select text in your document or type below to summarize, refine, or expand your document!' }
+    ]);
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
+
+    // Navigation & Versioning Drawers
+    const [tocOpen, setTocOpen] = useState(false);
+    const [tocItems, setTocItems] = useState([]);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [versionHistory, setVersionHistory] = useState([]);
+    const [isDictating, setIsDictating] = useState(false);
+    const recognitionRef = useRef(null);
 
     // Element selection states (Image / Table)
     const [selectedImage, setSelectedImage] = useState(null);
@@ -95,7 +115,7 @@ export default function Notebook() {
     const [activeModal, setActiveModal] = useState(null); // null | 'link' | 'image' | 'table' | 'templates'
     const [modalData, setModalData] = useState({});
 
-    // Inject export CDNs dynamically
+    // Inject CDNs dynamically (.docx mammoth, .ods xlsx, turndown markdown, html2pdf, html-docx)
     useEffect(() => {
         if (!window.htmlDocx) {
             const s1 = document.createElement('script');
@@ -107,9 +127,110 @@ export default function Notebook() {
             s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js';
             document.head.appendChild(s2);
         }
+        if (!window.mammoth) {
+            const s3 = document.createElement('script');
+            s3.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+            document.head.appendChild(s3);
+        }
+        if (!window.XLSX) {
+            const s4 = document.createElement('script');
+            s4.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+            document.head.appendChild(s4);
+        }
+        if (!window.TurndownService) {
+            const s5 = document.createElement('script');
+            s5.src = 'https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.2/turndown.min.js';
+            document.head.appendChild(s5);
+        }
     }, []);
 
-    // Function to calculate editor stats
+    // Load active AI Providers
+    useEffect(() => {
+        if (window.getEnabledProvidersOrderedByPriority) {
+            const providers = window.getEnabledProvidersOrderedByPriority();
+            setAiProvidersList(providers);
+            if (providers.length > 0) {
+                setSelectedModel(providers[0].id);
+            }
+        }
+    }, [aiPanelOpen]);
+
+    // Outside click handler for Margin Dropdown
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (marginMenuRef.current && !marginMenuRef.current.contains(e.target)) {
+                setMarginMenuOpen(false);
+            }
+        };
+        if (marginMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [marginMenuOpen]);
+
+    // Update Table of Contents (TOC)
+    const updateToc = useCallback(() => {
+        if (!editorRef.current) return;
+        const headings = editorRef.current.querySelectorAll('h1, h2, h3');
+        const items = [];
+        headings.forEach((h, idx) => {
+            if (!h.id) h.id = `heading-toc-${idx}-${Date.now()}`;
+            items.push({
+                id: h.id,
+                text: h.innerText || `Heading ${idx + 1}`,
+                level: h.tagName.toLowerCase()
+            });
+        });
+        setTocItems(items);
+    }, []);
+
+    // AI Assistant Handlers using UltraSudo Agent Priority Engine
+    const handleAiSend = async (promptText = aiPrompt) => {
+        const q = promptText.trim();
+        if (!q) return;
+        const userMsg = { role: 'user', text: q };
+        setAiMessages(prev => [...prev, userMsg]);
+        setAiPrompt('');
+        setAiLoading(true);
+
+        const currentText = editorRef.current ? editorRef.current.innerText : '';
+        const selectionObj = window.getSelection();
+        const selectedText = selectionObj ? selectionObj.toString().trim() : '';
+
+        const fullPrompt = selectedText 
+            ? `Context selected from document: "${selectedText}"\n\nInstruction: ${q}`
+            : `Document Content Context:\n${currentText.slice(0, 1500)}\n\nInstruction: ${q}`;
+
+        try {
+            let responseText = '';
+            if (window.ultrasudoAgent) {
+                const aiRes = await window.ultrasudoAgent.chat(fullPrompt, selectedModel);
+                responseText = aiRes.text;
+                if (aiRes.providerUsed) {
+                    responseText += `\n\n*(Generated via ${aiRes.providerUsed} - ${aiRes.modelUsed})*`;
+                }
+            } else {
+                responseText = `Mock AI Response (${selectedModel}): Complete feature overview for document writing.`;
+            }
+
+            setAiMessages(prev => [...prev, { role: 'assistant', text: responseText }]);
+        } catch (err) {
+            setAiMessages(prev => [...prev, { role: 'assistant', text: `⚠️ AI Request failed: ${err.message}` }]);
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
+    const insertAiTextToEditor = (text) => {
+        if (!editorRef.current) return;
+        editorRef.current.focus();
+        const cleanText = text.replace(/\n\n\*(Generated via.*?)\*/, '');
+        const formattedText = cleanText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
+        document.execCommand('insertHTML', false, formattedText);
+        triggerAutoSave();
+    };
+
+    // Calculate editor stats
     const updateStats = useCallback(() => {
         if (!editorRef.current) return;
         const text = editorRef.current.innerText || '';
@@ -122,7 +243,7 @@ export default function Notebook() {
         setStats({ words, chars, paragraphs, readingTime });
     }, []);
 
-    // Load initial document data
+    // Load initial document data & version history
     useEffect(() => {
         const savedData = localStorage.getItem('desktop_app_notebook_doc');
         if (savedData && editorRef.current) {
@@ -135,10 +256,19 @@ export default function Notebook() {
                 console.error('Error loading saved document', e);
             }
         }
-        updateStats();
-    }, [updateStats]);
 
-    // Auto-save debouncer
+        const savedHistory = localStorage.getItem('desktop_app_notebook_history');
+        if (savedHistory) {
+            try {
+                setVersionHistory(JSON.parse(savedHistory));
+            } catch (ignore) {}
+        }
+
+        updateStats();
+        updateToc();
+    }, [updateStats, updateToc]);
+
+    // Auto-save debouncer & Snapshot History
     const autoSaveTimeoutRef = useRef(null);
     const triggerAutoSave = useCallback(() => {
         setSaveStatus('saving');
@@ -146,17 +276,35 @@ export default function Notebook() {
 
         autoSaveTimeoutRef.current = setTimeout(() => {
             if (editorRef.current) {
+                const content = editorRef.current.innerHTML;
                 const docObj = {
                     title: docTitle,
-                    content: editorRef.current.innerHTML,
+                    content,
                     margins: marginState,
                     updatedAt: new Date().toISOString()
                 };
                 localStorage.setItem('desktop_app_notebook_doc', JSON.stringify(docObj));
                 setSaveStatus('saved');
+                updateToc();
+
+                // Save snapshot into version history list (cap at 20)
+                setVersionHistory(prev => {
+                    const snippet = editorRef.current.innerText.slice(0, 100);
+                    const newRecord = {
+                        id: 'ver_' + Date.now(),
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                        date: new Date().toLocaleDateString(),
+                        title: docTitle,
+                        snippet,
+                        content
+                    };
+                    const updated = [newRecord, ...prev.slice(0, 19)];
+                    localStorage.setItem('desktop_app_notebook_history', JSON.stringify(updated));
+                    return updated;
+                });
             }
-        }, 1000);
-    }, [docTitle, marginState]);
+        }, 1200);
+    }, [docTitle, marginState, updateToc]);
 
     const handleEditorInput = () => {
         updateStats();
@@ -177,30 +325,16 @@ export default function Notebook() {
             const justifyFull = document.queryCommandState('justifyFull');
             const unorderedList = document.queryCommandState('insertUnorderedList');
             const orderedList = document.queryCommandState('insertOrderedList');
-
             const blockVal = document.queryCommandValue('formatBlock') || 'P';
             const fontVal = document.queryCommandValue('fontName') || 'Arial';
 
             setActiveFormats({
-                bold,
-                italic,
-                underline,
-                strikethrough,
-                justifyLeft,
-                justifyCenter,
-                justifyRight,
-                justifyFull,
-                unorderedList,
-                orderedList,
+                bold, italic, underline, strikethrough, justifyLeft, justifyCenter, justifyRight, justifyFull, unorderedList, orderedList,
                 block: blockVal.toUpperCase(),
                 font: fontVal.replace(/['"]/g, ''),
-                fontSize: '12',
-                fontColor: '#000000',
-                hiliteColor: '#ffff00'
+                fontSize: '12', fontColor: '#000000', hiliteColor: '#ffff00'
             });
-        } catch (e) {
-            // queryCommandState may fail gracefully in edge cases
-        }
+        } catch (e) {}
     }, []);
 
     useEffect(() => {
@@ -211,12 +345,10 @@ export default function Notebook() {
                 checkActiveFormats();
             }
         };
-
         document.addEventListener('selectionchange', handleSelectionChange);
         return () => document.removeEventListener('selectionchange', handleSelectionChange);
     }, [checkActiveFormats]);
 
-    // Exec command helper
     const execCommand = (command, value = null) => {
         if (editorRef.current) editorRef.current.focus();
         document.execCommand(command, false, value);
@@ -224,18 +356,13 @@ export default function Notebook() {
         triggerAutoSave();
     };
 
-    // Selection handling for Image and Table properties panels
+    // Selection handling for Image and Table properties
     const handleEditorClick = (e) => {
         const target = e.target;
-
-        // Image Selection
         if (target && target.tagName === 'IMG') {
             if (selectedImage && selectedImage !== target) selectedImage.classList.remove('selected-image');
             target.classList.add('selected-image');
             setSelectedImage(target);
-            
-            // Read image styles
-            const style = getComputedStyle(target);
             let layout = 'inline';
             if (target.classList.contains('img-block')) layout = 'block';
             else if (target.classList.contains('img-center')) layout = 'center';
@@ -245,16 +372,13 @@ export default function Notebook() {
             setImageProps({
                 layout,
                 width: parseInt(target.style.width, 10) || 100,
-                brightness: 100,
-                saturation: 100,
-                hue: 0
+                brightness: 100, saturation: 100, hue: 0
             });
         } else {
             if (selectedImage) selectedImage.classList.remove('selected-image');
             setSelectedImage(null);
         }
 
-        // Table Selection
         let tableEl = target ? target.closest('table') : null;
         if (tableEl) {
             if (selectedTable && selectedTable !== tableEl) selectedTable.style.outline = '';
@@ -266,141 +390,137 @@ export default function Notebook() {
         }
     };
 
-    // Update Image properties
-    const applyImageStyles = (newProps) => {
-        if (!selectedImage) return;
-        const updated = { ...imageProps, ...newProps };
-        setImageProps(updated);
-
-        selectedImage.classList.remove('img-block', 'img-center', 'img-float-left', 'img-float-right');
-        if (updated.layout === 'block') selectedImage.classList.add('img-block');
-        else if (updated.layout === 'center') selectedImage.classList.add('img-center');
-        else if (updated.layout === 'float-left') selectedImage.classList.add('img-float-left');
-        else if (updated.layout === 'float-right') selectedImage.classList.add('img-float-right');
-
-        selectedImage.style.width = `${updated.width}%`;
-        selectedImage.style.height = 'auto';
-        selectedImage.style.filter = `brightness(${updated.brightness / 100}) saturate(${updated.saturation / 100}) hue-rotate(${updated.hue}deg)`;
-
-        triggerAutoSave();
-    };
-
-    // Delete selected image
-    const deleteSelectedImage = () => {
-        if (selectedImage) {
-            selectedImage.remove();
-            setSelectedImage(null);
-            triggerAutoSave();
-        }
-    };
-
-    // Update Table properties & actions
-    const applyTableStyles = (newProps) => {
-        if (!selectedTable) return;
-        const updated = { ...tableProps, ...newProps };
-        setTableProps(updated);
-
-        const borderCss = updated.borderStyle === 'none' ? 'none' : `${updated.borderWidth}px ${updated.borderStyle} ${updated.borderColor}`;
-        selectedTable.style.border = borderCss;
-        const cells = selectedTable.querySelectorAll('td, th');
-        cells.forEach(c => c.style.border = borderCss);
-
-        triggerAutoSave();
-    };
-
-    const addTableRow = (where = 'after') => {
-        if (!selectedTable) return;
-        const selection = window.getSelection();
-        let targetRow = selection ? selection.anchorNode?.parentElement?.closest('tr') : null;
-        if (!targetRow) targetRow = selectedTable.rows[selectedTable.rows.length - 1];
-
-        const colCount = targetRow.cells.length;
-        const newRow = document.createElement('tr');
-        for (let i = 0; i < colCount; i++) {
-            const td = document.createElement('td');
-            td.innerHTML = '<br>';
-            td.style.border = selectedTable.style.border || '1px solid #cbd5e1';
-            td.style.padding = '10px 14px';
-            newRow.appendChild(td);
+    // Voice Dictation via Web Speech API
+    const toggleVoiceDictation = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('Speech recognition is not supported in this browser environment.');
+            return;
         }
 
-        if (where === 'before') targetRow.parentNode.insertBefore(newRow, targetRow);
-        else targetRow.parentNode.insertBefore(newRow, targetRow.nextSibling);
-
-        triggerAutoSave();
-    };
-
-    const addTableColumn = () => {
-        if (!selectedTable) return;
-        Array.from(selectedTable.rows).forEach(row => {
-            const td = document.createElement('td');
-            td.innerHTML = '<br>';
-            td.style.border = selectedTable.style.border || '1px solid #cbd5e1';
-            td.style.padding = '10px 14px';
-            row.appendChild(td);
-        });
-        triggerAutoSave();
-    };
-
-    const deleteTable = () => {
-        if (selectedTable) {
-            selectedTable.remove();
-            setSelectedTable(null);
-            triggerAutoSave();
+        if (isDictating && recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsDictating(false);
+            return;
         }
-    };
 
-    // Modal Action Handlers
-    const handleInsertLink = () => {
-        if (!modalData.url) return;
-        execCommand('createLink', modalData.url);
-        setActiveModal(null);
-        setModalData({});
-    };
+        try {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
 
-    const handleInsertImage = () => {
-        if (modalData.file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                execCommand('insertImage', reader.result);
-                setActiveModal(null);
-                setModalData({});
-            };
-            reader.readAsDataURL(modalData.file);
-        } else if (modalData.url) {
-            execCommand('insertImage', modalData.url);
-            setActiveModal(null);
-            setModalData({});
-        }
-    };
+            recognition.onstart = () => setIsDictating(true);
+            recognition.onend = () => setIsDictating(false);
+            recognition.onerror = () => setIsDictating(false);
 
-    const handleInsertTable = () => {
-        const rows = parseInt(modalData.rows || 3, 10);
-        const cols = parseInt(modalData.cols || 3, 10);
-        if (rows > 0 && cols > 0) {
-            let html = '<table class="nb-table" style="width:100%; border-collapse:collapse; margin:16px 0;">';
-            for (let r = 0; r < rows; r++) {
-                html += '<tr>';
-                for (let c = 0; c < cols; c++) {
-                    html += `<td style="border:1px solid #cbd5e1; padding:10px 14px;"><br></td>`;
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript + ' ';
+                    }
                 }
-                html += '</tr>';
-            }
-            html += '</table><p><br></p>';
-            execCommand('insertHTML', html);
+                if (transcript && editorRef.current) {
+                    editorRef.current.focus();
+                    document.execCommand('insertText', false, transcript);
+                    triggerAutoSave();
+                }
+            };
+
+            recognitionRef.current = recognition;
+            recognition.start();
+        } catch (e) {
+            alert('Could not start voice dictation: ' + e.message);
+            setIsDictating(false);
         }
-        setActiveModal(null);
-        setModalData({});
     };
 
-    const loadTemplate = (key) => {
-        if (!TEMPLATES[key] || !editorRef.current) return;
-        if (editorRef.current.innerText.trim() && !window.confirm('Replace current content with template?')) return;
-        setDocTitle(TEMPLATES[key].title);
-        editorRef.current.innerHTML = TEMPLATES[key].content;
-        updateStats();
-        triggerAutoSave();
-        setActiveModal(null);
+    // Document Import Handlers (.docx, .ods, .md, .json)
+    const handleImportDocx = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!window.mammoth) {
+            alert('Mammoth.js converter is loading, please try again in a moment.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const arrayBuffer = event.target.result;
+            window.mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                .then((result) => {
+                    if (editorRef.current) {
+                        editorRef.current.innerHTML = result.value || '<p>Empty Word Document</p>';
+                        setDocTitle(file.name.replace(/\.[^/.]+$/, ""));
+                        updateStats();
+                        triggerAutoSave();
+                    }
+                })
+                .catch((err) => alert('Failed to convert DOCX file: ' + err.message));
+        };
+        reader.readAsArrayBuffer(file);
+        e.target.value = '';
+    };
+
+    const handleImportOds = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!window.XLSX) {
+            alert('SheetJS converter is loading, please try again in a moment.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = new Uint8Array(event.target.result);
+                const workbook = window.XLSX.read(data, { type: 'array' });
+                let html = `<h1>${file.name.replace(/\.[^/.]+$/, "")}</h1>`;
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const worksheet = workbook.Sheets[sheetName];
+                    const tableHtml = window.XLSX.utils.sheet_to_html(worksheet);
+                    html += `<h2 style="margin-top:20px;">Sheet: ${sheetName}</h2>` + tableHtml;
+                });
+
+                if (editorRef.current) {
+                    editorRef.current.innerHTML = html;
+                    setDocTitle(file.name.replace(/\.[^/.]+$/, ""));
+                    updateStats();
+                    triggerAutoSave();
+                }
+            } catch (err) {
+                alert('Failed to parse ODS spreadsheet file: ' + err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        e.target.value = '';
+    };
+
+    const handleImportMd = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const text = event.target.result || '';
+            let html = text
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br/>');
+
+            html = `<p>${html}</p>`;
+            if (editorRef.current) {
+                editorRef.current.innerHTML = html;
+                setDocTitle(file.name.replace(/\.[^/.]+$/, ""));
+                updateStats();
+                triggerAutoSave();
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
     };
 
     // Export Options
@@ -432,21 +552,19 @@ export default function Notebook() {
         window.html2pdf().set(opt).from(editorRef.current).save();
     };
 
-    const exportHtml = () => {
-        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${docTitle}</title><style>body{font-family:sans-serif;padding:40px;line-height:1.6;}table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:8px;}</style></head><body>${editorRef.current.innerHTML}</body></html>`;
-        const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+    const exportMd = () => {
+        if (!editorRef.current) return;
+        let mdText = '';
+        if (window.TurndownService) {
+            const turndownService = new window.TurndownService();
+            mdText = turndownService.turndown(editorRef.current.innerHTML);
+        } else {
+            mdText = editorRef.current.innerText;
+        }
+        const blob = new Blob([mdText], { type: 'text/markdown;charset=utf-8;' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${docTitle.replace(/\s+/g, '_')}.html`;
-        a.click();
-    };
-
-    const exportTxt = () => {
-        const text = editorRef.current ? editorRef.current.innerText : '';
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `${docTitle.replace(/\s+/g, '_')}.txt`;
+        a.download = `${docTitle.replace(/\s+/g, '_')}.md`;
         a.click();
     };
 
@@ -486,6 +604,15 @@ export default function Notebook() {
         e.target.value = '';
     };
 
+    const restoreVersion = (version) => {
+        if (editorRef.current && version.content) {
+            editorRef.current.innerHTML = version.content;
+            setDocTitle(version.title || DEFAULT_DOC_TITLE);
+            updateStats();
+            triggerAutoSave();
+        }
+    };
+
     // Calculate margins in CSS units for paper view
     const paperPadding = `${marginState.top}${marginState.unit} ${marginState.right}${marginState.unit} ${marginState.bottom}${marginState.unit} ${marginState.left}${marginState.unit}`;
 
@@ -508,24 +635,65 @@ export default function Notebook() {
                         />
                     </div>
                     <div className="notebook-header-actions">
-                        <button className="notebook-btn" onClick={() => setActiveModal('templates')}>
-                            <i className="fas fa-layer-group"></i> Templates
+                        <button 
+                            className={`notebook-btn ${isDictating ? 'notebook-btn-danger pulse' : ''}`}
+                            onClick={toggleVoiceDictation}
+                            title="Speech-to-Text Voice Dictation"
+                        >
+                            <i className="fas fa-microphone"></i> {isDictating ? 'Dictating...' : 'Dictate'}
                         </button>
-                        <button className="notebook-btn" onClick={() => jsonImportRef.current.click()}>
-                            <i className="fas fa-file-import"></i> Import
+
+                        <button 
+                            className={`notebook-btn ${tocOpen ? 'active' : ''}`}
+                            onClick={() => setTocOpen(!tocOpen)}
+                            title="Table of Contents Sidebar"
+                        >
+                            <i className="fas fa-list-ol"></i> TOC
                         </button>
+
+                        <button 
+                            className={`notebook-btn ${historyOpen ? 'active' : ''}`}
+                            onClick={() => setHistoryOpen(!historyOpen)}
+                            title="Document Revision History"
+                        >
+                            <i className="fas fa-clock-rotate-left"></i> History
+                        </button>
+
+                        <button 
+                            className={`notebook-btn ${aiPanelOpen ? 'notebook-btn-primary' : ''}`} 
+                            onClick={() => setAiPanelOpen(!aiPanelOpen)}
+                            title="Toggle AI Chat Assistant"
+                        >
+                            <i className="fas fa-robot"></i> AI Assistant
+                        </button>
+
+                        {/* File Import Dropdown */}
+                        <div className="dropdown-container">
+                            <button className="notebook-btn" title="Import Files (.docx, .ods, .md, .json)">
+                                <i className="fas fa-file-import"></i> Open File
+                            </button>
+                            <div className="nb-dropdown-menu">
+                                <button onClick={() => docxImportRef.current.click()}><i className="fas fa-file-word"></i> Open .DOCX (Word)</button>
+                                <button onClick={() => odsImportRef.current.click()}><i className="fas fa-table"></i> Open .ODS (Spreadsheet)</button>
+                                <button onClick={() => mdImportRef.current.click()}><i className="fas fa-file-code"></i> Open .MD (Markdown)</button>
+                                <button onClick={() => jsonImportRef.current.click()}><i className="fas fa-code"></i> Open .JSON Backup</button>
+                            </div>
+                        </div>
+
+                        <input type="file" ref={docxImportRef} accept=".docx" onChange={handleImportDocx} hidden />
+                        <input type="file" ref={odsImportRef} accept=".ods" onChange={handleImportOds} hidden />
+                        <input type="file" ref={mdImportRef} accept=".md,.markdown" onChange={handleImportMd} hidden />
                         <input type="file" ref={jsonImportRef} accept=".json" onChange={handleImportJson} hidden />
 
-                        <div className="dropdown-container">
-                            <button className="notebook-btn notebook-btn-primary" onClick={exportPdf}>
-                                <i className="fas fa-file-pdf"></i> Export PDF
-                            </button>
-                        </div>
+                        {/* Export Menu */}
+                        <button className="notebook-btn notebook-btn-primary" onClick={exportPdf}>
+                            <i className="fas fa-file-pdf"></i> PDF
+                        </button>
                         <button className="notebook-btn" onClick={exportDocx} title="Export Word DOCX">
                             <i className="fas fa-file-word"></i> DOCX
                         </button>
-                        <button className="notebook-btn" onClick={exportJson} title="Backup JSON">
-                            <i className="fas fa-download"></i> Backup
+                        <button className="notebook-btn" onClick={exportMd} title="Export Markdown">
+                            <i className="fas fa-file-code"></i> MD
                         </button>
                     </div>
                 </div>
@@ -618,25 +786,6 @@ export default function Notebook() {
                             >
                                 <i className="fas fa-strikethrough"></i>
                             </button>
-
-                            <label className="color-picker-label" title="Text Color">
-                                <i className="fas fa-font"></i>
-                                <span className="color-indicator-bar" style={{ background: activeFormats.fontColor }}></span>
-                                <input
-                                    type="color"
-                                    onChange={(e) => execCommand('foreColor', e.target.value)}
-                                />
-                            </label>
-
-                            <label className="color-picker-label" title="Highlight Color">
-                                <i className="fas fa-highlighter"></i>
-                                <span className="color-indicator-bar" style={{ background: '#ffff00' }}></span>
-                                <input
-                                    type="color"
-                                    defaultValue="#ffff00"
-                                    onChange={(e) => execCommand('hiliteColor', e.target.value)}
-                                />
-                            </label>
                         </div>
 
                         {/* Alignment & Lists */}
@@ -663,13 +812,6 @@ export default function Notebook() {
                                 <i className="fas fa-align-right"></i>
                             </button>
                             <button
-                                className={`toolbar-btn ${activeFormats.justifyFull ? 'active' : ''}`}
-                                onClick={() => execCommand('justifyFull')}
-                                title="Justify"
-                            >
-                                <i className="fas fa-align-justify"></i>
-                            </button>
-                            <button
                                 className={`toolbar-btn ${activeFormats.unorderedList ? 'active' : ''}`}
                                 onClick={() => execCommand('insertUnorderedList')}
                                 title="Bulleted List"
@@ -685,30 +827,8 @@ export default function Notebook() {
                             </button>
                         </div>
 
-                        {/* Inserts (Link, Image, Table, Page Break) */}
-                        <div className="toolbar-group">
-                            <button className="toolbar-btn" onClick={() => setActiveModal('link')} title="Insert Hyperlink">
-                                <i className="fas fa-link"></i>
-                            </button>
-                            <button className="toolbar-btn" onClick={() => execCommand('unlink')} title="Remove Hyperlink">
-                                <i className="fas fa-link-slash"></i>
-                            </button>
-                            <button className="toolbar-btn" onClick={() => setActiveModal('image')} title="Insert Image">
-                                <i className="fas fa-image"></i>
-                            </button>
-                            <button className="toolbar-btn" onClick={() => setActiveModal('table')} title="Insert Table">
-                                <i className="fas fa-table"></i>
-                            </button>
-                            <button className="toolbar-btn" onClick={() => execCommand('insertHTML', '<hr class="page-break">')} title="Insert Page Break">
-                                <i className="fas fa-scissors"></i>
-                            </button>
-                            <button className="toolbar-btn" onClick={() => execCommand('removeFormat')} title="Clear Formatting">
-                                <i className="fas fa-eraser"></i>
-                            </button>
-                        </div>
-
-                        {/* Page Margins Dropdown (Scoped Relative) */}
-                        <div className="toolbar-group">
+                        {/* Page Margins Dropdown */}
+                        <div className="toolbar-group" ref={marginMenuRef}>
                             <button
                                 className={`toolbar-btn ${marginMenuOpen ? 'active' : ''}`}
                                 onClick={() => setMarginMenuOpen(!marginMenuOpen)}
@@ -718,7 +838,7 @@ export default function Notebook() {
                             </button>
 
                             {marginMenuOpen && (
-                                <div className="margin-dropdown-panel">
+                                <div className="margin-dropdown-panel" onClick={(e) => e.stopPropagation()}>
                                     <div className="dropdown-row">
                                         <span>Margin Units</span>
                                         <select
@@ -786,276 +906,198 @@ export default function Notebook() {
                     </div>
                 </div>
 
-                {/* Workspace Paper View */}
-                <div className="notebook-canvas-scroll" onClick={() => setMarginMenuOpen(false)}>
-                    <div className="notebook-paper-outer" ref={paperRef}>
-                        {/* Interactive Ruler Header */}
-                        <div className="ruler-guide-horizontal">
-                            {Array.from({ length: 20 }).map((_, idx) => (
-                                <React.Fragment key={idx}>
-                                    <div className="ruler-tick-mark major" style={{ left: `${idx * 40}px` }}>
-                                        <span className="ruler-tick-number">{idx}</span>
+                {/* Main Workspace Canvas with Drawers */}
+                <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
+                    
+                    {/* Collapsible Table of Contents (TOC) Sidebar */}
+                    {tocOpen && (
+                        <aside className="notebook-toc-sidebar">
+                            <div className="toc-header">
+                                <h4><i className="fas fa-list-ol"></i> Table of Contents</h4>
+                                <button onClick={() => setTocOpen(false)}>×</button>
+                            </div>
+                            <div className="toc-list">
+                                {tocItems.length === 0 ? (
+                                    <div className="toc-empty">No headings found in document. Use H1, H2, or H3 to generate sections.</div>
+                                ) : (
+                                    tocItems.map(item => (
+                                        <div 
+                                            key={item.id} 
+                                            className={`toc-item toc-${item.level}`}
+                                            onClick={() => {
+                                                const el = document.getElementById(item.id);
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                        >
+                                            {item.text}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </aside>
+                    )}
+
+                    {/* Paper Editor Scroll Container */}
+                    <div className="notebook-canvas-scroll">
+                        <div className="notebook-paper-outer" ref={paperRef}>
+                            {/* Horizontal Ruler */}
+                            <div className="ruler-guide-horizontal">
+                                {Array.from({ length: 20 }).map((_, idx) => (
+                                    <React.Fragment key={idx}>
+                                        <div className="ruler-tick-mark major" style={{ left: `${idx * 40}px` }}>
+                                            <span className="ruler-tick-number">{idx}</span>
+                                        </div>
+                                        <div className="ruler-tick-mark" style={{ left: `${idx * 40 + 20}px` }}></div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+
+                            {/* Margin Overlays */}
+                            <div className="paper-margin-overlay">
+                                <div className="margin-line-v" style={{ left: `${marginState.left}${marginState.unit}` }}></div>
+                                <div className="margin-line-v" style={{ right: `${marginState.right}${marginState.unit}` }}></div>
+                                <div className="margin-line-h" style={{ top: `${marginState.top}${marginState.unit}` }}></div>
+                                <div className="margin-line-h" style={{ bottom: `${marginState.bottom}${marginState.unit}` }}></div>
+                            </div>
+
+                            {/* Rich Text Editor */}
+                            <div
+                                ref={editorRef}
+                                className="notebook-editor-content"
+                                contentEditable="true"
+                                suppressContentEditableWarning={true}
+                                onInput={handleEditorInput}
+                                onClick={handleEditorClick}
+                                style={{ padding: paperPadding }}
+                            >
+                                <h1>Welcome to Notebook</h1>
+                                <p>Open or drag existing <strong>.docx</strong>, <strong>.ods</strong>, or <strong>.md</strong> files into Notebook to edit seamlessly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Revision History Sidebar Drawer */}
+                    {historyOpen && (
+                        <aside className="notebook-history-sidebar">
+                            <div className="history-header">
+                                <h4><i className="fas fa-clock-rotate-left"></i> Revision History</h4>
+                                <button onClick={() => setHistoryOpen(false)}>×</button>
+                            </div>
+                            <div className="history-list">
+                                {versionHistory.length === 0 ? (
+                                    <div className="toc-empty">No revisions captured yet. Auto-saves will create snapshot restore points.</div>
+                                ) : (
+                                    versionHistory.map(ver => (
+                                        <div key={ver.id} className="history-card">
+                                            <div className="history-time">{ver.date} at {ver.timestamp}</div>
+                                            <div className="history-snippet">{ver.snippet || 'Untitled revision'}...</div>
+                                            <button className="history-restore-btn" onClick={() => restoreVersion(ver)}>
+                                                <i className="fas fa-rotate-left"></i> Restore Version
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </aside>
+                    )}
+
+                    {/* AI Chat Assistant Side Panel */}
+                    {aiPanelOpen && (
+                        <div className="notebook-ai-drawer">
+                            <div className="ai-drawer-header">
+                                <h3><i className="fas fa-sparkles"></i> AI Writing Assistant</h3>
+                                <button className="floating-props-close" onClick={() => setAiPanelOpen(false)}>×</button>
+                            </div>
+
+                            <div className="ai-model-selector">
+                                <label><i className="fas fa-brain"></i> Active Provider &amp; Model</label>
+                                <select 
+                                    className="ai-model-select"
+                                    value={selectedModel}
+                                    onChange={(e) => setSelectedModel(e.target.value)}
+                                >
+                                    {aiProvidersList.length === 0 ? (
+                                        <>
+                                            <option value="anthropic">Anthropic Claude 3.5 Sonnet</option>
+                                            <option value="gemini">Google Gemini 2.0 Flash</option>
+                                            <option value="openai">OpenAI GPT-4o-mini</option>
+                                        </>
+                                    ) : (
+                                        aiProvidersList.map(item => (
+                                            <option key={item.id} value={item.id}>
+                                                #{item.priority} {item.config.name} ({item.stored.model || item.config.model})
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                            </div>
+
+                            <div className="ai-presets-container">
+                                <button className="ai-preset-chip" onClick={() => handleAiSend('Summarize current document')}>
+                                    ✨ Summarize
+                                </button>
+                                <button className="ai-preset-chip" onClick={() => handleAiSend('Fix grammar and polish tone')}>
+                                    ✍️ Polish Grammar
+                                </button>
+                                <button className="ai-preset-chip" onClick={() => handleAiSend('Convert selection to bullet points')}>
+                                    📝 Bullet Points
+                                </button>
+                                <button className="ai-preset-chip" onClick={() => handleAiSend('Expand on selected topic with detail')}>
+                                    🚀 Expand Idea
+                                </button>
+                            </div>
+
+                            <div className="ai-chat-history">
+                                {aiMessages.map((msg, index) => (
+                                    <div key={index} className={`ai-message ${msg.role}`}>
+                                        <div className="ai-message-content" style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
+                                        {msg.role === 'assistant' && (
+                                            <div className="ai-message-actions">
+                                                <button className="ai-action-btn" onClick={() => insertAiTextToEditor(msg.text)}>
+                                                    <i className="fas fa-plus"></i> Insert into Note
+                                                </button>
+                                                <button className="ai-action-btn" onClick={() => navigator.clipboard.writeText(msg.text)}>
+                                                    <i className="fas fa-copy"></i> Copy
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="ruler-tick-mark" style={{ left: `${idx * 40 + 20}px` }}></div>
-                                </React.Fragment>
-                            ))}
-                        </div>
+                                ))}
+                                {aiLoading && (
+                                    <div className="ai-message assistant">
+                                        <div className="ai-message-content">
+                                            <i className="fas fa-spinner fa-spin" style={{ marginRight: '6px' }}></i> AI is generating response...
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                        {/* Margin Line Guides */}
-                        <div className="paper-margin-overlay">
-                            <div className="margin-line-v" style={{ left: `${marginState.left}${marginState.unit}` }}></div>
-                            <div className="margin-line-v" style={{ right: `${marginState.right}${marginState.unit}` }}></div>
-                            <div className="margin-line-h" style={{ top: `${marginState.top}${marginState.unit}` }}></div>
-                            <div className="margin-line-h" style={{ bottom: `${marginState.bottom}${marginState.unit}` }}></div>
+                            <div className="ai-chat-input-bar">
+                                <input
+                                    type="text"
+                                    placeholder={`Ask AI Assistant...`}
+                                    value={aiPrompt}
+                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleAiSend()}
+                                />
+                                <button className="notebook-btn notebook-btn-primary" onClick={() => handleAiSend()}>
+                                    <i className="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
-
-                        {/* Rich Text Editable Area */}
-                        <div
-                            ref={editorRef}
-                            className="notebook-editor-content"
-                            contentEditable="true"
-                            suppressContentEditableWarning={true}
-                            onInput={handleEditorInput}
-                            onClick={handleEditorClick}
-                            style={{ padding: paperPadding }}
-                        >
-                            <h1>Welcome to Notebook</h1>
-                            <p>Start writing your notes, documents, or reports with rich text formatting, interactive tables, images, and high-fidelity PDF/DOCX exports.</p>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Selected Image Floating Properties Panel */}
-                {selectedImage && (
-                    <div className="floating-props-panel">
-                        <div className="floating-props-header">
-                            <span><i className="fas fa-image"></i> Image Properties</span>
-                            <button className="floating-props-close" onClick={() => setSelectedImage(null)}>×</button>
-                        </div>
-                        <div className="floating-props-body">
-                            <div className="props-row">
-                                <label>Layout</label>
-                                <select
-                                    className="toolbar-select"
-                                    style={{ width: '100%' }}
-                                    value={imageProps.layout}
-                                    onChange={(e) => applyImageStyles({ layout: e.target.value })}
-                                >
-                                    <option value="inline">Inline</option>
-                                    <option value="block">Break Text</option>
-                                    <option value="center">Center</option>
-                                    <option value="float-left">Float Left</option>
-                                    <option value="float-right">Float Right</option>
-                                </select>
-                            </div>
-                            <div className="props-row">
-                                <label>Width ({imageProps.width}%)</label>
-                                <input
-                                    type="range"
-                                    min="10"
-                                    max="100"
-                                    value={imageProps.width}
-                                    onChange={(e) => applyImageStyles({ width: parseInt(e.target.value, 10) })}
-                                />
-                            </div>
-                            <div className="props-row">
-                                <label>Brightness ({imageProps.brightness}%)</label>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="200"
-                                    value={imageProps.brightness}
-                                    onChange={(e) => applyImageStyles({ brightness: parseInt(e.target.value, 10) })}
-                                />
-                            </div>
-                            <button className="notebook-btn notebook-btn-danger" onClick={deleteSelectedImage} style={{ marginTop: '8px' }}>
-                                <i className="fas fa-trash"></i> Remove Image
-                            </button>
-                        </div>
+                {/* Footer Status Bar */}
+                <footer className="notebook-status-bar">
+                    <div className="status-item"><i className="fas fa-file-text"></i> Words: {stats.words}</div>
+                    <div className="status-item"><i className="fas fa-font"></i> Chars: {stats.chars}</div>
+                    <div className="status-item"><i className="fas fa-paragraph"></i> Paragraphs: {stats.paragraphs}</div>
+                    <div className="status-item"><i className="fas fa-clock"></i> {stats.readingTime} min read</div>
+                    <div className="status-item margin-left-auto">
+                        <span className={`save-badge ${saveStatus}`}>{saveStatus === 'saving' ? 'Saving...' : 'All Changes Saved'}</span>
                     </div>
-                )}
-
-                {/* Selected Table Floating Tools Panel */}
-                {selectedTable && (
-                    <div className="floating-props-panel">
-                        <div className="floating-props-header">
-                            <span><i className="fas fa-table"></i> Table Tools</span>
-                            <button className="floating-props-close" onClick={() => setSelectedTable(null)}>×</button>
-                        </div>
-                        <div className="floating-props-body">
-                            <div className="table-quick-actions">
-                                <button className="table-action-btn" onClick={() => addTableRow('after')}>+ Row Below</button>
-                                <button className="table-action-btn" onClick={() => addTableRow('before')}>+ Row Above</button>
-                                <button className="table-action-btn" onClick={addTableColumn}>+ Column</button>
-                                <button className="table-action-btn" onClick={deleteTable} style={{ color: '#ef4444' }}>Delete Table</button>
-                            </div>
-                            <div className="props-row" style={{ marginTop: '6px' }}>
-                                <label>Border Style</label>
-                                <select
-                                    className="toolbar-select"
-                                    style={{ width: '100%' }}
-                                    value={tableProps.borderStyle}
-                                    onChange={(e) => applyTableStyles({ borderStyle: e.target.value })}
-                                >
-                                    <option value="solid">Solid</option>
-                                    <option value="dashed">Dashed</option>
-                                    <option value="dotted">Dotted</option>
-                                    <option value="none">None</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Custom Modals */}
-                {activeModal === 'link' && (
-                    <div className="notebook-modal-overlay" onClick={() => setActiveModal(null)}>
-                        <div className="notebook-modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="notebook-modal-header">
-                                <h3>Insert Hyperlink</h3>
-                                <button className="floating-props-close" onClick={() => setActiveModal(null)}>×</button>
-                            </div>
-                            <div className="notebook-modal-body">
-                                <div className="notebook-field">
-                                    <label>URL Address</label>
-                                    <input
-                                        type="url"
-                                        placeholder="https://example.com"
-                                        value={modalData.url || ''}
-                                        onChange={(e) => setModalData({ ...modalData, url: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="notebook-modal-footer">
-                                <button className="notebook-btn" onClick={() => setActiveModal(null)}>Cancel</button>
-                                <button className="notebook-btn notebook-btn-primary" onClick={handleInsertLink}>Insert Link</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeModal === 'image' && (
-                    <div className="notebook-modal-overlay" onClick={() => setActiveModal(null)}>
-                        <div className="notebook-modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="notebook-modal-header">
-                                <h3>Insert Image</h3>
-                                <button className="floating-props-close" onClick={() => setActiveModal(null)}>×</button>
-                            </div>
-                            <div className="notebook-modal-body">
-                                <div className="notebook-field">
-                                    <label>Image Web URL</label>
-                                    <input
-                                        type="url"
-                                        placeholder="https://images.unsplash.com/..."
-                                        value={modalData.url || ''}
-                                        onChange={(e) => setModalData({ ...modalData, url: e.target.value })}
-                                    />
-                                </div>
-                                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>— OR —</div>
-                                <div className="notebook-field">
-                                    <label>Upload Image File</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => setModalData({ ...modalData, file: e.target.files[0] })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="notebook-modal-footer">
-                                <button className="notebook-btn" onClick={() => setActiveModal(null)}>Cancel</button>
-                                <button className="notebook-btn notebook-btn-primary" onClick={handleInsertImage}>Insert Image</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeModal === 'table' && (
-                    <div className="notebook-modal-overlay" onClick={() => setActiveModal(null)}>
-                        <div className="notebook-modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="notebook-modal-header">
-                                <h3>Insert Table</h3>
-                                <button className="floating-props-close" onClick={() => setActiveModal(null)}>×</button>
-                            </div>
-                            <div className="notebook-modal-body">
-                                <div className="notebook-field">
-                                    <label>Number of Rows</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        defaultValue="3"
-                                        onChange={(e) => setModalData({ ...modalData, rows: e.target.value })}
-                                    />
-                                </div>
-                                <div className="notebook-field">
-                                    <label>Number of Columns</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        defaultValue="3"
-                                        onChange={(e) => setModalData({ ...modalData, cols: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="notebook-modal-footer">
-                                <button className="notebook-btn" onClick={() => setActiveModal(null)}>Cancel</button>
-                                <button className="notebook-btn notebook-btn-primary" onClick={handleInsertTable}>Insert Table</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {activeModal === 'templates' && (
-                    <div className="notebook-modal-overlay" onClick={() => setActiveModal(null)}>
-                        <div className="notebook-modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="notebook-modal-header">
-                                <h3>Document Templates</h3>
-                                <button className="floating-props-close" onClick={() => setActiveModal(null)}>×</button>
-                            </div>
-                            <div className="notebook-modal-body">
-                                <div className="table-quick-actions" style={{ gridTemplateColumns: '1fr', gap: '10px' }}>
-                                    <button className="notebook-btn" onClick={() => loadTemplate('blank')}>
-                                        <i className="fas fa-file"></i> Blank Document
-                                    </button>
-                                    <button className="notebook-btn" onClick={() => loadTemplate('meeting')}>
-                                        <i className="fas fa-users"></i> Meeting Notes Template
-                                    </button>
-                                    <button className="notebook-btn" onClick={() => loadTemplate('proposal')}>
-                                        <i className="fas fa-briefcase"></i> Project Proposal Template
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Footer Live Metrics Status Bar */}
-                <div className="notebook-status-bar">
-                    <div className="status-stats-group">
-                        <span className="status-stat-item">
-                            Words: <span className="status-stat-value">{stats.words}</span>
-                        </span>
-                        <span className="status-stat-item">
-                            Characters: <span className="status-stat-value">{stats.chars}</span>
-                        </span>
-                        <span className="status-stat-item">
-                            Reading time: <span className="status-stat-value">~{stats.readingTime} min</span>
-                        </span>
-                    </div>
-
-                    <div className="status-stats-group">
-                        {saveStatus === 'saved' ? (
-                            <span className="status-badge">
-                                <i className="fas fa-circle-check"></i> Saved automatically
-                            </span>
-                        ) : (
-                            <span className="status-badge saving">
-                                <i className="fas fa-sync fa-spin"></i> Saving...
-                            </span>
-                        )}
-                    </div>
-                </div>
+                </footer>
             </div>
         </AppShell>
     );

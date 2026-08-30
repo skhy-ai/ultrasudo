@@ -125,7 +125,19 @@ async function connect() {
 
     // Show stats
     document.getElementById('stats-panel').style.display = 'block';
-    document.getElementById('ip-address').textContent = generateFakeIP();
+    const activeIp = generateFakeIP();
+    document.getElementById('ip-address').textContent = activeIp;
+
+    // Save global state & broadcast to main app & browser tabs
+    localStorage.setItem('vpn_connected', 'true');
+    localStorage.setItem('vpn_active_server', JSON.stringify({
+        id: selectedServer.id,
+        country: selectedServer.country,
+        city: selectedServer.city,
+        flag: selectedServer.flag,
+        ip: activeIp
+    }));
+    window.dispatchEvent(new Event('storage'));
 
     // Start timers
     connectionSeconds = 0;
@@ -152,12 +164,16 @@ function disconnect() {
     }
 
     isConnected = false;
+    localStorage.setItem('vpn_connected', 'false');
+    window.dispatchEvent(new Event('storage'));
+
     ring.className = 'status-ring';
     status.textContent = 'Disconnected';
     btn.innerHTML = '<i class="fas fa-power-off"></i> <span>Connect</span>';
     btn.classList.remove('connected');
 
     document.getElementById('stats-panel').style.display = 'none';
+
     clearInterval(connectionTimer);
     clearInterval(statsInterval);
 }
