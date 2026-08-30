@@ -154,6 +154,21 @@
         </aside>
     </div>
 
+    <!-- ─── Supabase Status Bar ────────────────────────────────────── -->
+    <div class="supabase-status-bar" id="supabase-status-bar" title="Active Supabase Project">
+        <div class="sb-status-left">
+            <span class="sb-dot" id="sb-dot"></span>
+            <span class="sb-label">Supabase</span>
+            <code class="sb-project-id">uzwkvctnmruesdhtfbvz</code>
+            <span class="sb-region">ap-northeast-2</span>
+        </div>
+        <div class="sb-status-right">
+            <span class="sb-sync-status" id="sb-sync-status">⚡ Connected</span>
+            <span class="sb-user" id="sb-user-display">Guest</span>
+            <button class="sb-logout-btn" id="sb-logout-btn" title="Sign out">Sign Out</button>
+        </div>
+    </div>
+
     <!-- ─── App Slide-Over ───────────────────────────────────────── -->
     <div class="app-slideover" id="app-slideover">
         <div class="app-slideover-header">
@@ -178,10 +193,49 @@
 
     <!-- ─── Scripts ──────────────────────────────────────────────── -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth/config.js"></script>
+    <script src="auth/auth-check.js"></script>
     <script src="ai/config.js"></script>
     <script src="ai/secureclaw.js"></script>
     <script src="ai/agent.js"></script>
     <script src="dashboard.js"></script>
+    <script>
+    /* ── Supabase status bar binding ────────────────────────────── */
+    (function() {
+        const dot      = document.getElementById('sb-dot');
+        const syncEl   = document.getElementById('sb-sync-status');
+        const userEl   = document.getElementById('sb-user-display');
+        const logoutEl = document.getElementById('sb-logout-btn');
+
+        function updateBar(user) {
+            if (!user || user.isGuest) {
+                dot.style.background = '#f59e0b';
+                syncEl.textContent   = '● Guest mode';
+                userEl.textContent   = 'Guest';
+                logoutEl.textContent = 'Sign In';
+            } else {
+                dot.style.background = '#34d399';
+                syncEl.textContent   = '⚡ Synced';
+                userEl.textContent   = user.email || 'Authenticated';
+                logoutEl.textContent = 'Sign Out';
+            }
+        }
+
+        document.addEventListener('auth-ready', (e) => updateBar(e.detail.user));
+
+        logoutEl.addEventListener('click', () => {
+            if (window.currentUser && !window.currentUser.isGuest) {
+                window.logout && window.logout();
+            } else {
+                window.location.href = '/auth/login.html';
+            }
+        });
+
+        // Also wire up existing logout-btn in dropdown
+        const dropLogout = document.getElementById('logout-btn');
+        if (dropLogout) dropLogout.addEventListener('click', () => window.logout && window.logout());
+    })();
+    </script>
 </body>
 
 </html>

@@ -258,7 +258,7 @@ h1 {
     border-radius: 14px;
     padding: 16px;
     box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-    z-index: 5;
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-4px);
@@ -431,6 +431,29 @@ h1 {
 #editor:focus {
     box-shadow: 0 0 0 3px rgba(72, 118, 249, 0.18);
 }
+
+/* List numbering — keep inside the editor’s padding area */
+#editor ol,
+#editor ul {
+    padding-left: 1.8em;
+    margin: 0.4em 0;
+}
+
+#editor ol {
+    list-style-type: decimal;
+    list-style-position: inside;
+}
+
+#editor ul {
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+#editor li {
+    margin: 0.2em 0;
+    padding-left: 0.3em;
+}
+
 
 #editor img {
     max-width: 100%;

@@ -561,3 +561,198 @@ h3 {
     .category-apps { grid-template-columns: 1fr; }
     .theme-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── Step 2: API Key Cards ────────────────────────────────────────────────── */
+.api-key-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+    overflow-y: auto;
+    flex: 1 1 0;
+    min-height: 0;
+    padding-right: 4px;
+}
+
+.api-key-cards::-webkit-scrollbar { width: 4px; }
+.api-key-cards::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+.api-key-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 16px 18px;
+    transition: border-color 0.2s;
+}
+
+.api-key-card:focus-within {
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.api-key-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.api-provider-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.api-provider-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.api-provider-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.api-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.api-provider-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 3px;
+    line-height: 1.4;
+}
+
+.api-saved-tick {
+    color: #10b981;
+    font-size: 18px;
+    flex-shrink: 0;
+    animation: tickPop 0.3s ease;
+}
+
+@keyframes tickPop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.api-get-key-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #818cf8;
+    text-decoration: none;
+    padding: 4px 0;
+    margin-bottom: 10px;
+    transition: color 0.15s;
+}
+
+.api-get-key-link:hover { color: #a5b4fc; text-decoration: underline; }
+.api-get-key-link i { font-size: 10px; }
+
+.api-key-input-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.api-key-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9px;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 0;
+}
+
+.api-key-input:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+}
+
+.api-eye-btn, .api-save-btn {
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.api-eye-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #64748b;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.api-eye-btn:hover { background: rgba(255,255,255,0.1); color: #94a3b8; }
+
+.api-save-btn {
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 0 16px;
+    height: 36px;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+
+.api-save-btn:hover:not(:disabled) { box-shadow: 0 4px 16px rgba(99,102,241,0.5); transform: translateY(-1px); }
+.api-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Skip button */
+.btn-skip {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.15s;
+    font-family: 'Outfit', sans-serif;
+}
+
+.btn-skip:hover {
+    border-color: rgba(255,255,255,0.22);
+    color: #94a3b8;
+}
+
+/* Wizard hint */
+.wizard-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #475569;
+    margin-top: 10px;
+    padding-bottom: 4px;
+}
+
+.wizard-hint strong { color: #64748b; }

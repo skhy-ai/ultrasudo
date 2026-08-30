@@ -1,11 +1,356 @@
-body{font-family:Segoe UI,Roboto,Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0}
-.container{max-width:900px;margin:40px auto;padding:20px}
-h1{margin:0 0 16px;font-size:28px}
-.provider{background:#111827;border:1px solid #1f2937;border-radius:10px;padding:16px;margin:16px 0}
-.provider h2{margin-top:0}
-label{display:flex;flex-direction:column;gap:6px;margin:8px 0}
-input{background:#0b1220;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:10px}
-.actions{display:flex;gap:10px;margin-top:8px}
-button{background:#16a34a;border:none;color:#fff;padding:10px 14px;border-radius:6px;cursor:pointer}
-button:hover{background:#15803d}
-.status{margin-top:8px;font-size:12px;color:#93c5fd}
+/* ── API Key Manager — Premium Dark Design ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #080d1a;
+  color: #e2e8f0;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ── Page Container ── */
+.akm-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+/* ── Header ── */
+.akm-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.akm-header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+}
+
+.akm-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.3px;
+}
+
+.akm-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* ── Provider Grid ── */
+.provider-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Provider Card ── */
+.provider-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+  padding: 22px 24px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.provider-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent, #7c3aed);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.provider-card:focus-within::before,
+.provider-card:hover::before {
+  opacity: 1;
+}
+
+.provider-card:focus-within,
+.provider-card:hover {
+  border-color: rgba(255,255,255,0.14);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ── Card Header ── */
+.provider-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.provider-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.provider-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.provider-info h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.provider-desc {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* Badges */
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.badge.free  { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+.badge.paid  { background: rgba(251,191,36,0.15);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+.badge.local { background: rgba(249,115,22,0.15);  color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+
+/* Get key link */
+.get-key-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #818cf8;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border: 1px solid rgba(129,140,248,0.3);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.get-key-link:hover {
+  background: rgba(129,140,248,0.12);
+  border-color: rgba(129,140,248,0.6);
+  color: #a5b4fc;
+}
+
+.get-key-link i { font-size: 10px; }
+
+/* ── Fields ── */
+.provider-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.provider-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.key-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: #475569;
+  margin-left: 6px;
+}
+
+.key-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.provider-fields input[type="text"],
+.provider-fields input[type="password"] {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-family: 'Inter', monospace;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.provider-fields input:focus {
+  border-color: rgba(129,140,248,0.5);
+  box-shadow: 0 0 0 2px rgba(129,140,248,0.12);
+}
+
+.btn-eye {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #64748b;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-eye:hover { background: rgba(255,255,255,0.1); color: #94a3b8; }
+
+/* ── Guide Section ── */
+.guide-section {
+  margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.guide-section summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.guide-section summary::-webkit-details-marker { display: none; }
+.guide-section summary::after { content: '▼'; font-size: 9px; margin-left: auto; transition: transform 0.2s; }
+.guide-section[open] summary::after { transform: rotate(180deg); }
+.guide-section summary:hover { background: rgba(255,255,255,0.04); color: #94a3b8; }
+.guide-section summary i { color: #6366f1; }
+
+.guide-steps {
+  padding: 12px 20px 14px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.15);
+}
+
+.guide-steps li {
+  font-size: 12.5px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.guide-steps a {
+  color: #818cf8;
+  text-decoration: none;
+}
+
+.guide-steps a:hover { text-decoration: underline; color: #a5b4fc; }
+.guide-steps code {
+  background: rgba(255,255,255,0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11.5px;
+  color: #e2e8f0;
+}
+
+/* ── Actions ── */
+.provider-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-save, .btn-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 18px;
+  transition: all 0.2s ease;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.3);
+}
+
+.btn-save:hover {
+  box-shadow: 0 4px 20px rgba(99,102,241,0.5);
+  transform: translateY(-1px);
+}
+
+.btn-test {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #94a3b8;
+}
+
+.btn-test:hover {
+  background: rgba(255,255,255,0.1);
+  color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* ── Status Messages ── */
+.status-msg {
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  min-height: 18px;
+  transition: all 0.2s;
+}
+
+.status-msg.success { color: #34d399; }
+.status-msg.error   { color: #f87171; }
+.status-msg.info    { color: #818cf8; }

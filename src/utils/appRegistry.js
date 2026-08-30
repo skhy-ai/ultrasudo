@@ -12,7 +12,7 @@
 export const APP_REGISTRY = [
     // ── Native React Apps (fully migrated) ──────────────────────────────────
     { id: 'calculator',    name: 'Calculator',         path: '/app/calculator', icon: 'fas fa-calculator',         category: 'utility',       type: 'react' },
-    { id: 'notebook',      name: 'Notebook',           path: '/app/notebook',   icon: 'fas fa-file-word',          category: 'productivity',  type: 'react' },
+    { id: 'notebook',      name: 'Notebook',           path: '/app/notebook',   icon: 'fas fa-file-word',          category: 'productivity',  type: 'react',   ai: true },
 
     // ── System ───────────────────────────────────────────────────────────────
     { id: 'desktop',       name: 'Desktop',            path: '/desktop',        icon: 'fas fa-desktop',            category: 'system',        type: 'react' },
@@ -22,7 +22,7 @@ export const APP_REGISTRY = [
     { id: 'api-key-manager',name:'API Key Manager',    src: '/api-key-manager/index.html',                        icon: 'fas fa-key',              category: 'system',   type: 'hybrid' },
     { id: 'pqc-education', name: 'PQC Explorer',       src: '/pqc-education/index.html',                          icon: 'fas fa-shield-halved',    category: 'system',   type: 'offline' },
     { id: 'vpn',           name: 'VPN',                src: '/vpn/index.html',                                    icon: 'fas fa-shield-virus',     category: 'system',   type: 'online' },
-    { id: 'openfang',      name: 'OpenFang AI',        src: '/openfang/index.html',                               icon: 'fas fa-robot',            category: 'system',   type: 'online' },
+    { id: 'openfang',      name: 'OpenFang AI',        src: '/openfang/index.html',                               icon: 'fas fa-robot',            category: 'system',   type: 'online',  ai: true },
 
     // ── Productivity ─────────────────────────────────────────────────────────
     { id: 'productivity-hub', name: 'Productivity Hub', path: '/app/productivity',                             icon: 'fas fa-stopwatch',        category: 'productivity',  type: 'react' },
@@ -33,13 +33,13 @@ export const APP_REGISTRY = [
     { id: 'markdown-editor', name: 'Markdown Editor', icon: 'fas fa-file-lines', category: 'productivity', type: 'react', path: '/app/markdown-editor' },
     { id: 'spreadsheet-app',  name: 'Spreadsheets',           path: '/app/spreadsheet',                               icon: 'fas fa-table',              category: 'productivity',  type: 'react'    },
     { id: 'quote-and-catalog-generator', name: 'Quote & Catalog', path: '/app/quote-generator',                 icon: 'fas fa-quote-left',         category: 'productivity',  type: 'react'    },
-    { id: 'patent-researcher',name: 'Patent Researcher',      src: '/patent-researcher/index.html',                     icon: 'fas fa-lightbulb',          category: 'productivity',  type: 'online'  },
+    { id: 'patent-researcher',name: 'Patent Researcher',      src: '/patent-researcher/index.html',                     icon: 'fas fa-lightbulb',          category: 'productivity',  type: 'online',  ai: true },
     { id: 'calendar',         name: 'Calendar',               src: '/calendar/index.html',                              icon: 'fas fa-calendar-days',      category: 'productivity',  type: 'offline' },
     { id: 'calendar-sync',    name: 'Calendar Sync',          src: '/calendar/calendar_sync.html',                      icon: 'fas fa-calendar-check',     category: 'productivity',  type: 'online'  },
     { id: 'life-board',       name: 'Life Board',             src: '/life-board/index.html',                            icon: 'fas fa-clipboard-user',     category: 'lifestyle',     type: 'hybrid'  },
 
     // ── Development ──────────────────────────────────────────────────────────
-    { id: 'code-generator',  name: 'Code Generator',          src: '/code-generator/code-generator.html',               icon: 'fas fa-code',               category: 'development',   type: 'hybrid'  },
+    { id: 'code-generator',  name: 'Code Generator',          src: '/code-generator/code-generator.html',               icon: 'fas fa-code',               category: 'development',   type: 'hybrid',  ai: true },
     { id: 'mermaid-editor',  name: 'Mermaid Editor',          src: '/mermaid-editor/mermaid-live-editor.html',          icon: 'fas fa-diagram-project',    category: 'development',   type: 'online'  },
     { id: 'python-ide',      name: 'Data Science Workspace',  src: '/python-IDE/index.html',                            icon: 'fas fa-flask-vial',         category: 'development',   type: 'offline' },
 

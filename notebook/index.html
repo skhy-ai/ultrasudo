@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notebook</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ai-panel.css">
 </head>
 
 <body>
@@ -158,6 +159,9 @@
                 <button type="button" id="download-pdf" title="Download as PDF" data-tooltip="Download as PDF"><span
                         class="icon-text">PDF</span></button>
             </div>
+            <div class="toolbar-group">
+                <button type="button" id="ai-panel-toggle" title="AI Writing Assistant" data-tooltip="AI Writing Assistant">&#10024;</button>
+            </div>
         </div>
         <div class="editor-shell">
             <div class="ruler horizontal" aria-hidden="true"></div>
@@ -218,12 +222,60 @@
             </div>
         </div>
     </div>
-    <!-- Local export libraries with CDN fallback -->
+
+    <!-- AI Panel Overlay -->
+    <div id="ai-panel-overlay" class="ai-panel-overlay"></div>
+
+    <!-- AI Writing Assistant Side Drawer -->
+    <div id="ai-panel" class="ai-panel hidden" role="complementary" aria-label="AI Writing Assistant">
+        <div class="ai-panel-header">
+            <div class="ai-panel-title">
+                <span class="ai-sparkle">&#10024;</span>
+                <span>AI Assistant</span>
+            </div>
+            <button id="ai-panel-close" class="ai-panel-close" title="Close AI Panel">&times;</button>
+        </div>
+
+        <div class="ai-quick-actions">
+            <button class="ai-quick-btn" data-ai-action="write">
+                <span class="btn-icon">&#128221;</span> Write paragraph
+            </button>
+            <button class="ai-quick-btn" data-ai-action="improve">
+                <span class="btn-icon">&#9999;</span> Improve selection
+            </button>
+            <button class="ai-quick-btn" data-ai-action="summarize">
+                <span class="btn-icon">&#128203;</span> Summarize doc
+            </button>
+            <button class="ai-quick-btn" data-ai-action="grammar">
+                <span class="btn-icon">&#128269;</span> Grammar check
+            </button>
+        </div>
+
+        <div id="ai-messages" class="ai-messages"></div>
+
+        <div id="ai-suggestion-card" class="ai-suggestion-card hidden">
+            <div class="suggestion-label">&#9889; AI Suggestion</div>
+            <div class="suggestion-content" id="ai-suggestion-text"></div>
+            <div class="suggestion-actions">
+                <button id="ai-accept-btn" class="ai-accept-btn">&#9989; Accept</button>
+                <button id="ai-reject-btn" class="ai-reject-btn">&times; Reject</button>
+            </div>
+        </div>
+
+        <div class="ai-input-area">
+            <div class="ai-input-row">
+                <textarea id="ai-input" placeholder="Ask AI to write, improve, or analyze..." rows="2"></textarea>
+                <button id="ai-send">Send</button>
+            </div>
+            <div class="ai-input-hint">Shift+Enter for new line &bull; Enter to send</div>
+        </div>
+    </div>
     <script src="vendor/html-docx.js"></script>
     <script>if (!window.htmlDocx) { var s = document.createElement('script'); s.src = 'https://unpkg.com/html-docx-js/dist/html-docx.js'; document.head.appendChild(s); }</script>
     <script src="vendor/html2pdf.bundle.min.js"></script>
     <script>if (typeof html2pdf !== 'function') { var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js'; document.head.appendChild(s); }</script>
     <script src="script.js"></script>
+    <script src="ai-panel.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.AppShell) {

@@ -964,3 +964,110 @@ body {
     .chat-message { max-width: 90%; }
     .app-slideover { width: 100%; min-width: 0; }
 }
+
+/* ─── Supabase Status Bar ──────────────────────────────────────── */
+.supabase-status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    height: 28px;
+    background: rgba(6, 10, 20, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(56, 189, 248, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 11px;
+    color: #2a3a52;
+    font-family: 'Inter', monospace;
+    user-select: none;
+    gap: 12px;
+}
+
+.sb-status-left,
+.sb-status-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.sb-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 6px #34d399;
+    animation: sb-pulse 2.5s ease-in-out infinite;
+    flex-shrink: 0;
+    transition: background 0.4s, box-shadow 0.4s;
+}
+
+@keyframes sb-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+}
+
+.sb-label {
+    color: #3a5070;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 10.5px;
+}
+
+.sb-project-id {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 10.5px;
+    color: rgba(56, 189, 248, 0.4);
+    letter-spacing: 0.3px;
+}
+
+.sb-region {
+    color: #263550;
+    font-size: 10px;
+    padding: 1px 6px;
+    background: rgba(56, 189, 248, 0.04);
+    border: 1px solid rgba(56, 189, 248, 0.07);
+    border-radius: 999px;
+}
+
+.sb-sync-status {
+    font-size: 10.5px;
+    color: #34d399;
+    font-weight: 500;
+}
+
+.sb-user {
+    font-size: 10.5px;
+    color: #3a5070;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sb-logout-btn {
+    background: none;
+    border: 1px solid rgba(56, 189, 248, 0.1);
+    border-radius: 4px;
+    color: #3a5070;
+    font-size: 10px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 1px 8px;
+    transition: all 0.2s;
+}
+.sb-logout-btn:hover {
+    background: rgba(56, 189, 248, 0.06);
+    border-color: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+}
+
+/* Bump body bottom padding so content isn't hidden behind status bar */
+body { padding-bottom: 28px; }
+

@@ -77,6 +77,30 @@ export default function DesktopPage() {
 
     const activeCatObj = categories.find(c => c.id === selectedCategory) || categories[0];
 
+    /** Returns indicator badge elements for an app */
+    function getIndicators(app) {
+        const indicators = [];
+        const isOffline = app.type === 'react' || app.type === 'offline';
+        const isOnline  = app.type === 'online' || app.type === 'hybrid';
+
+        if (isOffline && !isOnline) {
+            indicators.push(
+                <span key="offline" className="app-indicator offline" title="Works offline">📴</span>
+            );
+        }
+        if (isOnline) {
+            indicators.push(
+                <span key="online" className="app-indicator online" title="Requires internet">🌐</span>
+            );
+        }
+        if (app.ai) {
+            indicators.push(
+                <span key="ai" className="app-indicator ai" title="Uses Generative AI">🤖</span>
+            );
+        }
+        return indicators;
+    }
+
     return (
         <div className="desktop-page-wrapper">
             {/* Top Header Bar */}
@@ -192,6 +216,11 @@ export default function DesktopPage() {
                                     handleAppClick(app);
                                 }}
                             >
+                                {/* Connectivity indicators — top-right corner */}
+                                <div className="app-card-indicators">
+                                    {getIndicators(app)}
+                                </div>
+
                                 <div className="app-card-icon">
                                     <i className={app.icon}></i>
                                 </div>
@@ -212,7 +241,36 @@ export default function DesktopPage() {
                 onClose={() => setIsAuthOpen(false)}
                 onAuthSuccess={(user) => setCurrentUser(user)}
             />
+
+            {/* Floating Connectivity Legend */}
+            <ConnectivityLegend />
         </div>
     );
 }
 
+/** Floating legend panel — fixed bottom-right */
+function ConnectivityLegend() {
+    const [collapsed, setCollapsed] = useState(false);
+    return (
+        <div className={`connectivity-legend${collapsed ? ' collapsed' : ''}`}>
+            <div className="legend-header" onClick={() => setCollapsed(c => !c)}>
+                <span className="legend-title">App Legend</span>
+                <span className="legend-chevron">{collapsed ? '▲' : '▼'}</span>
+            </div>
+            <div className="legend-body">
+                <div className="legend-row">
+                    <span className="legend-icon offline">📴</span>
+                    <span>Works fully offline</span>
+                </div>
+                <div className="legend-row">
+                    <span className="legend-icon online">🌐</span>
+                    <span>Requires internet</span>
+                </div>
+                <div className="legend-row">
+                    <span className="legend-icon ai">🤖</span>
+                    <span>Uses Generative AI</span>
+                </div>
+            </div>
+        </div>
+    );
+}

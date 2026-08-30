@@ -2,65 +2,199 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2P Calling</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css">
-    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <!-- PeerJS for WebRTC -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <!-- QRCode.js for QR generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Critical layout override — ensures flex layout regardless of cache */
+        html, body { height: 100% !important; overflow: hidden !important; font-family: 'Inter', sans-serif !important; background: #080d1a !important; color: #e2e8f0 !important; }
+        .p2p-layout { display: flex !important; height: calc(100vh - 36px) !important; margin-top: 36px !important; }
+        .p2p-sidebar { width: 300px !important; flex-shrink: 0 !important; background: rgba(10,15,30,0.95) !important; border-right: 1px solid rgba(255,255,255,0.07) !important; display: flex !important; flex-direction: column !important; overflow-y: auto !important; }
+        .p2p-main { flex: 1 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h2>P2P Connect</h2>
-            <div class="id-section">
-                <label>Your ID (Share this to receive calls):</label>
-                <div class="id-box">
-                    <input type="text" id="my-id" readonly placeholder="Generating ID...">
-                    <button id="btn-copy" title="Copy ID"><i class="fas fa-copy"></i></button>
+    <script src="../desktop/app-shell.js"></script>
+    <div class="p2p-layout">
+
+        <!-- ── SIDEBAR ── -->
+        <aside class="p2p-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo"><i class="fas fa-phone-volume"></i></div>
+                <div>
+                    <h2>P2P Connect</h2>
+                    <div id="status-badge" class="status-badge disconnected">
+                        <span class="status-dot"></span>
+                        <span id="status-text">Disconnected</span>
+                    </div>
                 </div>
             </div>
-            <div class="call-section">
-                <label>Call a Peer:</label>
-                <input type="text" id="target-id" placeholder="Enter Peer ID...">
-                <button id="btn-call" class="btn-primary"><i class="fas fa-phone"></i> Call</button>
+
+            <!-- Your Peer ID -->
+            <div class="sidebar-section">
+                <div class="section-label"><i class="fas fa-id-card"></i> Your Peer ID</div>
+                <div class="peer-id-box">
+                    <input type="text" id="my-id" readonly placeholder="Generating ID..." class="peer-id-input">
+                    <button id="btn-copy" title="Copy ID" class="icon-btn"><i class="fas fa-copy"></i></button>
+                    <button id="btn-qr" title="Show QR Code" class="icon-btn qr-btn"><i class="fas fa-qrcode"></i></button>
+                </div>
             </div>
-            
-            <div id="status-display" class="status">Disconnected</div>
-            
+
+            <!-- Contacts -->
+            <div class="sidebar-section contacts-section">
+                <div class="section-header-row">
+                    <div class="section-label"><i class="fas fa-address-book"></i> Contacts</div>
+                    <div class="contact-actions-row">
+                        <button id="btn-import-wa" title="Import from WhatsApp" class="text-btn wa-btn"><i class="fab fa-whatsapp"></i> Import</button>
+                        <button id="btn-add-contact" title="Add Contact" class="text-btn"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div id="contacts-list" class="contacts-list">
+                    <div class="contacts-empty">No contacts yet. Add one to get started.</div>
+                </div>
+            </div>
+
+            <!-- Call Section -->
+            <div class="sidebar-section">
+                <div class="section-label"><i class="fas fa-phone-alt"></i> Start a Call</div>
+                <input type="text" id="target-id" placeholder="Enter Peer ID or select contact..." class="call-input">
+                <div class="call-type-row">
+                    <button id="btn-call-video" class="btn-call-type video"><i class="fas fa-video"></i> Video Call</button>
+                    <button id="btn-call-audio" class="btn-call-type audio"><i class="fas fa-microphone"></i> Audio Only</button>
+                </div>
+            </div>
+
+            <!-- Call History -->
+            <div class="sidebar-section history-section">
+                <div class="section-header-row">
+                    <div class="section-label"><i class="fas fa-clock-rotate-left"></i> Recent Calls</div>
+                    <button id="btn-clear-history" class="text-btn danger-text"><i class="fas fa-trash"></i></button>
+                </div>
+                <div id="call-history" class="call-history"></div>
+            </div>
+
             <!-- Incoming call alert -->
             <div id="incoming-call" class="incoming-call-box hidden">
-                <p>Incoming Call...</p>
-                <div class="action-buttons">
-                    <button id="btn-accept" class="btn-success"><i class="fas fa-phone"></i> Accept</button>
-                    <button id="btn-reject" class="btn-danger"><i class="fas fa-phone-slash"></i> Reject</button>
+                <div class="incoming-ring"><i class="fas fa-phone"></i></div>
+                <div>
+                    <div class="incoming-label">Incoming Call</div>
+                    <div id="incoming-from" class="incoming-from">...</div>
+                </div>
+                <div class="incoming-btns">
+                    <button id="btn-accept" class="btn-accept"><i class="fas fa-phone"></i></button>
+                    <button id="btn-reject" class="btn-reject"><i class="fas fa-phone-slash"></i></button>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Video Area -->
-        <div class="main-content">
+        <!-- ── MAIN VIDEO AREA ── -->
+        <main class="p2p-main">
+            <!-- Video Grid -->
             <div class="video-grid">
                 <div class="video-wrapper local">
                     <video id="local-video" autoplay muted playsinline></video>
                     <div class="video-label">You</div>
+                    <div id="local-avatar" class="video-avatar hidden"><i class="fas fa-microphone"></i><span>Audio Only</span></div>
                 </div>
                 <div class="video-wrapper remote">
                     <video id="remote-video" autoplay playsinline></video>
-                    <div class="video-label">Remote</div>
-                    <div id="remote-waiting" class="waiting-text">Waiting for connection...</div>
+                    <div class="video-label" id="remote-label">Remote</div>
+                    <div id="remote-waiting" class="waiting-overlay">
+                        <i class="fas fa-satellite-dish"></i>
+                        <p>Waiting for connection...</p>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Call Controls -->
+
+            <!-- Call timer -->
+            <div id="call-timer" class="call-timer hidden">
+                <i class="fas fa-circle timer-dot"></i>
+                <span id="timer-display">00:00</span>
+            </div>
+
+            <!-- Controls bar -->
             <div class="controls-bar">
-                <button id="btn-toggle-video" class="control-btn" title="Toggle Camera"><i class="fas fa-video"></i></button>
-                <button id="btn-toggle-audio" class="control-btn" title="Toggle Microphone"><i class="fas fa-microphone"></i></button>
-                <button id="btn-share-screen" class="control-btn" title="Share Screen"><i class="fas fa-desktop"></i></button>
-                <button id="btn-end-call" class="control-btn danger" title="End Call"><i class="fas fa-phone-slash"></i></button>
+                <button id="btn-toggle-video" class="control-btn" title="Toggle Camera">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button id="btn-toggle-audio" class="control-btn" title="Toggle Microphone">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="btn-share-screen" class="control-btn" title="Share Screen">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button id="btn-end-call" class="control-btn danger" title="End Call">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+            </div>
+
+            <!-- Text Chat Panel -->
+            <div class="chat-panel">
+                <div class="chat-header">
+                    <i class="fas fa-message"></i> Chat
+                    <span id="chat-status" class="chat-status">(connect to chat)</span>
+                </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-row">
+                    <input type="text" id="chat-input" placeholder="Type a message..." disabled>
+                    <button id="btn-send-chat" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ── QR Modal ── -->
+    <div id="qr-modal" class="modal-overlay hidden">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <h3><i class="fas fa-qrcode"></i> Share Your Peer ID</h3>
+                <button id="btn-close-qr" class="modal-close">&times;</button>
+            </div>
+            <p class="qr-desc">Share this QR code so others can call you directly.</p>
+            <div id="qr-code" class="qr-code-box"></div>
+            <div id="qr-peer-id" class="qr-peer-id-text"></div>
+        </div>
+    </div>
+
+    <!-- ── Add/Import Contact Modal ── -->
+    <div id="contact-modal" class="modal-overlay hidden">
+        <div class="contact-modal-content">
+            <div class="qr-modal-header">
+                <h3 id="contact-modal-title"><i class="fas fa-user-plus"></i> Add Contact</h3>
+                <button id="btn-close-contact" class="modal-close">&times;</button>
+            </div>
+            <p class="qr-desc" id="contact-modal-desc">Enter the contact's name and their Peer ID (they can find it in their P2P app).</p>
+
+            <div class="contact-form">
+                <label>Name
+                    <input type="text" id="contact-name" placeholder="e.g. Alice Smith" autocomplete="off">
+                </label>
+                <label id="phone-row" class="hidden">Phone Number <span class="hint-text">(from WhatsApp)</span>
+                    <input type="tel" id="contact-phone" placeholder="+1 555 0123">
+                </label>
+                <label>Peer ID <span class="hint-text">(optional — fill later)</span>
+                    <input type="text" id="contact-peer-id" placeholder="Leave blank if unknown">
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btn-cancel-contact" class="btn-modal-cancel">Cancel</button>
+                <button id="btn-save-contact" class="btn-modal-save"><i class="fas fa-floppy-disk"></i> Save Contact</button>
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.AppShell) AppShell.init({ appId: 'p2p-calling', title: 'P2P Calling' });
+        });
+    </script>
 </body>
 </html>

@@ -5,60 +5,250 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Key Manager</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../src/vendor/fontawesome/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <script src="../desktop/app-shell.js"></script>
   <script src="../desktop/data-manager.js"></script>
   <script src="../desktop/file-helper.js"></script>
-  <div class="container">
-    <h1>API Key Manager</h1>
-    <p>Manage API keys centrally. Keys are stored in localStorage via the desktop DataManager.</p>
 
-    <section class="provider">
-      <h2>OpenAI</h2>
-      <label>API Key <input id="openai-key" type="password" placeholder="sk-..."/></label>
-      <label>Model <input id="openai-model" type="text" value="gpt-4o-mini"/></label>
-      <label>Base URL <input id="openai-base" type="text" value="https://api.openai.com/v1"/></label>
-      <div class="actions">
-        <button id="save-openai">Save</button>
-        <button id="test-openai">Test</button>
+  <div class="akm-container">
+    <div class="akm-header">
+      <div class="akm-header-icon"><i class="fas fa-key"></i></div>
+      <div>
+        <h1>API Key Manager</h1>
+        <p class="akm-subtitle">Connect AI providers and financial data services. Keys are stored locally on your device.</p>
       </div>
-      <div id="openai-status" class="status"></div>
-    </section>
+    </div>
 
-    <section class="provider">
-      <h2>Gemini</h2>
-      <label>API Key <input id="gemini-key" type="password" placeholder="AIza..."/></label>
-      <label>Model <input id="gemini-model" type="text" value="gemini-1.5-flash"/></label>
-      <label>Base URL <input id="gemini-base" type="text" value="https://generativelanguage.googleapis.com"/></label>
-      <div class="actions">
-        <button id="save-gemini">Save</button>
-        <button id="test-gemini">Test</button>
-      </div>
-      <div id="gemini-status" class="status"></div>
-    </section>
+    <div class="provider-grid">
 
-    <section class="provider">
-      <h2>LMStudio</h2>
-      <label>Base URL <input id="lmstudio-base" type="text" value="http://localhost:1234"/></label>
-      <label>Model <input id="lmstudio-model" type="text" placeholder="(optional)"/></label>
-      <div class="actions">
-        <button id="save-lmstudio">Save</button>
-        <button id="test-lmstudio">Test</button>
-      </div>
-      <div id="lmstudio-status" class="status"></div>
-    </section>
+      <!-- OpenRouter -->
+      <div class="provider-card" data-provider="openrouter" data-color="#7c3aed">
+        <div class="provider-card-header">
+          <div class="provider-icon" style="background: linear-gradient(135deg, #7c3aed, #6366f1);">
+            <i class="fas fa-route"></i>
+          </div>
+          <div class="provider-info">
+            <h2>OpenRouter <span class="badge free">Free Tier</span></h2>
+            <p class="provider-desc">Access 100+ models (Gemini, Claude, Llama, GPT-4) via a single key.</p>
+          </div>
+          <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="get-key-link">
+            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
 
-    <section class="provider">
-      <h2>Alpha Vantage</h2>
-      <label>API Key <input id="av-key" type="password" placeholder="Alpha Vantage key"/></label>
-      <div class="actions">
-        <button id="save-av">Save</button>
-        <button id="test-av">Test</button>
+        <div class="provider-fields">
+          <label>API Key <span class="key-hint">sk-or-v1-...</span>
+            <div class="key-input-row">
+              <input id="openrouter-key" type="password" placeholder="sk-or-v1-..." autocomplete="off"/>
+              <button class="btn-eye" data-target="openrouter-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+            </div>
+          </label>
+          <label>Model <span class="key-hint">Default model to use</span>
+            <input id="openrouter-model" type="text" value="google/gemini-2.0-flash-exp:free"/>
+          </label>
+        </div>
+
+        <details class="guide-section">
+          <summary><i class="fas fa-circle-info"></i> How to get your OpenRouter key</summary>
+          <ol class="guide-steps">
+            <li>Visit <a href="https://openrouter.ai" target="_blank">openrouter.ai</a> and click <strong>Sign In</strong></li>
+            <li>After signing in, go to <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></li>
+            <li>Click <strong>Create Key</strong> — give it a name like "Ultrasudo"</li>
+            <li>Copy the key (starts with <code>sk-or-v1-</code>) and paste it above</li>
+            <li>The free tier includes access to Google Gemini Flash and other free models</li>
+          </ol>
+        </details>
+
+        <div class="provider-actions">
+          <button id="save-openrouter" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
+          <button id="test-openrouter" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
+        </div>
+        <div id="openrouter-status" class="status-msg"></div>
       </div>
-      <div id="av-status" class="status"></div>
-    </section>
+
+      <!-- Gemini -->
+      <div class="provider-card" data-provider="gemini" data-color="#4285f4">
+        <div class="provider-card-header">
+          <div class="provider-icon" style="background: linear-gradient(135deg, #4285f4, #0f9d58);">
+            <i class="fab fa-google"></i>
+          </div>
+          <div class="provider-info">
+            <h2>Google Gemini <span class="badge free">Free Tier</span></h2>
+            <p class="provider-desc">Google's multimodal AI. Gemini Flash is free with generous limits.</p>
+          </div>
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="get-key-link">
+            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <div class="provider-fields">
+          <label>API Key <span class="key-hint">AIza...</span>
+            <div class="key-input-row">
+              <input id="gemini-key" type="password" placeholder="AIzaSy..." autocomplete="off"/>
+              <button class="btn-eye" data-target="gemini-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+            </div>
+          </label>
+          <label>Model
+            <input id="gemini-model" type="text" value="gemini-2.0-flash"/>
+          </label>
+        </div>
+
+        <details class="guide-section">
+          <summary><i class="fas fa-circle-info"></i> How to get your Gemini key</summary>
+          <ol class="guide-steps">
+            <li>Go to <a href="https://aistudio.google.com" target="_blank">Google AI Studio</a> — sign in with your Google account</li>
+            <li>Click <strong>Get API Key</strong> in the left sidebar</li>
+            <li>Select <strong>Create API key in new project</strong></li>
+            <li>Copy the key (starts with <code>AIza</code>) and paste it above</li>
+            <li>The free tier includes Gemini 1.5 Flash &amp; 2.0 Flash with 15 requests/min</li>
+          </ol>
+        </details>
+
+        <div class="provider-actions">
+          <button id="save-gemini" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
+          <button id="test-gemini" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
+        </div>
+        <div id="gemini-status" class="status-msg"></div>
+      </div>
+
+      <!-- OpenAI -->
+      <div class="provider-card" data-provider="openai" data-color="#10a37f">
+        <div class="provider-card-header">
+          <div class="provider-icon" style="background: linear-gradient(135deg, #10a37f, #0d8a6c);">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="provider-info">
+            <h2>OpenAI <span class="badge paid">Paid</span></h2>
+            <p class="provider-desc">GPT-4o, GPT-4o-mini and more. Requires a paid plan or credits.</p>
+          </div>
+          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="get-key-link">
+            Get API key <i class="fas fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <div class="provider-fields">
+          <label>API Key <span class="key-hint">sk-...</span>
+            <div class="key-input-row">
+              <input id="openai-key" type="password" placeholder="sk-..." autocomplete="off"/>
+              <button class="btn-eye" data-target="openai-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+            </div>
+          </label>
+          <label>Model
+            <input id="openai-model" type="text" value="gpt-4o-mini"/>
+          </label>
+          <label>Base URL <span class="key-hint">Custom endpoint (optional)</span>
+            <input id="openai-base" type="text" value="https://api.openai.com/v1"/>
+          </label>
+        </div>
+
+        <details class="guide-section">
+          <summary><i class="fas fa-circle-info"></i> How to get your OpenAI key</summary>
+          <ol class="guide-steps">
+            <li>Go to <a href="https://platform.openai.com" target="_blank">platform.openai.com</a> and sign in or create an account</li>
+            <li>Navigate to <a href="https://platform.openai.com/api-keys" target="_blank">API Keys</a> in the dashboard</li>
+            <li>Click <strong>Create new secret key</strong></li>
+            <li>Copy the key (starts with <code>sk-</code>) — it's only shown once</li>
+            <li>Add billing credits at <a href="https://platform.openai.com/settings/billing" target="_blank">Billing</a> to make API calls</li>
+          </ol>
+        </details>
+
+        <div class="provider-actions">
+          <button id="save-openai" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
+          <button id="test-openai" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
+        </div>
+        <div id="openai-status" class="status-msg"></div>
+      </div>
+
+      <!-- LMStudio (Local) -->
+      <div class="provider-card" data-provider="lmstudio" data-color="#f97316">
+        <div class="provider-card-header">
+          <div class="provider-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+            <i class="fas fa-server"></i>
+          </div>
+          <div class="provider-info">
+            <h2>LM Studio <span class="badge local">Local</span></h2>
+            <p class="provider-desc">Run AI models locally on your machine — completely private and offline.</p>
+          </div>
+          <a href="https://lmstudio.ai" target="_blank" rel="noopener" class="get-key-link">
+            Download free <i class="fas fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <div class="provider-fields">
+          <label>Local Server URL
+            <input id="lmstudio-base" type="text" value="http://localhost:1234"/>
+          </label>
+          <label>Model Name <span class="key-hint">Optional — leave blank to use loaded model</span>
+            <input id="lmstudio-model" type="text" placeholder="e.g. llama-3.2-3b-instruct"/>
+          </label>
+        </div>
+
+        <details class="guide-section">
+          <summary><i class="fas fa-circle-info"></i> How to set up LM Studio</summary>
+          <ol class="guide-steps">
+            <li>Download <a href="https://lmstudio.ai" target="_blank">LM Studio</a> for your OS</li>
+            <li>Open LM Studio and download a model (e.g. Llama 3.2 or Gemma 2)</li>
+            <li>Go to <strong>Local Server</strong> tab and click <strong>Start Server</strong></li>
+            <li>The default port is <code>1234</code> — no API key needed</li>
+            <li>Click <strong>Test Connection</strong> to verify Ultrasudo can reach LM Studio</li>
+          </ol>
+        </details>
+
+        <div class="provider-actions">
+          <button id="save-lmstudio" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
+          <button id="test-lmstudio" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
+        </div>
+        <div id="lmstudio-status" class="status-msg"></div>
+      </div>
+
+      <!-- Alpha Vantage -->
+      <div class="provider-card" data-provider="alphavantage" data-color="#14b8a6">
+        <div class="provider-card-header">
+          <div class="provider-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="provider-info">
+            <h2>Alpha Vantage <span class="badge free">Free Tier</span></h2>
+            <p class="provider-desc">Real-time and historical stock, forex, and crypto market data.</p>
+          </div>
+          <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener" class="get-key-link">
+            Get free key <i class="fas fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <div class="provider-fields">
+          <label>API Key
+            <div class="key-input-row">
+              <input id="av-key" type="password" placeholder="Your Alpha Vantage key" autocomplete="off"/>
+              <button class="btn-eye" data-target="av-key" title="Show/hide key"><i class="fas fa-eye"></i></button>
+            </div>
+          </label>
+        </div>
+
+        <details class="guide-section">
+          <summary><i class="fas fa-circle-info"></i> How to get your Alpha Vantage key</summary>
+          <ol class="guide-steps">
+            <li>Go to <a href="https://www.alphavantage.co/support/#api-key" target="_blank">alphavantage.co/support/#api-key</a></li>
+            <li>Fill in your name and email — no credit card required</li>
+            <li>Click <strong>GET FREE API KEY</strong></li>
+            <li>Your key appears immediately on screen — copy and paste it above</li>
+            <li>The free tier allows 25 API requests per day</li>
+          </ol>
+        </details>
+
+        <div class="provider-actions">
+          <button id="save-av" class="btn-save"><i class="fas fa-floppy-disk"></i> Save</button>
+          <button id="test-av" class="btn-test"><i class="fas fa-flask"></i> Test Connection</button>
+        </div>
+        <div id="av-status" class="status-msg"></div>
+      </div>
+
+    </div><!-- /provider-grid -->
   </div>
+
   <script src="../desktop/data-manager.js"></script>
   <script src="script.js"></script>
   <script>

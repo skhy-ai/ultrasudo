@@ -113,6 +113,24 @@ const FUNCTION_DECLARATIONS = [
             properties: {},
             required: []
         }
+    },
+    {
+        name: 'edit_notebook',
+        description: 'Generate or improve content in the Notebook app using AI. Opens the notebook AI panel to write a paragraph, improve selected text, summarize the document, or check grammar.',
+        parameters: {
+            type: 'OBJECT',
+            properties: {
+                action: {
+                    type: 'STRING',
+                    description: 'The AI action to perform. One of: write (generate a paragraph), improve (improve selected text), summarize (summarize the document), grammar (check and fix grammar)'
+                },
+                prompt: {
+                    type: 'STRING',
+                    description: 'The user\'s writing request, topic, or the text to improve/check'
+                }
+            },
+            required: ['action', 'prompt']
+        }
     }
 ];
 
