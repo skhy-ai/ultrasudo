@@ -227,7 +227,7 @@
   // Init
   fetchNotes();
   if (window.AppShell) {
-    AppShell.init({ appId: 'notebook', title: 'Notebook' });
+    
   }
 
 })();

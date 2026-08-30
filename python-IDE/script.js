@@ -335,8 +335,4 @@ await _do_install()
   // Initialization
   initPyodide();
   fetchNotebooks();
-
-  if (window.AppShell) {
-    AppShell.init({ appId: 'python-IDE', title: 'Data Science Workspace' });
-  }
 })();

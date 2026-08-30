@@ -13,9 +13,6 @@
   const outputEl = $('response-output');
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (window.AppShell) {
-      AppShell.init({ appId: 'code-generator', title: 'Code Generator' });
-    }
     $('test-api').addEventListener('click', testApi);
     genTestsBtn.addEventListener('click', onGenerateTests);
     acceptTestsBtn.addEventListener('click', onAcceptTests);

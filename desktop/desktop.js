@@ -340,121 +340,292 @@ window.startWidgetTimer = function () {
 };
 
 // --- News Panel Logic ---
+// --- News Panel Logic & Live Intelligence ---
 window.currentNewsItems = [];
 
+async function fetchDesktopFeedRaw(feedUrl) {
+    try {
+        const directRes = await fetch(feedUrl, { headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' } });
+        if (directRes.ok) {
+            const text = await directRes.text();
+            if (text && (text.includes('<rss') || text.includes('<feed') || text.includes('<xml'))) return text;
+        }
+    } catch (e) { }
+
+    try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+        const res = await fetch(proxyUrl);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.contents) return data.contents;
+        }
+    } catch (e) { }
+
+    try {
+        const codeTabUrl = `https://api.codetab.org/v1/proxy?quest=${encodeURIComponent(feedUrl)}`;
+        const res = await fetch(codeTabUrl);
+        if (res.ok) {
+            const text = await res.text();
+            if (text && text.length > 20) return text;
+        }
+    } catch (e) { }
+
+    throw new Error(`Could not fetch RSS feed from ${feedUrl}`);
+}
+
+function parseDesktopXmlFeed(xmlString, feedUrl) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlString, 'text/xml');
+    
+    let feedTitle = '';
+    const channelTitle = xml.querySelector('channel > title, feed > title');
+    if (channelTitle) feedTitle = channelTitle.textContent.trim();
+    if (!feedTitle) {
+        try { feedTitle = new URL(feedUrl).hostname.replace('www.', ''); } catch(e) { feedTitle = 'News Source'; }
+    }
+
+    const articles = [];
+
+    // RSS 2.0
+    const items = xml.querySelectorAll('item');
+    if (items && items.length > 0) {
+        items.forEach(item => {
+            const title = item.querySelector('title')?.textContent?.trim() || 'Untitled';
+            const link = item.querySelector('link')?.textContent?.trim() || '#';
+            let description = item.querySelector('description')?.textContent || item.querySelector('content\\:encoded')?.textContent || '';
+            
+            let imageUrl = item.querySelector('media\\:content, content')?.getAttribute('url') ||
+                           item.querySelector('enclosure[type^="image"]')?.getAttribute('url') || null;
+
+            if (!imageUrl && description) {
+                const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+                if (imgMatch) imageUrl = imgMatch[1];
+            }
+
+            const cleanSnippet = description.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+            const snippet = cleanSnippet.length > 140 ? cleanSnippet.substring(0, 140) + '...' : cleanSnippet;
+            const rawDate = item.querySelector('pubDate')?.textContent || item.querySelector('dc\\:date')?.textContent || '';
+            const pubDate = rawDate ? new Date(rawDate).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Today';
+
+            articles.push({
+                title,
+                link,
+                snippet,
+                imageUrl,
+                sourceTitle: feedTitle,
+                pubDate,
+                timestamp: rawDate ? new Date(rawDate).getTime() : Date.now()
+            });
+        });
+        return articles;
+    }
+
+    // Atom
+    const entries = xml.querySelectorAll('entry');
+    if (entries && entries.length > 0) {
+        entries.forEach(entry => {
+            const title = entry.querySelector('title')?.textContent?.trim() || 'Untitled';
+            let link = entry.querySelector('link[rel="alternate"]')?.getAttribute('href') || entry.querySelector('link')?.getAttribute('href') || '#';
+            let description = entry.querySelector('summary')?.textContent || entry.querySelector('content')?.textContent || '';
+            let imageUrl = entry.querySelector('media\\:content')?.getAttribute('url') || null;
+
+            if (!imageUrl && description) {
+                const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+                if (imgMatch) imageUrl = imgMatch[1];
+            }
+
+            const cleanSnippet = description.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+            const snippet = cleanSnippet.length > 140 ? cleanSnippet.substring(0, 140) + '...' : cleanSnippet;
+            const rawDate = entry.querySelector('published')?.textContent || entry.querySelector('updated')?.textContent || '';
+            const pubDate = rawDate ? new Date(rawDate).toLocaleDateString([], { month: 'short', day: 'numeric' }) : 'Today';
+
+            articles.push({
+                title,
+                link,
+                snippet,
+                imageUrl,
+                sourceTitle: feedTitle,
+                pubDate,
+                timestamp: rawDate ? new Date(rawDate).getTime() : Date.now()
+            });
+        });
+    }
+
+    return articles;
+}
+
 window.fetchNews = async function () {
-    const select = document.getElementById('news-category-select');
-    if (!select) return;
-    const category = select.value;
+    const categorySelect = document.getElementById('news-category-select');
+    const countrySelect = document.getElementById('news-country-select');
+    if (!categorySelect) return;
+
+    const category = categorySelect.value;
+    const country = countrySelect ? countrySelect.value : 'US';
     const container = document.getElementById('news-feed-container');
-    container.innerHTML = '<div class="loading-state" style="padding:10px;">Loading latest headlines...</div>';
+    container.innerHTML = '<div class="loading-state" style="padding:10px;"><i class="fas fa-circle-notch fa-spin"></i> Aggregating live RSS headlines & NLP sentiment...</div>';
 
     try {
         let urls = [];
-        if (window.RSS_SOURCES && window.RSS_SOURCES['IN'] && window.RSS_SOURCES['IN'][category]) {
-            urls = window.RSS_SOURCES['IN'][category];
-        } else if (window.RSS_SOURCES && window.RSS_SOURCES['US'] && window.RSS_SOURCES['US'][category]) {
-            urls = window.RSS_SOURCES['US'][category];
+        if (window.RSS_SOURCES && window.RSS_SOURCES[country] && window.RSS_SOURCES[country][category]) {
+            urls = window.RSS_SOURCES[country][category];
         }
 
         if (urls.length === 0) {
-            container.innerHTML = '<div class="empty-state">No sources found for this category.</div>';
+            container.innerHTML = '<div class="empty-state">No feed sources found for this selection.</div>';
             return;
         }
 
-        let success = false;
-
-        for (const rssUrl of urls) {
+        const fetchPromises = urls.map(async (url) => {
             try {
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-
-                if (data.status === 'ok' && data.items && data.items.length > 0) {
-                    window.currentNewsItems = data.items.map(item => {
-                        // Attempt to find an image wrapper
-                        let imageUrl = null;
-                        if (item.thumbnail && item.thumbnail !== "") {
-                            imageUrl = item.thumbnail;
-                        } else if (item.enclosure && item.enclosure.link) {
-                            imageUrl = item.enclosure.link;
-                        } else {
-                            // Extract from content
-                            const imgMatch = item.content ? item.content.match(/<img[^>]+src=["']([^"']+)["']/i) : null;
-                            if (imgMatch) imageUrl = imgMatch[1];
-                        }
-                        return {
-                            ...item,
-                            imageUrl,
-                            sourceTitle: data.feed.title || 'News Source'
-                        };
-                    });
-
-                    window.filterNews(); // Render initial list
-                    success = true;
-                    break; // Successfully loaded news, exit loop
-                }
-            } catch (err) {
-                console.warn('Failed to fetch from RSS URL:', rssUrl, err);
-                // Continue to next URL
+                const rawXml = await fetchDesktopFeedRaw(url);
+                return parseDesktopXmlFeed(rawXml, url);
+            } catch (e) {
+                return [];
             }
+        });
+
+        const results = await Promise.allSettled(fetchPromises);
+        let aggregated = [];
+
+        results.forEach(res => {
+            if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+                aggregated.push(...res.value);
+            }
+        });
+
+        if (aggregated.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="padding:10px;">Failed to load live RSS items. Feeds may be temporarily offline.</div>';
+            return;
         }
 
-        if (!success) {
-            container.innerHTML = '<div class="empty-state" style="padding:10px;">Failed to load news items. API limit may be reached or sources are down.</div>';
-        }
+        // Deduplicate & sort
+        const seen = new Set();
+        const unique = aggregated.filter(item => {
+            const k = item.title.toLowerCase().trim();
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return true;
+        });
+
+        unique.sort((a, b) => b.timestamp - a.timestamp);
+
+        // Run Client-Side NLP Analysis
+        window.currentNewsItems = unique.map(item => {
+            if (window.NewsNLP) {
+                return window.NewsNLP.analyzeArticle(item);
+            }
+            return item;
+        });
+
+        renderBreakingTicker();
+        window.filterNews();
     } catch (e) {
-        console.error('News fetch error:', e);
-        container.innerHTML = '<div class="empty-state" style="padding:10px;">Error loading news feed. API limit may be reached.</div>';
+        console.error('Desktop news fetch error:', e);
+        container.innerHTML = '<div class="empty-state" style="padding:10px;">Error aggregating news feed.</div>';
     }
 };
 
+function renderBreakingTicker() {
+    const track = document.getElementById('ticker-content-track');
+    if (!track || !window.currentNewsItems || window.currentNewsItems.length === 0) return;
+
+    const breakingItems = window.currentNewsItems.slice(0, 8);
+    track.innerHTML = breakingItems.map(item => {
+        const sentBadge = item.sentiment ? ` <span class="sentiment-badge ${item.sentiment.label.toLowerCase()}"><i class="fas ${item.sentiment.icon}"></i> ${item.sentiment.label}</span>` : '';
+        const invokeLink = `if(window.__TAURI__) { window.__TAURI__.event.emit('open-new-tab', '${item.link}') } else { window.open('${item.link}','_blank') }`;
+        return `<span class="ticker-item" onclick="${invokeLink}">${item.title}${sentBadge}</span>`;
+    }).join(' • ');
+}
+
 window.filterNews = function () {
-    const searchInput = document.getElementById('news-search-input');
+    const searchInput = document.getElementById('desktop-news-search');
+    const sentimentSelect = document.getElementById('news-sentiment-select');
     const container = document.getElementById('news-feed-container');
     if (!container) return;
 
-    if (!window.currentNewsItems || window.currentNewsItems.length === 0) {
-        return; // Empty state already handled
-    }
+    if (!window.currentNewsItems || window.currentNewsItems.length === 0) return;
 
-    const query = searchInput ? searchInput.value.toLowerCase() : '';
-    const filtered = window.currentNewsItems.filter(item =>
-        item.title.toLowerCase().includes(query) || (item.content && item.content.toLowerCase().includes(query))
-    );
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const targetSentiment = sentimentSelect ? sentimentSelect.value : 'ALL';
+
+    const filtered = window.currentNewsItems.filter(item => {
+        // Sentiment filter
+        if (targetSentiment !== 'ALL' && item.sentiment && item.sentiment.label !== targetSentiment) {
+            return false;
+        }
+
+        // Search query filter (matches title, snippet, entity text, or source)
+        if (query) {
+            const matchTitle = item.title.toLowerCase().includes(query);
+            const matchSnippet = item.snippet && item.snippet.toLowerCase().includes(query);
+            const matchSource = item.sourceTitle && item.sourceTitle.toLowerCase().includes(query);
+            const matchEntity = item.entities && item.entities.some(e => e.text.toLowerCase().includes(query));
+            return matchTitle || matchSnippet || matchSource || matchEntity;
+        }
+
+        return true;
+    });
 
     if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="padding:10px;">No articles match your search.</div>';
+        container.innerHTML = '<div class="empty-state" style="padding:20px; grid-column:1/-1;">No headlines match your search filter.</div>';
         return;
     }
 
     const page = window.newsPage || 0;
-    const pageSize = window.newsPageSize || 20;
-    const paginated = filtered.slice(page * pageSize, (page + 1) * pageSize);
+    const pageSize = 9;
+    const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+    if (page >= totalPages) window.newsPage = totalPages - 1;
 
-    container.innerHTML = paginated.map(item => `
-        <div class="news-item">
-            ${item.imageUrl ? `<img src="${item.imageUrl}" onerror="this.style.display='none'">` : ''}
-            <a href="javascript:void(0)" onclick="if(window.__TAURI__) { window.__TAURI__.event.emit('open-new-tab', '${item.link}') } else { window.open('${item.link}','_blank') }">${item.title}</a>
-            <div class="source">${item.sourceTitle} • ${new Date(item.pubDate.replace(' ', 'T')).toLocaleDateString()}</div>
-        </div>
-    `).join('');
+    const paginated = filtered.slice((window.newsPage || 0) * pageSize, ((window.newsPage || 0) + 1) * pageSize);
+
+    container.innerHTML = paginated.map(item => {
+        const sentBadge = item.sentiment ? `<span class="sentiment-badge ${item.sentiment.label.toLowerCase()}"><i class="fas ${item.sentiment.icon}"></i> ${item.sentiment.label}</span>` : '';
+        
+        let entityChips = '';
+        if (item.entities && item.entities.length > 0) {
+            entityChips = item.entities.slice(0, 3).map(e => `
+                <span class="entity-chip" onclick="event.stopPropagation(); filterByEntityChip('${e.text.replace(/'/g, "\\'")}')">${e.text}</span>
+            `).join('');
+        }
+
+        const invokeLink = `if(window.__TAURI__) { window.__TAURI__.event.emit('open-new-tab', '${item.link}') } else { window.open('${item.link}','_blank') }`;
+
+        return `
+            <div class="news-item">
+                ${item.imageUrl ? `<img src="${item.imageUrl}" onerror="this.style.display='none'">` : ''}
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    ${sentBadge}
+                    <span style="font-size:11px; color:#94a3b8;">${item.pubDate}</span>
+                </div>
+                <a href="javascript:void(0)" onclick="${invokeLink}">${item.title}</a>
+                ${item.snippet ? `<p style="font-size:12px; color:#94a3b8; line-height:1.4; margin:0;">${item.snippet}</p>` : ''}
+                ${entityChips ? `<div style="margin-top:4px;">${entityChips}</div>` : ''}
+                <div class="source">${item.sourceTitle}</div>
+            </div>
+        `;
+    }).join('');
+
+    const indicator = document.getElementById('news-page-indicator');
+    if (indicator) indicator.textContent = `${(window.newsPage || 0) + 1} / ${totalPages}`;
 };
 
-window.fetchNextNews = function () {
-    if ((window.newsPage + 1) * window.newsPageSize < window.currentNewsItems.length) {
-        window.newsPage++;
-        const indicator = document.getElementById('news-page-indicator');
-        if (indicator) indicator.textContent = window.newsPage + 1;
+window.filterByEntityChip = function(entityText) {
+    const searchInput = document.getElementById('desktop-news-search');
+    if (searchInput) {
+        searchInput.value = entityText;
+        window.newsPage = 0;
         window.filterNews();
     }
 };
 
+window.fetchNextNews = function () {
+    window.newsPage = (window.newsPage || 0) + 1;
+    window.filterNews();
+};
+
 window.fetchPreviousNews = function () {
-    if (window.newsPage > 0) {
+    if ((window.newsPage || 0) > 0) {
         window.newsPage--;
-        const indicator = document.getElementById('news-page-indicator');
-        if (indicator) indicator.textContent = window.newsPage + 1;
         window.filterNews();
     }
 };

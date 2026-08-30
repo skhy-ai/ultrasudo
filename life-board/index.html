@@ -13,7 +13,6 @@
 </head>
 
 <body>
-  <script src="../desktop/app-shell.js"></script>
   <div class="container">
     <header class="header">
       <h1>🌟 Daily Life Enhancer</h1>
@@ -268,7 +267,6 @@
   <!-- Music Control Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.AppShell) AppShell.init({ appId: 'life-board', title: 'Life Board', showSave: false, showOpen: false });
       // Initialize calendar functionality if available
       if (typeof handleClientLoad === 'function') {
         handleClientLoad();

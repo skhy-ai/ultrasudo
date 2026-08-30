@@ -337,6 +337,6 @@ await _do_install()
   fetchNotebooks();
 
   if (window.AppShell) {
-    AppShell.init({ appId: 'python-IDE', title: 'Data Science Workspace' });
+    
   }
 })();

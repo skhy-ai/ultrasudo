@@ -10,7 +10,6 @@
 </head>
 
 <body>
-  <script src="../desktop/app-shell.js"></script>
   <script src="../desktop/data-manager.js"></script>
   <script src="../desktop/file-helper.js"></script>
 
@@ -58,11 +57,6 @@
   <audio id="notification-sound" src="../assets/notification.mp3" preload="auto"></audio>
 
   <script src="script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.AppShell) AppShell.init({ appId: 'pomodoro-timer', title: 'Pomodoro Timer' });
-    });
-  </script>
 </body>
 
 </html>

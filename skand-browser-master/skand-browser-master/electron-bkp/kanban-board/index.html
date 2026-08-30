@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <script src="../desktop/app-shell.js"></script>
+  
   <script src="../desktop/file-helper.js"></script>
 
   <div class="app-container">
@@ -71,7 +71,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (window.AppShell) {
-        AppShell.init({ appId: 'kanban-board', title: 'Kanban Board', showSave: true, showOpen: true });
+        
         AppShell.onSave(async () => {
           const data = window.Kanban.serialize();
           await FileHelper.saveText('kanban.json', JSON.stringify(data));

@@ -2,7 +2,7 @@
   const $ = (id) => document.getElementById(id);
   document.addEventListener('DOMContentLoaded', () => {
     if (window.AppShell) {
-      AppShell.init({ appId: 'stock-screener', title: 'Stock Screener' });
+      
     }
 
     // Prefill some symbols for markets

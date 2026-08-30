@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <script src="../desktop/app-shell.js"></script>
+  
   <script src="../desktop/file-helper.js"></script>
   <div class="app-layout">
     <aside class="sidebar">
@@ -79,7 +79,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (window.AppShell) {
-        AppShell.init({ appId: 'python-IDE', title: 'Python IDE', showSave: true, showOpen: true });
+        
         AppShell.onSave(async () => {
           if (window.PyNotebook?.serialize) {
             const json = window.PyNotebook.serialize();

@@ -18,26 +18,7 @@
     </div>
   </div>
 
-  <script src="../desktop/app-shell.js"></script>
   <script src="../desktop/file-helper.js"></script>
   <script src="script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      AppShell.init({ appId: 'markdown-editor', title: 'Markdown Editor', showSave: true, showOpen: true });
-      // Wire Save/Open
-      AppShell.onSave(async () => {
-        const text = document.getElementById('editor').value || '';
-        await FileHelper.saveText('notes.md', text);
-      });
-      AppShell.onOpen(async () => {
-        const res = await FileHelper.openText();
-        if (res.ok) {
-          const ta = document.getElementById('editor');
-          ta.value = res.content || '';
-          if (window.updatePreview) updatePreview();
-        }
-      });
-    });
-  </script>
 </body>
 </html>

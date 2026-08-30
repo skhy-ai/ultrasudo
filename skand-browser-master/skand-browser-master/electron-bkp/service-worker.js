@@ -10,7 +10,7 @@ const STATIC_ASSETS = [
     '/desktop/desktop.css',
     '/desktop/desktop.js',
     '/desktop/app-classifier.js',
-    '/desktop/app-shell.js',
+    
     '/desktop/data-manager.js',
     '/core/sync-manager.js'
 ];

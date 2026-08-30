@@ -10,7 +10,6 @@
 </head>
 
 <body>
-    <script src="../desktop/app-shell.js"></script>
     <script src="../desktop/file-helper.js"></script>
     <div class="container">
         <h1>Notebook</h1>
@@ -276,32 +275,6 @@
     <script>if (typeof html2pdf !== 'function') { var s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js'; document.head.appendChild(s); }</script>
     <script src="script.js"></script>
     <script src="ai-panel.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AppShell) {
-                AppShell.init({ appId: 'notebook', title: 'Notebook', showSave: true, showOpen: true });
-                AppShell.onSave(async () => {
-                    const html = window.Notebook ? window.Notebook.serialize() : (document.getElementById('editor').innerHTML || '');
-                    await FileHelper.saveText('notes.html', html);
-                });
-                AppShell.onOpen(async () => {
-                    const res = await FileHelper.openText();
-                    if (res.ok) {
-                        if (window.Notebook) {
-                            window.Notebook.deserialize(res.content || '');
-                        } else {
-                            document.getElementById('editor').innerHTML = res.content || '';
-                        }
-                    }
-                });
-            }
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AppShell) AppShell.init({ appId: 'notebook', title: 'Notebook', showSave: true, showOpen: true });
-        });
-    </script>
 </body>
 
 </html>

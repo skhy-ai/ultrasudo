@@ -29,7 +29,6 @@
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 font-sans antialiased">
-    <script src="../desktop/app-shell.js"></script>
     <script src="../desktop/file-helper.js"></script>
     <div class="flex flex-col h-screen">
         <!-- Header -->
@@ -393,21 +392,6 @@ style D fill:#ef4444,stroke:#b91c1c,stroke-width:2px,color:#fff</textarea>
                 };
                 img.src = svgUrl;
             };
-
-            // App Shell integration
-            if (window.AppShell) {
-                AppShell.init({ appId: 'mermaid-editor', title: 'Mermaid Editor' });
-                AppShell.onSave(async () => {
-                    const name = prompt('Save as', 'diagram.mmd') || 'diagram.mmd';
-                    const res = await FileHelper.saveText(name, codeInput.value);
-                    if (!res.ok) alert('Save failed: ' + (res.error || res.method));
-                });
-                AppShell.onOpen(async () => {
-                    const res = await FileHelper.openText();
-                    if (res.ok) { codeInput.value = res.content; renderMermaid(); }
-                    else alert('Open failed: ' + (res.error || res.method));
-                });
-            }
 
             // --- Event Listeners ---
             codeInput.addEventListener('input', renderMermaid);

@@ -1,7 +1,7 @@
 (function(){
   document.addEventListener('DOMContentLoaded', () => {
     if (window.AppShell) {
-      AppShell.init({ appId: 'api-key-manager', title: 'API Key Manager' });
+      
     }
     const keys = (window.getAllApiKeys && window.getAllApiKeys()) || {};
 

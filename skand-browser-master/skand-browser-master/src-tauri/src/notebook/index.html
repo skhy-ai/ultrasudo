@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <script src="../desktop/app-shell.js"></script>
+    
     <script src="../desktop/file-helper.js"></script>
     <div class="app-layout">
         <aside class="sidebar">
@@ -114,7 +114,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.AppShell) {
-                AppShell.init({ appId: 'notebook', title: 'Notebook', showSave: true, showOpen: true });
+                
                 AppShell.onSave(async () => {
                     const html = window.Notebook ? window.Notebook.serialize() : (document.getElementById('editor').innerHTML || '');
                     await FileHelper.saveText('notes.html', html);
@@ -132,11 +132,7 @@
             }
         });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AppShell) AppShell.init({ appId: 'notebook', title: 'Notebook', showSave: true, showOpen: true });
-        });
-    </script>
+    
 </body>
 
 </html>

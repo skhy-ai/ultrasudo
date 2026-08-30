@@ -3,7 +3,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (window.AppShell) {
-      AppShell.init({ appId: 'patent-researcher', title: 'Patent Researcher' });
+      
     }
     $('test-api').addEventListener('click', testApi);
     $('search').addEventListener('click', onSearch);

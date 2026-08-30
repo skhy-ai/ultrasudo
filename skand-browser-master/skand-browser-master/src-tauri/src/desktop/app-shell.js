@@ -1,5 +1,5 @@
 // App Shell: Shared top bar for all apps
-// Usage: include this file and call AppShell.init({ appId: 'timer', title: 'Timer', showOpen: true, showSave: true })
+// Usage: include this file and call 
 
 const AppShell = (() => {
   const state = { appId: '', title: document.title || 'App', showOpen: false, showSave: false };

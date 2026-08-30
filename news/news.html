@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultrasudo — News Feed</title>
+    <title>Ultrasudo — RSS News Reader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,15 +12,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --bg-darker: #020617;
-            --header-bg: rgba(30, 41, 59, 0.85);
-            --card-bg: rgba(30, 41, 59, 0.6);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #0b0f19;
+            --bg-darker: #05070e;
+            --header-bg: rgba(15, 23, 42, 0.85);
+            --card-bg: rgba(30, 41, 59, 0.5);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover: rgba(51, 65, 85, 0.7);
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.4);
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --accent-glow: rgba(59, 130, 246, 0.35);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --font-main: 'Inter', -apple-system, sans-serif;
         }
 
@@ -46,25 +51,29 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 24px;
+            padding: 12px 24px;
             background: var(--header-bg);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--card-border);
             gap: 16px;
             flex-shrink: 0;
+            z-index: 10;
         }
 
         .news-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-color);
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
         }
 
         .news-brand i {
-            color: var(--accent);
+            -webkit-text-fill-color: #3b82f6;
         }
 
         .news-header-controls {
@@ -74,17 +83,53 @@
             flex-wrap: wrap;
         }
 
-        select, input {
-            padding: 8px 12px;
-            background: rgba(15, 23, 42, 0.8);
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .search-box input {
+            padding: 8px 12px 8px 34px;
+            width: 220px;
+            background: rgba(15, 23, 42, 0.9);
             border: 1px solid var(--card-border);
             border-radius: 8px;
             color: var(--text-color);
             font-size: 0.88rem;
             outline: none;
+            transition: all 0.2s ease;
         }
 
-        select:focus, input:focus {
+        .search-box input:focus {
+            border-color: var(--accent);
+            width: 260px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        select, input, button {
+            font-family: inherit;
+        }
+
+        select {
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
             border-color: var(--accent);
         }
 
@@ -96,7 +141,7 @@
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             padding: 8px 14px;
             background: rgba(51, 65, 85, 0.5);
             border: 1px solid var(--card-border);
@@ -109,9 +154,50 @@
         }
 
         .btn:hover {
-            background: var(--accent);
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent);
             color: #fff;
             box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            border: none;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Sync Status Badge */
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .sync-badge i {
+            font-size: 0.65rem;
         }
 
         /* Layout Main */
@@ -121,9 +207,9 @@
             overflow: hidden;
         }
 
-        /* Category Sidebar */
+        /* Sidebar */
         .news-sidebar {
-            width: 220px;
+            width: 230px;
             background: rgba(15, 23, 42, 0.95);
             border-right: 1px solid var(--card-border);
             padding: 16px 12px;
@@ -139,15 +225,14 @@
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 6px 10px;
-            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+            padding: 8px 10px 4px 10px;
         }
 
         .cat-nav-btn {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
             padding: 10px 12px;
             border-radius: 8px;
             background: transparent;
@@ -160,6 +245,12 @@
             transition: all 0.2s ease;
         }
 
+        .cat-nav-btn div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .cat-nav-btn:hover {
             background: rgba(255, 255, 255, 0.06);
             color: var(--text-color);
@@ -169,62 +260,158 @@
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
             font-weight: 600;
+            border-left: 3px solid var(--accent);
         }
 
-        /* News Cards Container */
+        .cat-count {
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Content Main */
         .news-content-main {
             flex: 1;
-            padding: 24px;
+            padding: 20px 24px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
+        /* Source Pills Bar */
+        .source-pills-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+        }
+
+        .source-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--card-border);
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .source-pill:hover {
+            border-color: var(--accent);
+            color: var(--text-color);
+        }
+
+        .source-pill.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* News Cards Container */
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
 
         .news-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 18px;
+            border-radius: 14px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.2s ease;
+            transition: all 0.25 ease;
             text-decoration: none;
             color: inherit;
+            position: relative;
         }
 
         .news-card:hover {
-            background: rgba(51, 65, 85, 0.6);
-            border-color: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+            background: var(--card-hover);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        }
+
+        .news-card-img-container {
+            width: 100%;
+            height: 160px;
+            background: #1e293b;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .news-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .news-card:hover .news-card-img {
+            transform: scale(1.05);
+        }
+
+        .news-card-fallback-img {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 3rem;
+        }
+
+        .news-card-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card-header-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .news-badge {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             padding: 3px 8px;
             border-radius: 6px;
-            background: rgba(59, 130, 246, 0.2);
+            background: rgba(59, 130, 246, 0.18);
             color: #60a5fa;
-            margin-bottom: 10px;
+            letter-spacing: 0.03em;
+        }
+
+        .news-pubdate {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         .news-card-title {
-            font-size: 1.02rem;
+            font-size: 1.05rem;
             font-weight: 600;
             line-height: 1.4;
             color: var(--text-color);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -232,44 +419,260 @@
         }
 
         .news-card-snippet {
-            font-size: 0.85rem;
+            font-size: 0.86rem;
             color: var(--text-muted);
-            line-height: 1.45;
-            margin-bottom: 12px;
+            line-height: 1.5;
+            margin-bottom: 14px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            flex: 1;
         }
 
         .news-card-footer {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 10px;
+            padding-top: 12px;
+            margin-top: auto;
         }
 
         .news-source {
             font-weight: 600;
             color: #60a5fa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .loading-box, .empty-box {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.05rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .loading-spinner {
+            font-size: 2.2rem;
+            color: var(--accent);
         }
 
         .pagination-bar {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+            padding: 12px;
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            background: rgba(30, 41, 59, 0.5);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-color);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feed-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .feed-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 8px;
             gap: 12px;
-            margin-top: 16px;
+        }
+
+        .feed-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .feed-item-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .feed-item-url {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .add-feed-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--card-border);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .add-feed-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-feed-inputs input[type="url"] {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .test-feed-status {
+            font-size: 0.82rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .test-feed-status.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .test-feed-status.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
         }
     </style>
 </head>
@@ -278,13 +681,20 @@
     <header class="news-app-header">
         <div class="news-brand">
             <i class="fas fa-newspaper"></i>
-            <span>Ultrasudo RSS News</span>
+            <span>Ultrasudo News</span>
         </div>
 
         <div class="news-header-controls">
-            <input type="text" id="news-search" placeholder="Search headlines..." oninput="renderNews()">
-            
-            <select id="country-select" onchange="loadFeed()">
+            <div class="sync-badge" id="sync-badge" title="Preferences synced with Supabase Cloud">
+                <i class="fas fa-cloud"></i> Synced
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="news-search" placeholder="Search articles..." oninput="filterAndRenderNews()">
+            </div>
+
+            <select id="country-select" onchange="changeCountry(this.value)">
                 <option value="US">🇺🇸 United States</option>
                 <option value="IN">🇮🇳 India</option>
                 <option value="GB">🇬🇧 United Kingdom</option>
@@ -292,27 +702,67 @@
                 <option value="CA">🇨🇦 Canada</option>
             </select>
 
-            <button class="btn" onclick="loadFeed()"><i class="fas fa-rotate"></i> Refresh</button>
+            <button class="btn" onclick="openManageFeedsModal()"><i class="fas fa-sliders"></i> Manage Feeds</button>
+            <button class="btn btn-primary" onclick="loadCategoryFeeds()"><i class="fas fa-rotate"></i> Refresh</button>
         </div>
     </header>
 
     <div class="news-app-body">
         <aside class="news-sidebar">
             <div class="sidebar-title">Categories</div>
-            <button class="cat-nav-btn active" data-cat="general" onclick="selectCategory('general', this)"><i class="fas fa-globe"></i> General</button>
-            <button class="cat-nav-btn" data-cat="business" onclick="selectCategory('business', this)"><i class="fas fa-briefcase"></i> Business</button>
-            <button class="cat-nav-btn" data-cat="tech" onclick="selectCategory('tech', this)"><i class="fas fa-microchip"></i> Technology</button>
-            <button class="cat-nav-btn" data-cat="science" onclick="selectCategory('science', this)"><i class="fas fa-flask"></i> Science</button>
-            <button class="cat-nav-btn" data-cat="sports" onclick="selectCategory('sports', this)"><i class="fas fa-football"></i> Sports</button>
-            <button class="cat-nav-btn" data-cat="entertainment" onclick="selectCategory('entertainment', this)"><i class="fas fa-film"></i> Entertainment</button>
-            <button class="cat-nav-btn" data-cat="health" onclick="selectCategory('health', this)"><i class="fas fa-heart-pulse"></i> Health</button>
+            <button class="cat-nav-btn active" data-cat="general" onclick="selectCategory('general', this)">
+                <div><i class="fas fa-globe"></i> General</div>
+                <span class="cat-count" id="count-general">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="business" onclick="selectCategory('business', this)">
+                <div><i class="fas fa-briefcase"></i> Business</div>
+                <span class="cat-count" id="count-business">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="tech" onclick="selectCategory('tech', this)">
+                <div><i class="fas fa-microchip"></i> Technology</div>
+                <span class="cat-count" id="count-tech">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="science" onclick="selectCategory('science', this)">
+                <div><i class="fas fa-flask"></i> Science</div>
+                <span class="cat-count" id="count-science">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="sports" onclick="selectCategory('sports', this)">
+                <div><i class="fas fa-football"></i> Sports</div>
+                <span class="cat-count" id="count-sports">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="entertainment" onclick="selectCategory('entertainment', this)">
+                <div><i class="fas fa-film"></i> Entertainment</div>
+                <span class="cat-count" id="count-entertainment">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="health" onclick="selectCategory('health', this)">
+                <div><i class="fas fa-heart-pulse"></i> Health</div>
+                <span class="cat-count" id="count-health">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="gaming" onclick="selectCategory('gaming', this)">
+                <div><i class="fas fa-gamepad"></i> Gaming</div>
+                <span class="cat-count" id="count-gaming">-</span>
+            </button>
+            <button class="cat-nav-btn" data-cat="politics" onclick="selectCategory('politics', this)">
+                <div><i class="fas fa-landmark"></i> Politics</div>
+                <span class="cat-count" id="count-politics">-</span>
+            </button>
         </aside>
 
         <main class="news-content-main">
-            <div id="news-container">
-                <div class="loading-box"><i class="fas fa-circle-notch fa-spin"></i> Fetching latest RSS headlines...</div>
+            <!-- Source Pills Bar -->
+            <div class="source-pills-bar" id="source-pills-bar">
+                <!-- Populated dynamically -->
             </div>
 
+            <!-- Articles grid -->
+            <div id="news-container">
+                <div class="loading-box">
+                    <i class="fas fa-circle-notch fa-spin loading-spinner"></i>
+                    <span>Aggregating news from subscribed RSS feeds...</span>
+                </div>
+            </div>
+
+            <!-- Pagination Bar -->
             <div class="pagination-bar">
                 <button class="btn" id="prev-btn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Previous</button>
                 <span id="page-num" style="font-weight:600; font-size:0.9rem;">Page 1</span>
@@ -321,103 +771,455 @@
         </main>
     </div>
 
+    <!-- Manage Feeds Modal -->
+    <div class="modal-overlay" id="feeds-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-sliders" style="color:var(--accent)"></i>
+                    <span>Manage RSS Sources & Preferences</span>
+                </div>
+                <button class="modal-close" onclick="closeManageFeedsModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="feed-section-title">Subscribed Sources for <span id="modal-cat-name" style="color:var(--text-color)">General</span></div>
+                    <div id="modal-preset-sources-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <div>
+                    <div class="feed-section-title">Custom RSS / Atom Feeds</div>
+                    <div id="modal-custom-sources-list">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div class="add-feed-form">
+                        <div style="font-size:0.86rem; font-weight:600;">Add Custom RSS Feed URL</div>
+                        <div class="add-feed-inputs">
+                            <input type="url" id="custom-feed-url" placeholder="https://example.com/rss.xml">
+                            <select id="custom-feed-category">
+                                <option value="general">General</option>
+                                <option value="business">Business</option>
+                                <option value="tech">Technology</option>
+                                <option value="science">Science</option>
+                                <option value="sports">Sports</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="health">Health</option>
+                                <option value="gaming">Gaming</option>
+                                <option value="politics">Politics</option>
+                            </select>
+                        </div>
+                        <div id="test-feed-status" class="test-feed-status"></div>
+                        <div style="display:flex; gap:10px; justify-content:flex-end;">
+                            <button class="btn" onclick="testCustomFeed()"><i class="fas fa-vial"></i> Test Feed</button>
+                            <button class="btn btn-primary" onclick="addCustomFeed()"><i class="fas fa-plus"></i> Add Feed</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../desktop/data-manager.js"></script>
     <script src="rss_sources.js"></script>
     <script>
+        // State variables
         let currentCategory = 'general';
+        let currentCountry = 'US';
+        let activeSourceFilter = 'ALL';
         let allArticles = [];
         let currentPage = 1;
         const pageSize = 9;
 
-        const FALLBACK_ARTICLES = [
-            {
-                title: "Decentralized Personal OS Architectures Gain Widespread Adoption",
-                snippet: "Security-focused personal computing platforms integrating Post-Quantum Cryptography and localized data managers gain momentum.",
-                link: "https://news.ycombinator.com",
-                source: "Tech Security News",
-                pubDate: "Just now",
-                category: "tech"
-            },
-            {
-                title: "Global Tech Sector Shows Strong Quarterly Growth",
-                snippet: "Innovations in client-side storage, WebAssembly, and edge AI processing drive efficiency improvements across developer ecosystems.",
-                link: "https://news.google.com",
-                source: "Global Tech Insider",
-                pubDate: "15m ago",
-                category: "business"
-            },
-            {
-                title: "Next-Generation Web Standards Enhance Browser Multi-Tasking",
-                snippet: "Modern web standards enable zero-friction local storage synchronization across web desktop suites.",
-                link: "https://bbc.com",
-                source: "World News Daily",
-                pubDate: "1h ago",
-                category: "general"
-            }
-        ];
+        // User Preferences Structure stored via window.dataManager under 'news_preferences'
+        let userPrefs = {
+            country: 'US',
+            disabledSources: {}, // { feedUrl: true }
+            customFeeds: {}      // { category: [ { url, title } ] }
+        };
 
+        // --- Data Manager & Preferences ---
+        function initPreferences() {
+            let loaded = null;
+            if (window.dataManager && typeof window.dataManager.getData === 'function') {
+                loaded = window.dataManager.getData('news_preferences');
+            } else if (window.parent && window.parent.dataManager) {
+                loaded = window.parent.dataManager.getData('news_preferences');
+            }
+
+            if (loaded && typeof loaded === 'object') {
+                userPrefs = {
+                    country: loaded.country || 'US',
+                    disabledSources: loaded.disabledSources || {},
+                    customFeeds: loaded.customFeeds || {}
+                };
+            }
+
+            currentCountry = userPrefs.country || 'US';
+            document.getElementById('country-select').value = currentCountry;
+        }
+
+        function saveUserPreferences() {
+            userPrefs.country = currentCountry;
+            if (window.dataManager && typeof window.dataManager.setData === 'function') {
+                window.dataManager.setData('news_preferences', userPrefs, 'news');
+            } else if (window.parent && window.parent.dataManager) {
+                window.parent.dataManager.setData('news_preferences', userPrefs, 'news');
+            }
+            
+            const badge = document.getElementById('sync-badge');
+            if (badge) {
+                badge.style.opacity = '1';
+                badge.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Saved';
+                setTimeout(() => {
+                    badge.innerHTML = '<i class="fas fa-cloud"></i> Synced';
+                }, 2000);
+            }
+        }
+
+        function changeCountry(countryCode) {
+            currentCountry = countryCode;
+            saveUserPreferences();
+            loadCategoryFeeds();
+        }
+
+        // --- Client-Side RSS XML Parsing Engine ---
+        async function fetchFeedRaw(feedUrl) {
+            // Step 1: Direct fetch with XML headers
+            try {
+                const directRes = await fetch(feedUrl, {
+                    headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' }
+                });
+                if (directRes.ok) {
+                    const text = await directRes.text();
+                    if (text && (text.includes('<rss') || text.includes('<feed') || text.includes('<xml'))) {
+                        return text;
+                    }
+                }
+            } catch (e) {
+                // Direct fetch blocked by CORS or mixed content
+            }
+
+            // Step 2: AllOrigins CORS Proxy
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+                const res = await fetch(proxyUrl);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.contents) return data.contents;
+                }
+            } catch (e) { }
+
+            // Step 3: CodeTab CORS Proxy
+            try {
+                const codeTabUrl = `https://api.codetab.org/v1/proxy?quest=${encodeURIComponent(feedUrl)}`;
+                const res = await fetch(codeTabUrl);
+                if (res.ok) {
+                    const text = await res.text();
+                    if (text && text.length > 20) return text;
+                }
+            } catch (e) { }
+
+            throw new Error(`Could not fetch RSS feed from ${feedUrl}`);
+        }
+
+        function parseXmlFeed(xmlString, feedUrl) {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlString, 'text/xml');
+            
+            // Extract feed domain / source title
+            let feedTitle = '';
+            const channelTitle = xml.querySelector('channel > title, feed > title');
+            if (channelTitle) feedTitle = channelTitle.textContent.trim();
+            if (!feedTitle) {
+                try {
+                    feedTitle = new URL(feedUrl).hostname.replace('www.', '');
+                } catch(e) {
+                    feedTitle = 'RSS Source';
+                }
+            }
+
+            const articles = [];
+
+            // Case A: RSS 2.0 / RDF (<item>)
+            const items = xml.querySelectorAll('item');
+            if (items && items.length > 0) {
+                items.forEach(item => {
+                    const title = item.querySelector('title')?.textContent?.trim() || 'Untitled';
+                    const link = item.querySelector('link')?.textContent?.trim() || item.querySelector('guid')?.textContent?.trim() || '#';
+                    
+                    let description = item.querySelector('description')?.textContent || item.querySelector('content\\:encoded')?.textContent || '';
+                    
+                    // Extract image thumbnail from media tags or html description
+                    let imageUrl = item.querySelector('media\\:content, content')?.getAttribute('url') ||
+                                   item.querySelector('enclosure[type^="image"]')?.getAttribute('url') ||
+                                   item.querySelector('itunes\\:image')?.getAttribute('href') || null;
+
+                    if (!imageUrl && description) {
+                        const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+                        if (imgMatch) imageUrl = imgMatch[1];
+                    }
+
+                    // Strip HTML tags for snippet
+                    const cleanSnippet = description.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+                    const snippet = cleanSnippet.length > 180 ? cleanSnippet.substring(0, 180) + '...' : cleanSnippet;
+
+                    // Publication date
+                    const rawDate = item.querySelector('pubDate')?.textContent || item.querySelector('dc\\:date')?.textContent || '';
+                    const timestamp = rawDate ? new Date(rawDate).getTime() : Date.now();
+
+                    articles.push({
+                        title,
+                        link,
+                        snippet,
+                        imageUrl,
+                        source: feedTitle,
+                        feedUrl,
+                        pubDate: formatRelTime(timestamp),
+                        timestamp: isNaN(timestamp) ? Date.now() : timestamp,
+                        category: currentCategory
+                    });
+                });
+                return articles;
+            }
+
+            // Case B: Atom (<entry>)
+            const entries = xml.querySelectorAll('entry');
+            if (entries && entries.length > 0) {
+                entries.forEach(entry => {
+                    const title = entry.querySelector('title')?.textContent?.trim() || 'Untitled';
+                    
+                    let link = '#';
+                    const linkEl = entry.querySelector('link[rel="alternate"]') || entry.querySelector('link');
+                    if (linkEl) link = linkEl.getAttribute('href') || linkEl.textContent;
+
+                    let description = entry.querySelector('summary')?.textContent || entry.querySelector('content')?.textContent || '';
+                    
+                    let imageUrl = entry.querySelector('media\\:content')?.getAttribute('url') ||
+                                   entry.querySelector('link[rel="enclosure"]')?.getAttribute('href') || null;
+
+                    if (!imageUrl && description) {
+                        const imgMatch = description.match(/<img[^>]+src=["']([^"']+)["']/i);
+                        if (imgMatch) imageUrl = imgMatch[1];
+                    }
+
+                    const cleanSnippet = description.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+                    const snippet = cleanSnippet.length > 180 ? cleanSnippet.substring(0, 180) + '...' : cleanSnippet;
+
+                    const rawDate = entry.querySelector('published')?.textContent || entry.querySelector('updated')?.textContent || '';
+                    const timestamp = rawDate ? new Date(rawDate).getTime() : Date.now();
+
+                    articles.push({
+                        title,
+                        link,
+                        snippet,
+                        imageUrl,
+                        source: feedTitle,
+                        feedUrl,
+                        pubDate: formatRelTime(timestamp),
+                        timestamp: isNaN(timestamp) ? Date.now() : timestamp,
+                        category: currentCategory
+                    });
+                });
+            }
+
+            return articles;
+        }
+
+        function formatRelTime(timestamp) {
+            if (!timestamp || isNaN(timestamp)) return 'Recently';
+            const diffMs = Date.now() - timestamp;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return new Date(timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+
+        // --- Category Selection & Multi-Feed Aggregation ---
         function selectCategory(cat, btnEl) {
             currentCategory = cat;
+            activeSourceFilter = 'ALL';
             document.querySelectorAll('.cat-nav-btn').forEach(b => b.classList.remove('active'));
             if (btnEl) btnEl.classList.add('active');
             currentPage = 1;
-            loadFeed();
+            loadCategoryFeeds();
         }
 
-        async function loadFeed() {
-            const container = document.getElementById('news-container');
-            container.innerHTML = '<div class="loading-box"><i class="fas fa-circle-notch fa-spin"></i> Fetching latest RSS headlines...</div>';
-
-            const country = document.getElementById('country-select').value;
-            let targetUrl = null;
-
-            if (window.RSS_SOURCES && window.RSS_SOURCES[country] && window.RSS_SOURCES[country][currentCategory]) {
-                const urls = window.RSS_SOURCES[country][currentCategory];
-                if (urls && urls.length > 0) {
-                    targetUrl = urls[Math.floor(Math.random() * urls.length)];
-                }
-            }
-
-            if (targetUrl) {
-                try {
-                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetUrl)}`;
-                    const res = await fetch(apiUrl);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
-                            allArticles = data.items.map(item => ({
-                                title: item.title,
-                                snippet: item.description ? item.description.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...' : '',
-                                link: item.link,
-                                source: data.feed?.title || 'RSS Feed',
-                                pubDate: item.pubDate ? new Date(item.pubDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today',
-                                category: currentCategory
-                            }));
-                            renderNews();
-                            return;
-                        }
+        function getActiveFeedUrlsForCategory(cat) {
+            const urls = [];
+            // 1. Preset feeds for country & category
+            if (window.RSS_SOURCES && window.RSS_SOURCES[currentCountry] && window.RSS_SOURCES[currentCountry][cat]) {
+                const presets = window.RSS_SOURCES[currentCountry][cat];
+                presets.forEach(url => {
+                    if (!userPrefs.disabledSources[url]) {
+                        urls.push(url);
                     }
-                } catch (e) {
-                    console.warn("Live RSS fetch warning:", e);
-                }
+                });
             }
 
-            allArticles = FALLBACK_ARTICLES;
-            renderNews();
+            // 2. Custom added feeds for category
+            if (userPrefs.customFeeds && userPrefs.customFeeds[cat]) {
+                userPrefs.customFeeds[cat].forEach(feedObj => {
+                    if (!userPrefs.disabledSources[feedObj.url]) {
+                        urls.push(feedObj.url);
+                    }
+                });
+            }
+
+            return urls;
         }
 
-        function renderNews() {
+        async function loadCategoryFeeds() {
+            const container = document.getElementById('news-container');
+            container.innerHTML = `
+                <div class="loading-box">
+                    <i class="fas fa-circle-notch fa-spin loading-spinner"></i>
+                    <span>Aggregating news from subscribed RSS feeds...</span>
+                </div>
+            `;
+
+            const activeUrls = getActiveFeedUrlsForCategory(currentCategory);
+
+            if (activeUrls.length === 0) {
+                allArticles = [];
+                renderSourcePills();
+                container.innerHTML = `
+                    <div class="empty-box">
+                        <i class="fas fa-rss-slash" style="font-size:2.5rem; color:var(--text-muted);"></i>
+                        <div>No active RSS feeds for <strong>${currentCategory}</strong>.</div>
+                        <button class="btn btn-primary" onclick="openManageFeedsModal()"><i class="fas fa-plus"></i> Enable or Add Feeds</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Concurrently fetch all active RSS sources
+            const fetchPromises = activeUrls.map(async (url) => {
+                try {
+                    const rawXml = await fetchFeedRaw(url);
+                    return parseXmlFeed(rawXml, url);
+                } catch (e) {
+                    console.warn(`Failed to load feed ${url}:`, e);
+                    return [];
+                }
+            });
+
+            const results = await Promise.allSettled(fetchPromises);
+            let combined = [];
+
+            results.forEach(res => {
+                if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+                    combined.push(...res.value);
+                }
+            });
+
+            // Fallback if no live articles retrieved
+            if (combined.length === 0) {
+                combined = [
+                    {
+                        title: "Ultrasudo Personal OS: Client-Side Security Engine Initialized",
+                        snippet: "Post-Quantum Cryptography local storage encryption and client-side RSS multi-feed aggregation active.",
+                        link: "https://github.com",
+                        imageUrl: null,
+                        source: "Ultrasudo System",
+                        pubDate: "Just now",
+                        timestamp: Date.now(),
+                        category: currentCategory
+                    }
+                ];
+            }
+
+            // Deduplicate by title
+            const seenTitles = new Set();
+            allArticles = combined.filter(art => {
+                const norm = art.title.toLowerCase().trim();
+                if (seenTitles.has(norm)) return false;
+                seenTitles.add(norm);
+                return true;
+            });
+
+            // Sort chronologically (newest first)
+            allArticles.sort((a, b) => b.timestamp - a.timestamp);
+
+            // Update badge count
+            const countEl = document.getElementById(`count-${currentCategory}`);
+            if (countEl) countEl.textContent = allArticles.length;
+
+            renderSourcePills();
+            filterAndRenderNews();
+        }
+
+        // --- Source Filter Pills Bar ---
+        function renderSourcePills() {
+            const pillsBar = document.getElementById('source-pills-bar');
+            if (!pillsBar) return;
+
+            const sourcesMap = {};
+            allArticles.forEach(art => {
+                sourcesMap[art.source] = (sourcesMap[art.source] || 0) + 1;
+            });
+
+            const sourcesList = Object.keys(sourcesMap);
+            if (sourcesList.length <= 1) {
+                pillsBar.style.display = 'none';
+                return;
+            }
+
+            pillsBar.style.display = 'flex';
+            let html = `
+                <button class="source-pill ${activeSourceFilter === 'ALL' ? 'active' : ''}" onclick="setSourceFilter('ALL')">
+                    All Feeds (${allArticles.length})
+                </button>
+            `;
+
+            sourcesList.forEach(src => {
+                html += `
+                    <button class="source-pill ${activeSourceFilter === src ? 'active' : ''}" onclick="setSourceFilter('${src.replace(/'/g, "\\'")}')">
+                        ${src} (${sourcesMap[src]})
+                    </button>
+                `;
+            });
+
+            pillsBar.innerHTML = html;
+        }
+
+        function setSourceFilter(sourceName) {
+            activeSourceFilter = sourceName;
+            currentPage = 1;
+            renderSourcePills();
+            filterAndRenderNews();
+        }
+
+        // --- Render News Cards & Pagination ---
+        function filterAndRenderNews() {
             const container = document.getElementById('news-container');
             const searchVal = document.getElementById('news-search').value.toLowerCase().trim();
 
             const filtered = allArticles.filter(art => {
-                if (!searchVal) return true;
-                return art.title.toLowerCase().includes(searchVal) || (art.snippet && art.snippet.toLowerCase().includes(searchVal));
+                // Source filter
+                if (activeSourceFilter !== 'ALL' && art.source !== activeSourceFilter) return false;
+                // Search query
+                if (searchVal) {
+                    const matchTitle = art.title.toLowerCase().includes(searchVal);
+                    const matchSnippet = art.snippet && art.snippet.toLowerCase().includes(searchVal);
+                    return matchTitle || matchSnippet;
+                }
+                return true;
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-box">No headlines found matching your search.</div>';
+                container.innerHTML = '<div class="empty-box"><i class="fas fa-search" style="font-size:2rem; color:var(--text-muted);"></i><div>No headlines found matching your search.</div></div>';
+                document.getElementById('page-num').textContent = `Page 0 of 0`;
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
                 return;
             }
 
@@ -429,16 +1231,26 @@
 
             let html = '<div class="news-grid">';
             paged.forEach(item => {
+                const categoryIcon = getCategoryIcon(item.category);
                 html += `
-                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-card" onclick="saveHistory('${item.title.replace(/'/g, "\\'")}')">
-                        <div>
-                            <span class="news-badge">${item.category}</span>
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-card" onclick="trackReadHistory('${item.title.replace(/'/g, "\\'")}')">
+                        <div class="news-card-img-container">
+                            ${item.imageUrl ? 
+                                `<img src="${item.imageUrl}" class="news-card-img" alt="Thumbnail" onerror="this.parentNode.innerHTML='<div class=\\'news-card-fallback-img\\'><i class=\\'fas ${categoryIcon}\\'></i></div>'">` :
+                                `<div class="news-card-fallback-img"><i class="fas ${categoryIcon}"></i></div>`
+                            }
+                        </div>
+                        <div class="news-card-body">
+                            <div class="news-card-header-meta">
+                                <span class="news-badge">${item.category}</span>
+                                <span class="news-pubdate">${item.pubDate}</span>
+                            </div>
                             <h3 class="news-card-title">${item.title}</h3>
                             ${item.snippet ? `<p class="news-card-snippet">${item.snippet}</p>` : ''}
-                        </div>
-                        <div class="news-card-footer">
-                            <span class="news-source">${item.source}</span>
-                            <span>${item.pubDate}</span>
+                            <div class="news-card-footer">
+                                <span class="news-source"><i class="fas fa-rss" style="font-size:0.7rem;"></i> ${item.source}</span>
+                                <span style="color:var(--accent); font-size:0.78rem; font-weight:600;">Read <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i></span>
+                            </div>
                         </div>
                     </a>
                 `;
@@ -453,17 +1265,193 @@
 
         function changePage(delta) {
             currentPage += delta;
-            renderNews();
+            filterAndRenderNews();
+            document.querySelector('.news-content-main').scrollTop = 0;
         }
 
-        function saveHistory(title) {
+        function getCategoryIcon(cat) {
+            const icons = {
+                general: 'fa-globe',
+                business: 'fa-briefcase',
+                tech: 'fa-microchip',
+                science: 'fa-flask',
+                sports: 'fa-football',
+                entertainment: 'fa-film',
+                health: 'fa-heart-pulse',
+                gaming: 'fa-gamepad',
+                politics: 'fa-landmark'
+            };
+            return icons[cat] || 'fa-newspaper';
+        }
+
+        function trackReadHistory(title) {
             if (window.saveAppHistory) {
                 window.saveAppHistory('news', { action: 'read_article', title, timestamp: Date.now() });
             }
         }
 
+        // --- Manage Feeds Modal Logic ---
+        function openManageFeedsModal() {
+            document.getElementById('modal-cat-name').textContent = currentCategory.toUpperCase();
+            renderModalSourcesList();
+            document.getElementById('feeds-modal').classList.add('active');
+        }
+
+        function closeManageFeedsModal() {
+            document.getElementById('feeds-modal').classList.remove('active');
+        }
+
+        function renderModalSourcesList() {
+            // 1. Preset sources
+            const presetContainer = document.getElementById('modal-preset-sources-list');
+            const presets = (window.RSS_SOURCES && window.RSS_SOURCES[currentCountry] && window.RSS_SOURCES[currentCountry][currentCategory]) || [];
+
+            if (presets.length === 0) {
+                presetContainer.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted);">No default presets for this country/category.</div>';
+            } else {
+                let html = '';
+                presets.forEach(url => {
+                    let domain = url;
+                    try { domain = new URL(url).hostname; } catch(e){}
+                    const isEnabled = !userPrefs.disabledSources[url];
+                    html += `
+                        <div class="feed-item-row">
+                            <div class="feed-item-info">
+                                <div class="feed-item-title">${domain}</div>
+                                <div class="feed-item-url">${url}</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleSource('${url.replace(/'/g, "\\'")}', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    `;
+                });
+                presetContainer.innerHTML = html;
+            }
+
+            // 2. Custom sources for category
+            const customContainer = document.getElementById('modal-custom-sources-list');
+            const customs = (userPrefs.customFeeds && userPrefs.customFeeds[currentCategory]) || [];
+
+            if (customs.length === 0) {
+                customContainer.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">No custom feeds added yet.</div>';
+            } else {
+                let html = '';
+                customs.forEach((feedObj, idx) => {
+                    const isEnabled = !userPrefs.disabledSources[feedObj.url];
+                    html += `
+                        <div class="feed-item-row">
+                            <div class="feed-item-info">
+                                <div class="feed-item-title">${feedObj.title || feedObj.url}</div>
+                                <div class="feed-item-url">${feedObj.url}</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleSource('${feedObj.url.replace(/'/g, "\\'")}', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <button class="btn btn-danger" style="padding:4px 8px;" onclick="deleteCustomFeed(${idx})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+                customContainer.innerHTML = html;
+            }
+        }
+
+        function toggleSource(url, isChecked) {
+            if (isChecked) {
+                delete userPrefs.disabledSources[url];
+            } else {
+                userPrefs.disabledSources[url] = true;
+            }
+            saveUserPreferences();
+            loadCategoryFeeds();
+        }
+
+        async function testCustomFeed() {
+            const urlInput = document.getElementById('custom-feed-url');
+            const statusEl = document.getElementById('test-feed-status');
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                statusEl.className = 'test-feed-status error';
+                statusEl.textContent = 'Please enter an RSS / Atom feed URL.';
+                return;
+            }
+
+            statusEl.className = 'test-feed-status';
+            statusEl.style.display = 'block';
+            statusEl.style.background = 'rgba(59, 130, 246, 0.2)';
+            statusEl.style.color = '#60a5fa';
+            statusEl.textContent = 'Testing feed accessibility & XML parsing...';
+
+            try {
+                const xmlRaw = await fetchFeedRaw(url);
+                const items = parseXmlFeed(xmlRaw, url);
+                if (items && items.length > 0) {
+                    statusEl.className = 'test-feed-status success';
+                    statusEl.textContent = `✅ Valid Feed! Discovered ${items.length} articles from "${items[0].source}"`;
+                } else {
+                    statusEl.className = 'test-feed-status error';
+                    statusEl.textContent = '⚠️ Accessible XML, but 0 articles were parsed.';
+                }
+            } catch (e) {
+                statusEl.className = 'test-feed-status error';
+                statusEl.textContent = `❌ Feed test failed: ${e.message}`;
+            }
+        }
+
+        async function addCustomFeed() {
+            const urlInput = document.getElementById('custom-feed-url');
+            const catSelect = document.getElementById('custom-feed-category');
+            const url = urlInput.value.trim();
+            const cat = catSelect.value;
+
+            if (!url) return;
+
+            let title = 'Custom Feed';
+            try {
+                const xmlRaw = await fetchFeedRaw(url);
+                const items = parseXmlFeed(xmlRaw, url);
+                if (items && items.length > 0) title = items[0].source;
+            } catch (e) { }
+
+            if (!userPrefs.customFeeds[cat]) {
+                userPrefs.customFeeds[cat] = [];
+            }
+
+            userPrefs.customFeeds[cat].push({ url, title });
+            saveUserPreferences();
+
+            urlInput.value = '';
+            document.getElementById('test-feed-status').style.display = 'none';
+
+            renderModalSourcesList();
+            if (cat === currentCategory) {
+                loadCategoryFeeds();
+            }
+        }
+
+        function deleteCustomFeed(index) {
+            if (userPrefs.customFeeds[currentCategory]) {
+                userPrefs.customFeeds[currentCategory].splice(index, 1);
+                saveUserPreferences();
+                renderModalSourcesList();
+                loadCategoryFeeds();
+            }
+        }
+
+        // Close modal on outside click
+        document.getElementById('feeds-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeManageFeedsModal();
+        });
+
+        // App Init
         document.addEventListener('DOMContentLoaded', () => {
-            loadFeed();
+            initPreferences();
+            loadCategoryFeeds();
         });
     </script>
 </body>
