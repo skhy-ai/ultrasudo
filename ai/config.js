@@ -40,7 +40,7 @@ const AI_PROVIDERS = {
     openrouter: {
         id: 'openrouter',
         name: 'OpenRouter',
-        model: 'google/gemini-2.0-flash-exp:free',
+        model: 'openrouter/auto',
         endpoint: 'https://openrouter.ai/api/v1/chat/completions',
         modelsEndpoint: 'https://openrouter.ai/api/v1/models',
         type: 'openai',

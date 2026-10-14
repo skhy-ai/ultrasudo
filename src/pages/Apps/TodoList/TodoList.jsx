@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import './TodoList.css';
 
 export default function TodoList({ embedded = false }) {
@@ -8,6 +9,74 @@ export default function TodoList({ embedded = false }) {
     const [dueDate, setDueDate] = useState('');
     const [category, setCategory] = useState('');
     const [score, setScore] = useState(0);
+
+    useAppAgent({
+        appId: 'todo-list',
+        appName: 'To-Do List',
+        getContext: () => ({
+            tasksCount: tasks.length,
+            completedCount: tasks.filter(t => t.checked).length,
+            gamificationScore: score,
+            currentTasks: tasks.map(t => ({ id: t.id, text: t.text, checked: t.checked, dueDate: t.dueDate, category: t.category }))
+        }),
+        suggestedPrompts: [
+            'Prioritize my pending tasks',
+            'Break down launch tasks into 3 checklist items',
+            'Clear all completed tasks'
+        ],
+        actions: [
+            {
+                name: 'add_task',
+                description: 'Add a new task to the todo list',
+                parameters: {
+                    taskText: { type: 'string', description: 'The task title or description' },
+                    dueDate: { type: 'string', description: 'Optional due date in YYYY-MM-DD' },
+                    category: { type: 'string', description: 'Optional category tag' }
+                },
+                handler: ({ taskText, dueDate = '', category = '' }) => {
+                    if (!taskText) throw new Error('Task text is required');
+                    const newTask = {
+                        id: Date.now(),
+                        text: taskText,
+                        dueDate,
+                        category: category.trim(),
+                        checked: false
+                    };
+                    setTasks(prev => {
+                        const updated = [...prev, newTask];
+                        localStorage.setItem("desktop_app_todo_tasks", JSON.stringify({ value: updated }));
+                        return updated;
+                    });
+                    return { success: true, task: newTask };
+                }
+            },
+            {
+                name: 'toggle_task',
+                description: 'Mark a task as completed or incomplete',
+                parameters: {
+                    taskId: { type: 'number', description: 'ID of the task to toggle' }
+                },
+                handler: ({ taskId }) => {
+                    toggleTask(Number(taskId));
+                    return { success: true };
+                }
+            },
+            {
+                name: 'clear_completed',
+                description: 'Clear all finished/completed tasks',
+                parameters: {},
+                isDestructive: true,
+                handler: () => {
+                    setTasks(prev => {
+                        const remaining = prev.filter(t => !t.checked);
+                        localStorage.setItem("desktop_app_todo_tasks", JSON.stringify({ value: remaining }));
+                        return remaining;
+                    });
+                    return { success: true };
+                }
+            }
+        ]
+    });
 
     // Load initial data
     useEffect(() => {

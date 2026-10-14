@@ -1,92 +1,195 @@
 /**
- * APP_REGISTRY — Central definition of all applications in Ultrasudo.
+ * APP_REGISTRY & HUB_REGISTRY — Central definition of all applications in Ultrasudo.
  *
- * Migration Status:
- * - type: 'react'   → Fully migrated to native React component, routed via /app/{id}
- * - type: 'offline' → Legacy HTML/JS app, loaded via /app-view?src=&title= (iframe)
- * - type: 'online'  → External/online web app, loaded via iframe
- * - type: 'hybrid'  → Mix of local + online data, loaded via iframe
- *
- * The DesktopPage uses `buildAppPath(app)` to construct the correct navigation target.
+ * All applications are grouped into consolidated Hubs to eliminate visual clutter
+ * while guaranteeing that NO application is left orphan.
  */
+
+export const HUB_REGISTRY = [
+  {
+    id: 'esg-hub',
+    name: 'ESG & Sustainability Hub',
+    description: 'GHG Scope 1 & 2 emissions inventory, Scope 3 supply chain scorecard, and Green CapEx Solar/Heat-pump ROI.',
+    icon: 'fas fa-leaf',
+    category: 'sme-ops',
+    path: '/app/esg',
+    type: 'react',
+    badge: 'SME Standard',
+    colorGradient: 'linear-gradient(135deg, #10b981, #059669)',
+    subApps: [
+      { id: 'scope1-calc', name: 'Scope 1 Fuel Logs', path: '/app/esg?tab=scope1', icon: 'fas fa-fire-flame-curved' },
+      { id: 'scope2-calc', name: 'Scope 2 Electricity & Grid', path: '/app/esg?tab=scope2', icon: 'fas fa-bolt' },
+      { id: 'scope3-calc', name: 'Scope 3 Supply Chain', path: '/app/esg?tab=scope3', icon: 'fas fa-truck-ramp-box' },
+      { id: 'capex-sim', name: 'Green CapEx & Solar ROI', path: '/app/esg?tab=capex', icon: 'fas fa-solar-panel' }
+    ]
+  },
+  {
+    id: 'bops-hub',
+    name: 'Business Operations & Cash Flow Hub',
+    description: '13-week direct cash runway forecaster, smart invoicing with DSO aging, unit breakeven model, and Wilson EOQ landed cost logistics.',
+    icon: 'fas fa-briefcase',
+    category: 'sme-ops',
+    path: '/app/business-ops',
+    type: 'react',
+    badge: 'Cash Runway',
+    colorGradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+    subApps: [
+      { id: 'cashflow-13w', name: '13-Week Cash Runway', path: '/app/business-ops?tab=cashflow', icon: 'fas fa-calendar-week' },
+      { id: 'dso-invoicing', name: 'Invoicing & DSO Aging', path: '/app/business-ops?tab=invoicing', icon: 'fas fa-receipt' },
+      { id: 'breakeven-model', name: 'Pricing & Breakeven', path: '/app/business-ops?tab=breakeven', icon: 'fas fa-chart-pie' },
+      { id: 'eoq-landed', name: 'EOQ & Landed Logistics', path: '/app/business-ops?tab=eoq', icon: 'fas fa-dolly' }
+    ]
+  },
+  {
+    id: 'legal-compliance-hub',
+    name: 'Legal, HR & Compliance Hub',
+    description: 'Contract risk redliner with standard counter-clauses, fully burdened labor rate calculator, HR policy handbook, and GDPR/cybersecurity audit.',
+    icon: 'fas fa-scale-balanced',
+    category: 'sme-ops',
+    path: '/app/legal-compliance',
+    type: 'react',
+    badge: 'Governance',
+    colorGradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+    subApps: [
+      { id: 'contract-redliner', name: 'Contract & NDA Redliner', path: '/app/legal-compliance?tab=redliner', icon: 'fas fa-pen-fancy' },
+      { id: 'burdened-labor', name: 'Fully Burdened Labor Rate', path: '/app/legal-compliance?tab=labor', icon: 'fas fa-user-clock' },
+      { id: 'hr-handbook', name: 'HR Policy Handbook', path: '/app/legal-compliance?tab=handbook', icon: 'fas fa-book' },
+      { id: 'privacy-audit', name: 'Cyber & GDPR Audit', path: '/app/legal-compliance?tab=privacy', icon: 'fas fa-shield-halved' }
+    ]
+  },
+  {
+    id: 'finance-hub',
+    name: 'Finance & Markets Hub',
+    description: 'Real-time stock ticker, peer-to-peer money transfers, investment portfolio manager, and multi-currency converter.',
+    icon: 'fas fa-chart-line',
+    category: 'finance',
+    path: '/app/finance',
+    type: 'react',
+    badge: 'Wealth & FX',
+    colorGradient: 'linear-gradient(135deg, #0ea5e9, #0369a1)',
+    subApps: [
+      { id: 'stock-ticker', name: 'Stock Ticker & Markets', path: '/app/finance?tab=markets', icon: 'fas fa-chart-candlestick' },
+      { id: 'send-money', name: 'Send & Receive Money', path: '/app/finance?tab=payments', icon: 'fas fa-paper-plane' },
+      { id: 'portfolio-manager', name: 'Portfolio Asset Manager', path: '/app/finance?tab=portfolio', icon: 'fas fa-wallet' },
+      { id: 'currency-converter', name: 'Currency Converter', path: '/app/finance?tab=payments', icon: 'fas fa-money-bill-transfer' }
+    ]
+  },
+  {
+    id: 'productivity-hub',
+    name: 'Productivity & Office Hub',
+    description: 'Unified workspace featuring Kanban boards, task lists, Pomodoro timers, spreadsheet modeling, markdown documentation, and calculators.',
+    icon: 'fas fa-stopwatch',
+    category: 'productivity',
+    path: '/app/productivity',
+    type: 'react',
+    badge: 'Workspace',
+    colorGradient: 'linear-gradient(135deg, #f59e0b, #b45309)',
+    subApps: [
+      { id: 'todo-list', name: 'Tasks & Checklists', path: '/app/productivity?tab=tasks', icon: 'fas fa-list-check' },
+      { id: 'kanban-board', name: 'Kanban Sprint Board', path: '/app/productivity?tab=kanban', icon: 'fas fa-columns' },
+      { id: 'pomodoro-timer', name: 'Pomodoro Focus Timer', path: '/app/productivity?tab=timers', icon: 'fas fa-clock' },
+      { id: 'markdown-editor', name: 'Markdown Docs Editor', path: '/app/markdown-editor', icon: 'fas fa-file-lines' },
+      { id: 'spreadsheet-app', name: 'Spreadsheets', path: '/app/spreadsheet', icon: 'fas fa-table' },
+      { id: 'notebook', name: 'AI Notebook', path: '/app/notebook', icon: 'fas fa-file-word' },
+      { id: 'calculator', name: 'Scientific Calculator', path: '/app/calculator', icon: 'fas fa-calculator' },
+      { id: 'quote-generator', name: 'Quote & Catalog', path: '/app/quote-generator', icon: 'fas fa-quote-left' },
+      { id: 'calendar', name: 'Company Calendar', src: '/calendar/index.html', icon: 'fas fa-calendar-days', type: 'offline' }
+    ]
+  },
+  {
+    id: 'health-hub',
+    name: 'Health & Lifestyle Hub',
+    description: 'Personal and employee wellness, healthy kitchen nutrition planner, guided yoga, symptom diagnostics, grocery organizer, and greeting cards.',
+    icon: 'fas fa-heart-pulse',
+    category: 'lifestyle',
+    path: '/app/health',
+    type: 'react',
+    badge: 'Wellness',
+    colorGradient: 'linear-gradient(135deg, #ec4899, #be185d)',
+    subApps: [
+      { id: 'healthy-kitchen', name: 'Healthy Kitchen & Recipes', path: '/app/health?tab=kitchen', icon: 'fas fa-utensils' },
+      { id: 'yoga', name: 'Guided Yoga & Meditation', path: '/app/health?tab=yoga', icon: 'fas fa-spa' },
+      { id: 'home-diagnostics', name: 'Home Diagnostics', path: '/app/health?tab=diagnostics', icon: 'fas fa-stethoscope' },
+      { id: 'grocery', name: 'Smart Grocery List', path: '/app/grocery', icon: 'fas fa-shopping-basket' },
+      { id: 'birthday-cards', name: 'Birthday & Event Cards', path: '/app/birthday-card', icon: 'fas fa-gift' },
+      { id: 'weather-app', name: 'Weather Forecast', src: '/weather/weather-dashboard.html', icon: 'fas fa-cloud-sun', type: 'online' },
+      { id: 'life-board', name: 'Life Vision Board', src: '/life-board/index.html', icon: 'fas fa-clipboard-user', type: 'hybrid' }
+    ]
+  },
+  {
+    id: 'dev-studio-hub',
+    name: 'Dev Studio & AI Workspace',
+    description: 'Autonomous coding agents, live Mermaid architecture diagrams, Python data science sandbox, and patent research tools.',
+    icon: 'fas fa-code',
+    category: 'development',
+    path: '/code-generator/code-generator.html',
+    type: 'hybrid',
+    badge: 'Engineering',
+    colorGradient: 'linear-gradient(135deg, #6366f1, #4338ca)',
+    subApps: [
+      { id: 'code-generator', name: 'AI Code Generator', src: '/code-generator/code-generator.html', icon: 'fas fa-code', type: 'hybrid', ai: true },
+      { id: 'mermaid-editor', name: 'Mermaid Architecture Editor', src: '/mermaid-editor/mermaid-live-editor.html', icon: 'fas fa-diagram-project', type: 'online' },
+      { id: 'python-ide', name: 'Data Science Workspace', src: '/python-IDE/index.html', icon: 'fas fa-flask-vial', type: 'offline' },
+      { id: 'openfang', name: 'OpenFang AI Agent', src: '/openfang/index.html', icon: 'fas fa-robot', type: 'online', ai: true },
+      { id: 'patent-researcher', name: 'Patent Researcher', src: '/patent-researcher/index.html', icon: 'fas fa-lightbulb', type: 'online', ai: true }
+    ]
+  },
+  {
+    id: 'system-security-hub',
+    name: 'Security, Privacy & Comms Hub',
+    description: 'Post-Quantum safe vault, API key management, encrypted VPN tunnel, P2P calling, and private messaging.',
+    icon: 'fas fa-shield-halved',
+    category: 'system',
+    path: '/app/secure-vault',
+    type: 'react',
+    badge: 'Zero-Trust',
+    colorGradient: 'linear-gradient(135deg, #475569, #1e293b)',
+    subApps: [
+      { id: 'secure-vault', name: 'Secure Password Vault', path: '/app/secure-vault', icon: 'fas fa-vault', type: 'react' },
+      { id: 'api-key-manager', name: 'API Key Manager', src: '/api-key-manager/index.html', icon: 'fas fa-key', type: 'hybrid' },
+      { id: 'pqc-education', name: 'PQC Quantum Shield', src: '/pqc-education/index.html', icon: 'fas fa-shield-halved', type: 'offline' },
+      { id: 'vpn', name: 'Private VPN Tunnel', src: '/vpn/index.html', icon: 'fas fa-shield-virus', type: 'online' },
+      { id: 'p2p-calling', name: 'P2P Encrypted Calling', src: '/p2p-calling/index.html', icon: 'fas fa-phone-volume', type: 'online' },
+      { id: 'community-board', name: 'Community Apps Board', src: '/community/index.html', icon: 'fas fa-users-viewfinder', type: 'offline' },
+      { id: 'social-feed', name: 'Unified Social Feed', src: '/social-feed/index.html', icon: 'fas fa-hashtag', type: 'online' },
+      { id: 'news', name: 'News & Media Feed', src: '/news/news.html', icon: 'fas fa-newspaper', type: 'offline' },
+      { id: 'music', name: 'Offline Music Player', src: '/music/index.html', icon: 'fas fa-music', type: 'offline' }
+    ]
+  }
+];
+
+// Flat list for global search and backwards compatibility
 export const APP_REGISTRY = [
-    // ── Native React Apps (fully migrated) ──────────────────────────────────
-    { id: 'calculator',    name: 'Calculator',         path: '/app/calculator', icon: 'fas fa-calculator',         category: 'utility',       type: 'react' },
-    { id: 'notebook',      name: 'Notebook',           path: '/app/notebook',   icon: 'fas fa-file-word',          category: 'productivity',  type: 'react',   ai: true },
-
-    // ── System ───────────────────────────────────────────────────────────────
-    { id: 'desktop',       name: 'Desktop',            path: '/desktop',        icon: 'fas fa-desktop',            category: 'system',        type: 'react' },
-    // { id: 'web-browser',   name: 'Web Browser',        path: '/browser',        icon: 'fab fa-chrome',             category: 'system',        type: 'react' },
-    { id: 'community-board',name:'Community Apps',     src: '/community/index.html',                             icon: 'fas fa-users-viewfinder', category: 'system',   type: 'offline' },
-    { id: 'p2p-calling',   name: 'P2P Calling',        src: '/p2p-calling/index.html',                            icon: 'fas fa-phone-volume',     category: 'system',   type: 'online' },
-    { id: 'api-key-manager',name:'API Key Manager',    src: '/api-key-manager/index.html',                        icon: 'fas fa-key',              category: 'system',   type: 'hybrid' },
-    { id: 'pqc-education', name: 'PQC Explorer',       src: '/pqc-education/index.html',                          icon: 'fas fa-shield-halved',    category: 'system',   type: 'offline' },
-    { id: 'vpn',           name: 'VPN',                src: '/vpn/index.html',                                    icon: 'fas fa-shield-virus',     category: 'system',   type: 'online' },
-    { id: 'openfang',      name: 'OpenFang AI',        src: '/openfang/index.html',                               icon: 'fas fa-robot',            category: 'system',   type: 'online',  ai: true },
-
-    // ── Productivity ─────────────────────────────────────────────────────────
-    { id: 'productivity-hub', name: 'Productivity Hub', path: '/app/productivity',                             icon: 'fas fa-stopwatch',        category: 'productivity',  type: 'react' },
-    { id: 'todo-list',     name: 'To-Do List',         path: '/app/productivity?tab=tasks',                      icon: 'fas fa-list-check',       category: 'productivity',  type: 'react' },
-    { id: 'kanban-board',  name: 'Kanban Board',       path: '/app/productivity?tab=kanban',                     icon: 'fas fa-columns',          category: 'productivity',  type: 'react' },
-    { id: 'pomodoro-timer',name: 'Pomodoro Timer',     path: '/app/productivity?tab=timers',                     icon: 'fas fa-clock',            category: 'productivity',  type: 'react' },
-    { id: 'timer',          name: 'Timer',              path: '/app/productivity?tab=timers',                     icon: 'fas fa-stopwatch',        category: 'productivity',  type: 'react' },
-    { id: 'markdown-editor', name: 'Markdown Editor', icon: 'fas fa-file-lines', category: 'productivity', type: 'react', path: '/app/markdown-editor' },
-    { id: 'spreadsheet-app',  name: 'Spreadsheets',           path: '/app/spreadsheet',                               icon: 'fas fa-table',              category: 'productivity',  type: 'react'    },
-    { id: 'quote-and-catalog-generator', name: 'Quote & Catalog', path: '/app/quote-generator',                 icon: 'fas fa-quote-left',         category: 'productivity',  type: 'react'    },
-    { id: 'patent-researcher',name: 'Patent Researcher',      src: '/patent-researcher/index.html',                     icon: 'fas fa-lightbulb',          category: 'productivity',  type: 'online',  ai: true },
-    { id: 'calendar',         name: 'Calendar',               src: '/calendar/index.html',                              icon: 'fas fa-calendar-days',      category: 'productivity',  type: 'offline' },
-    { id: 'calendar-sync',    name: 'Calendar Sync',          src: '/calendar/calendar_sync.html',                      icon: 'fas fa-calendar-check',     category: 'productivity',  type: 'online'  },
-    { id: 'life-board',       name: 'Life Board',             src: '/life-board/index.html',                            icon: 'fas fa-clipboard-user',     category: 'lifestyle',     type: 'hybrid'  },
-
-    // ── Development ──────────────────────────────────────────────────────────
-    { id: 'code-generator',  name: 'Code Generator',          src: '/code-generator/code-generator.html',               icon: 'fas fa-code',               category: 'development',   type: 'hybrid',  ai: true },
-    { id: 'mermaid-editor',  name: 'Mermaid Editor',          src: '/mermaid-editor/mermaid-live-editor.html',          icon: 'fas fa-diagram-project',    category: 'development',   type: 'online'  },
-    { id: 'python-ide',      name: 'Data Science Workspace',  src: '/python-IDE/index.html',                            icon: 'fas fa-flask-vial',         category: 'development',   type: 'offline' },
-
-    // ── Finance ──────────────────────────────────────────────────────────────
-    { id: 'finance-hub',       name: 'Finance Hub',            path: '/app/finance',                                     icon: 'fas fa-chart-line',         category: 'finance',       type: 'react'   },
-    { id: 'stock-ticker',     name: 'Stock Ticker',           path: '/app/finance?tab=markets',                         icon: 'fas fa-chart-candlestick',  category: 'finance',       type: 'react'   },
-    { id: 'send-money',       name: 'Send Money',             path: '/app/finance?tab=payments',                        icon: 'fas fa-paper-plane',        category: 'finance',       type: 'react'   },
-    { id: 'portfolio-manager',name: 'Portfolio Manager',      path: '/app/finance?tab=portfolio',                       icon: 'fas fa-briefcase',          category: 'finance',       type: 'react'   },
-    { id: 'currency-converter',name:'Currency Converter',     path: '/app/finance?tab=payments',                        icon: 'fas fa-money-bill-transfer', category: 'finance',      type: 'react'   },
-
-    // ── Entertainment ────────────────────────────────────────────────────────
-    { id: 'news',              name: 'News Feed',             src: '/news/news.html',                                   icon: 'fas fa-newspaper',          category: 'entertainment', type: 'offline' },
-    { id: 'music',             name: 'Music Player',          src: '/music/index.html',                                 icon: 'fas fa-music',              category: 'entertainment', type: 'offline' },
-    // { id: 'galactic-simulator',name: 'Galactic Simulator',   src: '/galactic-simulator/index.html',                    icon: 'fas fa-rocket',             category: 'entertainment', type: 'offline' },
-
-    // ── Lifestyle & Health ───────────────────────────────────────────────────
-    { id: 'health-hub',        name: 'Health & Wellness Hub', path: '/app/health',                                      icon: 'fas fa-heart-pulse',        category: 'lifestyle',     type: 'react'   },
-    { id: 'Healthy-kitchen',   name: 'Healthy Kitchen',       path: '/app/health?tab=kitchen',                          icon: 'fas fa-utensils',           category: 'lifestyle',     type: 'react'   },
-    { id: 'yoga',              name: 'Yoga & Wellness',       path: '/app/health?tab=yoga',                             icon: 'fas fa-spa',                category: 'lifestyle',     type: 'react'   },
-    { id: 'home-diagnostics',  name: 'Home Diagnostics',      path: '/app/health?tab=diagnostics',                      icon: 'fas fa-stethoscope',        category: 'lifestyle',     type: 'react'   },
-    { id: 'weather',           name: 'Weather App',           src: '/weather/weather-dashboard.html',                   icon: 'fas fa-cloud-sun',          category: 'lifestyle',     type: 'online'  },
-    { id: 'social-feed',       name: 'Unified Social Feed',   src: '/social-feed/index.html',                           icon: 'fas fa-hashtag',            category: 'lifestyle',     type: 'online'  },
-    { id: 'whatsapp-web',      name: 'WhatsApp',              src: 'https://web.whatsapp.com',                          icon: 'fab fa-whatsapp',           category: 'lifestyle',     type: 'online'  },
-    { id: 'telegram-web',      name: 'Telegram',              src: 'https://web.telegram.org',                          icon: 'fab fa-telegram',           category: 'lifestyle',     type: 'online'  },
-    { id: 'birthday-card-generator', name: 'Birthday Cards', icon: 'fas fa-gift', category: 'lifestyle', type: 'react', path: '/app/birthday-card' },
-    { id: 'grocery', name: 'Grocery List', icon: 'fas fa-shopping-basket', category: 'productivity', type: 'react', path: '/app/grocery' },
-    { id: 'secure-vault',      name: 'Secure Vault',          path: '/app/secure-vault',                                icon: 'fas fa-vault',              category: 'productivity',  type: 'react'    },
+  ...HUB_REGISTRY.map(hub => ({
+    id: hub.id,
+    name: hub.name,
+    path: hub.path,
+    src: hub.src,
+    icon: hub.icon,
+    category: hub.category,
+    type: hub.type,
+    isHub: true,
+    description: hub.description,
+    subApps: hub.subApps
+  }))
 ];
 
 /**
- * Returns the correct navigation path for a given app entry.
- * - React apps:  route directly to /app/{id} or /desktop etc.
- * - Other apps:  encode into /app-view?src=&title= for iframe loading.
+ * Returns the correct navigation path for any app or subApp entry.
  */
 export function buildAppPath(app) {
-    if (app.type === 'react') {
-        return app.path;
-    }
-    const src = encodeURIComponent(app.src || '');
-    const title = encodeURIComponent(app.name || '');
-    return `/app-view?src=${src}&title=${title}`;
+  if (app.path) {
+    return app.path;
+  }
+  const src = encodeURIComponent(app.src || '');
+  const title = encodeURIComponent(app.name || '');
+  return `/app-view?src=${src}&title=${title}`;
 }
 
 export const getCustomApps = () => {
-    try {
-        return JSON.parse(localStorage.getItem('custom_installed_apps')) || [];
-    } catch {
-        return [];
-    }
+  try {
+    return JSON.parse(localStorage.getItem('custom_installed_apps')) || [];
+  } catch {
+    return [];
+  }
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import './Notebook.css';
 
 const DEFAULT_DOC_TITLE = 'Untitled Document';
@@ -229,6 +230,48 @@ export default function Notebook() {
         document.execCommand('insertHTML', false, formattedText);
         triggerAutoSave();
     };
+
+    useAppAgent({
+        appId: 'notebook',
+        appName: 'Notebook Document Editor',
+        getContext: () => ({
+            documentTitle: docTitle,
+            wordCount: stats.words,
+            characterCount: stats.chars,
+            contentPreview: editorRef.current ? editorRef.current.innerText.slice(0, 1000) : ''
+        }),
+        suggestedPrompts: [
+            'Draft an executive summary of this note',
+            'Improve writing clarity and grammar',
+            'Generate a structured outline for next steps'
+        ],
+        actions: [
+            {
+                name: 'insert_text',
+                description: 'Insert generated formatted text or draft into the active document',
+                parameters: {
+                    content: { type: 'string', description: 'HTML or text content to insert' }
+                },
+                handler: ({ content }) => {
+                    if (!content) throw new Error('Content is required');
+                    insertAiTextToEditor(content);
+                    return { success: true };
+                }
+            },
+            {
+                name: 'set_document_title',
+                description: 'Update the title of the active document',
+                parameters: {
+                    title: { type: 'string', description: 'New document title' }
+                },
+                handler: ({ title }) => {
+                    if (!title) throw new Error('Title is required');
+                    setDocTitle(title);
+                    return { success: true, title };
+                }
+            }
+        ]
+    });
 
     // Calculate editor stats
     const updateStats = useCallback(() => {

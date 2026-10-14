@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ultrasudoLogo from '../../assets/ultrasudo-logo.png';
+import CopilotDrawer from '../shared/CopilotDrawer/CopilotDrawer';
+import { useAppAgent } from '../../hooks/useAppAgent';
 import './AppIframe.css';
 
 /**
@@ -157,10 +159,22 @@ export default function AppIframe({ src, title = 'App', showControls = true }) {
     const iframeRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState(false);
+    const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
     const params = new URLSearchParams(window.location.search);
     const resolvedSrc = src || params.get('src') || '';
     const resolvedTitle = title !== 'App' ? title : (params.get('title') || 'App');
+
+    useAppAgent({
+        appId: resolvedTitle.toLowerCase().replace(/\s+/g, '-'),
+        appName: resolvedTitle,
+        getContext: () => ({ src: resolvedSrc, title: resolvedTitle }),
+        suggestedPrompts: [
+            `Help me use ${resolvedTitle}`,
+            `What can I do in this tool?`,
+            `Summarize key features`
+        ]
+    });
 
     const blockedCfg = getBlockedConfig(resolvedSrc);
 
@@ -198,11 +212,22 @@ export default function AppIframe({ src, title = 'App', showControls = true }) {
                         <img src={ultrasudoLogo} alt="UltraSudo Logo" className="iframe-logo-img" onClick={handleHome} title="UltraSudo Home" />
                     </div>
                     <span className="iframe-title">{resolvedTitle}</span>
-                    {!blockedCfg && (
-                        <button className="iframe-refresh-btn" onClick={handleRefresh} title="Refresh">
-                            <i className="fas fa-rotate-right"></i>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                            className="nav-copilot-btn"
+                            onClick={() => setIsCopilotOpen((v) => !v)}
+                            title="Toggle UltraSudo Copilot (Ctrl+K)"
+                        >
+                            <i className="fas fa-sparkles"></i>
+                            <span>Ask AI</span>
+                            <span className="copilot-kbd">Ctrl+K</span>
                         </button>
-                    )}
+                        {!blockedCfg && (
+                            <button className="iframe-refresh-btn" onClick={handleRefresh} title="Refresh">
+                                <i className="fas fa-rotate-right"></i>
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -240,6 +265,9 @@ export default function AppIframe({ src, title = 'App', showControls = true }) {
                     )}
                 </>
             )}
+
+            {/* Global Copilot Drawer */}
+            <CopilotDrawer isOpen={isCopilotOpen} onClose={() => setIsCopilotOpen(false)} />
         </div>
     );
 }

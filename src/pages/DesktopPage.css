@@ -177,83 +177,250 @@
     min-width: 0;
 }
 
-.apps-section-header {
+.section-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 4px 0 0 0;
+}
+
+.hub-badge-top {
+    font-size: 11px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #c084fc;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.clear-search-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+}
+
+.clear-search-btn:hover {
+    color: #fff;
+}
+
+.sidebar-footer-stat {
+    margin-top: auto;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 11px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Consolidated Hubs Grid ── */
+.hubs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 22px;
+    margin-bottom: 36px;
+}
+
+@media (max-width: 640px) {
+    .hubs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hub-card {
+    background: rgba(30, 41, 59, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+    padding: 22px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.hub-card-header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.hub-icon-wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #ffffff;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.hub-icon-wrapper:hover {
+    transform: scale(1.08);
+}
+
+.hub-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.hub-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hub-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f8fafc;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.hub-title:hover {
+    color: #818cf8;
+}
+
+.hub-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.hub-desc {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.45;
+}
+
+/* ── Sub-Applications Tray ── */
+.hub-subapps-section {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.subapps-tray-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11.5px;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
-.apps-section-header h2 {
-    margin: 0;
-    font-size: 20px;
+.open-hub-btn {
+    background: transparent;
+    border: none;
+    color: #818cf8;
+    font-size: 12px;
     font-weight: 600;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #f8fafc;
+    gap: 5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
 }
 
-.app-count {
-    font-size: 13px;
-    color: #64748b;
+.open-hub-btn:hover {
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.subapps-chips-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.subapp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    font-size: 12px;
     font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
 }
 
-/* App Cards Grid */
+.subapp-chip i {
+    font-size: 12px;
+    color: #94a3b8;
+    transition: color 0.15s ease;
+}
+
+.subapp-chip:hover {
+    background: rgba(51, 65, 85, 0.95);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #f8fafc;
+    transform: translateY(-1px);
+}
+
+.subapp-chip:hover i {
+    color: #818cf8;
+}
+
+.subapp-chip.chip-highlight {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: #818cf8;
+    color: #c7d2fe;
+    font-weight: 600;
+}
+
+.subapp-chip.chip-highlight i {
+    color: #a5b4fc;
+}
+
+/* App Cards Grid (Legacy or Compact mode if needed) */
 .app-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 20px;
-}
-
-.app-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 12px 16px;
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    text-decoration: none;
-    color: #f8fafc;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    box-sizing: border-box;
-    position: relative;
-    overflow: visible;
-}
-
-.app-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    background: rgba(51, 65, 85, 0.8);
-    border-color: rgba(99, 102, 241, 0.4);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-}
-
-.app-card-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.25));
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    color: #818cf8;
-    font-size: 24px;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.app-card:hover .app-card-icon {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: #ffffff;
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
 .app-card-title {

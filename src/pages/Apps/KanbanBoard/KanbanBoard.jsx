@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
 import useLocalStore from '../../../hooks/useLocalStore';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import './KanbanBoard.css';
 
 const DEFAULT_DOC = {
@@ -19,6 +20,69 @@ const DEFAULT_DOC = {
 export default function KanbanBoard({ embedded = false }) {
     const [doc, setDoc] = useLocalStore('kanban_board_data', DEFAULT_DOC);
     const [draggedCardId, setDraggedCardId] = useState(null);
+
+    useAppAgent({
+        appId: 'kanban-board',
+        appName: 'Kanban Board',
+        getContext: () => ({
+            columns: doc.lists.map(l => l.title),
+            totalCards: doc.cards.length,
+            cards: doc.cards.map(c => ({ id: c.id, title: c.title, column: c.listId }))
+        }),
+        suggestedPrompts: [
+            'Add task "Release v1.0" to To Do column',
+            'Summarize board status',
+            'Move all in-progress tasks to Done'
+        ],
+        actions: [
+            {
+                name: 'add_card',
+                description: 'Add a new card/task to a specific Kanban column',
+                parameters: {
+                    title: { type: 'string', description: 'Card title or task description' },
+                    listId: { type: 'string', description: 'Column ID: "todo", "doing", or "done"' }
+                },
+                handler: ({ title, listId = 'todo' }) => {
+                    if (!title) throw new Error('Card title is required');
+                    const newCard = {
+                        id: `card-${Date.now()}`,
+                        title: title.trim(),
+                        listId,
+                        position: Date.now()
+                    };
+                    setDoc(prev => ({
+                        ...prev,
+                        cards: [...prev.cards, newCard]
+                    }));
+                    return { success: true, card: newCard };
+                }
+            },
+            {
+                name: 'move_card',
+                description: 'Move a card to a different column',
+                parameters: {
+                    cardId: { type: 'string', description: 'ID of the card to move' },
+                    targetListId: { type: 'string', description: 'Target column: "todo", "doing", or "done"' }
+                },
+                handler: ({ cardId, targetListId }) => {
+                    moveCard(cardId, targetListId);
+                    return { success: true };
+                }
+            },
+            {
+                name: 'delete_card',
+                description: 'Delete a card from the board',
+                parameters: {
+                    cardId: { type: 'string', description: 'ID of the card to remove' }
+                },
+                isDestructive: true,
+                handler: ({ cardId }) => {
+                    deleteCard(cardId);
+                    return { success: true };
+                }
+            }
+        ]
+    });
 
     const addCard = (listId) => {
         const title = prompt('Enter card title:');

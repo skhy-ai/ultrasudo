@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { APP_REGISTRY, buildAppPath } from '../utils/appRegistry';
+import { HUB_REGISTRY, buildAppPath } from '../utils/appRegistry';
 import { useSystemStore } from '../store/useSystemStore';
 import { ensureDataManagerLoaded } from '../utils/dataManagerBridge';
+import { useAppAgent } from '../hooks/useAppAgent';
+import CopilotDrawer from '../components/shared/CopilotDrawer/CopilotDrawer';
 import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
 import AuthModal from '../components/AuthModal/AuthModal';
 import NewsFeed from '../components/NewsFeed/NewsFeed';
@@ -11,20 +13,45 @@ import './DesktopPage.css';
 
 export default function DesktopPage() {
     const navigate = useNavigate();
-    const { setupComplete, enabledApps, loadFromStorage } = useSystemStore();
+    const { setupComplete, loadFromStorage } = useSystemStore();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isCopilotOpen, setIsCopilotOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState(() => {
         const savedEmail = localStorage.getItem('supabase_user_email');
         return savedEmail ? { email: savedEmail } : null;
     });
 
+    const totalSubApps = HUB_REGISTRY.reduce((acc, h) => acc + (h.subApps?.length || 0), 0);
+
+    useAppAgent({
+        appId: 'desktop',
+        appName: 'UltraSudo Home',
+        getContext: () => ({
+            selectedCategory,
+            totalHubsAvailable: HUB_REGISTRY.length,
+            totalIntegratedSubApps: totalSubApps,
+            searchQuery: searchQuery || undefined
+        }),
+        suggestedPrompts: [
+            'Show me the ESG & Carbon emissions tools',
+            'How do I model our 13-week cash runway?',
+            'What legal and contract redlining features are available?',
+            'Help me plan my workday'
+        ]
+    });
+
+    useEffect(() => {
+        const handleOpenCopilot = () => setIsCopilotOpen(true);
+        window.addEventListener('ultrasudo:open-copilot', handleOpenCopilot);
+        return () => window.removeEventListener('ultrasudo:open-copilot', handleOpenCopilot);
+    }, []);
+
     useEffect(() => {
         loadFromStorage();
         ensureDataManagerLoaded();
 
-        // Check active Supabase session if SDK present
         if (window.supabaseClient) {
             window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
                 if (session && session.user) {
@@ -38,9 +65,9 @@ export default function DesktopPage() {
         if (setupComplete === false) navigate('/wizard');
     }, [setupComplete, navigate]);
 
-    const handleAppClick = (app) => {
-        const appPath = buildAppPath(app);
-        navigate(appPath);
+    const handleLaunch = (target) => {
+        const path = buildAppPath(target);
+        navigate(path);
     };
 
     const handleSignOut = async () => {
@@ -53,53 +80,29 @@ export default function DesktopPage() {
     };
 
     const categories = [
-        { id: 'all',          name: 'All Apps',          icon: 'fas fa-th-large' },
+        { id: 'all',          name: 'All Hubs',         icon: 'fas fa-layer-group' },
+        { id: 'sme-ops',      name: 'SME & Operations', icon: 'fas fa-building-circle-check' },
+        { id: 'finance',      name: 'Finance & Markets',icon: 'fas fa-chart-line' },
         { id: 'productivity', name: 'Productivity',     icon: 'fas fa-briefcase' },
-        { id: 'development',  name: 'Development',      icon: 'fas fa-code' },
-        { id: 'finance',      name: 'Finance',          icon: 'fas fa-chart-line' },
         { id: 'lifestyle',    name: 'Health & Life',    icon: 'fas fa-heart-pulse' },
-        { id: 'entertainment',name: 'Media & Tools',    icon: 'fas fa-icons' },
-        { id: 'system',       name: 'System Utilities', icon: 'fas fa-shield-halved' }
+        { id: 'development',  name: 'Dev & AI Studio',  icon: 'fas fa-code' },
+        { id: 'system',       name: 'Security & Comms', icon: 'fas fa-shield-halved' }
     ];
 
-    const displayApps = APP_REGISTRY.filter(app => {
-        if (app.id === 'desktop') return false;
+    // Filter Hubs: check category and search query (which matches Hub name, description, OR any sub-app)
+    const displayHubs = HUB_REGISTRY.filter(hub => {
+        if (selectedCategory !== 'all' && hub.category !== selectedCategory) return false;
         
-        if (enabledApps && enabledApps.length > 0 && !enabledApps.includes(app.id)) {
-            if (app.category !== 'system' && app.type !== 'react') return false;
-        }
+        if (!searchQuery.trim()) return true;
 
-        if (selectedCategory !== 'all' && app.category !== selectedCategory) return false;
-        if (searchQuery && !app.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        const q = searchQuery.toLowerCase();
+        const matchesHub = hub.name.toLowerCase().includes(q) || hub.description.toLowerCase().includes(q);
+        const matchesSubApp = hub.subApps?.some(sub => sub.name.toLowerCase().includes(q));
 
-        return true;
+        return matchesHub || matchesSubApp;
     });
 
     const activeCatObj = categories.find(c => c.id === selectedCategory) || categories[0];
-
-    /** Returns indicator badge elements for an app */
-    function getIndicators(app) {
-        const indicators = [];
-        const isOffline = app.type === 'react' || app.type === 'offline';
-        const isOnline  = app.type === 'online' || app.type === 'hybrid';
-
-        if (isOffline && !isOnline) {
-            indicators.push(
-                <span key="offline" className="app-indicator offline" title="Works offline">📴</span>
-            );
-        }
-        if (isOnline) {
-            indicators.push(
-                <span key="online" className="app-indicator online" title="Requires internet">🌐</span>
-            );
-        }
-        if (app.ai) {
-            indicators.push(
-                <span key="ai" className="app-indicator ai" title="Uses Generative AI">🤖</span>
-            );
-        }
-        return indicators;
-    }
 
     return (
         <div className="desktop-page-wrapper">
@@ -107,7 +110,8 @@ export default function DesktopPage() {
             <header className="desktop-header">
                 <div className="desktop-brand" onClick={() => navigate('/desktop')} style={{ cursor: 'pointer' }} title="UltraSudo Home">
                     <img src={ultrasudoLogo} alt="UltraSudo Logo" className="desktop-logo-img" />
-                    <span className="brand-name">UltraSudo Home</span>
+                    <span className="brand-name">UltraSudo</span>
+                    <span className="hub-badge-top">Enterprise Hubs</span>
                 </div>
 
                 <div className="search-bar-container">
@@ -115,13 +119,27 @@ export default function DesktopPage() {
                     <input
                         type="text"
                         id="search-bar"
-                        placeholder="Search apps, web, or offline tools..."
+                        placeholder="Search hubs, tools (e.g. 'emissions', 'cashflow', 'redliner', 'kanban')..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    {searchQuery && (
+                        <button className="clear-search-btn" onClick={() => setSearchQuery('')}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    )}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button
+                        className="nav-copilot-btn"
+                        onClick={() => setIsCopilotOpen((v) => !v)}
+                        title="Open UltraSudo Copilot (Ctrl+K)"
+                    >
+                        <i className="fas fa-sparkles"></i>
+                        <span>Ask AI</span>
+                        <span className="copilot-kbd">Ctrl+K</span>
+                    </button>
                     <ThemeSelector />
 
                     {currentUser ? (
@@ -179,7 +197,7 @@ export default function DesktopPage() {
                 {/* Left Category Sidebar */}
                 <aside className="category-sidebar">
                     <div className="sidebar-header">
-                        <span>CATEGORIES</span>
+                        <span>WORKSPACE HUBS</span>
                     </div>
                     <nav className="category-nav">
                         {categories.map(cat => (
@@ -193,41 +211,81 @@ export default function DesktopPage() {
                             </button>
                         ))}
                     </nav>
+
+                    <div className="sidebar-footer-stat">
+                        <i className="fas fa-layer-group"></i>
+                        <span>{HUB_REGISTRY.length} Hubs • {totalSubApps} Tools</span>
+                    </div>
                 </aside>
 
                 {/* Main Content Area */}
                 <main className="desktop-main-area">
                     <div className="apps-section-header">
-                        <h2>
-                            <i className={activeCatObj.icon}></i>
-                            {activeCatObj.name}
-                        </h2>
-                        <span className="app-count">{displayApps.length} apps available</span>
+                        <div>
+                            <h2>
+                                <i className={activeCatObj.icon}></i>
+                                {activeCatObj.name}
+                            </h2>
+                            <p className="section-subtitle">
+                                Focused application suites built for SMEs. No app is left orphan.
+                            </p>
+                        </div>
+                        <span className="app-count">{displayHubs.length} Active Hubs</span>
                     </div>
 
-                    <div className="app-grid">
-                        {displayApps.map(app => (
-                            <a
-                                key={app.id}
-                                href="#"
-                                className="app-card"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleAppClick(app);
-                                }}
-                            >
-                                {/* Connectivity indicators — top-right corner */}
-                                <div className="app-card-indicators">
-                                    {getIndicators(app)}
-                                </div>
+                    {/* Consolidated Hubs Grid */}
+                    <div className="hubs-grid">
+                        {displayHubs.map(hub => {
+                            const isSearchMatch = searchQuery.trim().length > 0;
+                            return (
+                                <div key={hub.id} className="hub-card">
+                                    <div className="hub-card-header">
+                                        <div
+                                            className="hub-icon-wrapper"
+                                            style={{ background: hub.colorGradient || 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}
+                                            onClick={() => handleLaunch(hub)}
+                                        >
+                                            <i className={hub.icon}></i>
+                                        </div>
+                                        <div className="hub-title-block">
+                                            <div className="hub-title-row">
+                                                <h3 className="hub-title" onClick={() => handleLaunch(hub)}>
+                                                    {hub.name}
+                                                </h3>
+                                                {hub.badge && <span className="hub-badge">{hub.badge}</span>}
+                                            </div>
+                                            <p className="hub-desc">{hub.description}</p>
+                                        </div>
+                                    </div>
 
-                                <div className="app-card-icon">
-                                    <i className={app.icon}></i>
+                                    {/* Sub-Applications Tray: All member apps nested cleanly */}
+                                    <div className="hub-subapps-section">
+                                        <div className="subapps-tray-header">
+                                            <span>Integrated Sub-Tools ({hub.subApps?.length || 0}):</span>
+                                            <button className="open-hub-btn" onClick={() => handleLaunch(hub)}>
+                                                Open Full Hub <i className="fas fa-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                        <div className="subapps-chips-grid">
+                                            {hub.subApps?.map(sub => {
+                                                const matchesQuery = isSearchMatch && sub.name.toLowerCase().includes(searchQuery.toLowerCase());
+                                                return (
+                                                    <button
+                                                        key={sub.id}
+                                                        className={`subapp-chip ${matchesQuery ? 'chip-highlight' : ''}`}
+                                                        onClick={() => handleLaunch(sub)}
+                                                        title={`Open ${sub.name}`}
+                                                    >
+                                                        <i className={sub.icon}></i>
+                                                        <span>{sub.name}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
-                                <span className="app-card-title">{app.name}</span>
-                                <span className="app-card-category">{app.category}</span>
-                            </a>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Integrated News Feed Section */}
@@ -242,35 +300,8 @@ export default function DesktopPage() {
                 onAuthSuccess={(user) => setCurrentUser(user)}
             />
 
-            {/* Floating Connectivity Legend */}
-            <ConnectivityLegend />
-        </div>
-    );
-}
-
-/** Floating legend panel — fixed bottom-right */
-function ConnectivityLegend() {
-    const [collapsed, setCollapsed] = useState(false);
-    return (
-        <div className={`connectivity-legend${collapsed ? ' collapsed' : ''}`}>
-            <div className="legend-header" onClick={() => setCollapsed(c => !c)}>
-                <span className="legend-title">App Legend</span>
-                <span className="legend-chevron">{collapsed ? '▲' : '▼'}</span>
-            </div>
-            <div className="legend-body">
-                <div className="legend-row">
-                    <span className="legend-icon offline">📴</span>
-                    <span>Works fully offline</span>
-                </div>
-                <div className="legend-row">
-                    <span className="legend-icon online">🌐</span>
-                    <span>Requires internet</span>
-                </div>
-                <div className="legend-row">
-                    <span className="legend-icon ai">🤖</span>
-                    <span>Uses Generative AI</span>
-                </div>
-            </div>
+            {/* Global Copilot Drawer */}
+            <CopilotDrawer isOpen={isCopilotOpen} onClose={() => setIsCopilotOpen(false)} />
         </div>
     );
 }

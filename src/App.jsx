@@ -28,6 +28,9 @@ import QuoteGenerator from './pages/Apps/QuoteGenerator/QuoteGenerator';
 import FinanceHub from './pages/Apps/FinanceHub/FinanceHub';
 import ProductivityHub from './pages/Apps/ProductivityHub/ProductivityHub';
 import HealthHub from './pages/Apps/HealthHub/HealthHub';
+import EsgHub from './pages/Apps/EsgHub/EsgHub';
+import BusinessOpsHub from './pages/Apps/BusinessOpsHub/BusinessOpsHub';
+import LegalComplianceHub from './pages/Apps/LegalComplianceHub/LegalComplianceHub';
 
 export default function App() {
   return (
@@ -39,7 +42,10 @@ export default function App() {
         <Route path="/desktop" element={<DesktopPage />} />
         <Route path="/browser" element={<BrowserPage />} />
 
-        {/* Native React App Components */}
+        {/* Dedicated Hubs */}
+        <Route path="/app/esg" element={<EsgHub />} />
+        <Route path="/app/business-ops" element={<BusinessOpsHub />} />
+        <Route path="/app/legal-compliance" element={<LegalComplianceHub />} />
         <Route path="/app/finance" element={<FinanceHub />} />
         <Route path="/app/productivity" element={<ProductivityHub />} />
         <Route path="/app/health" element={<HealthHub />} />

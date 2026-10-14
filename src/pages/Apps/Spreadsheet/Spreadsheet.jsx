@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
 import useLocalStore from '../../../hooks/useLocalStore';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import { evaluateFormula, parseCellRef } from './formulaEngine';
 import './Spreadsheet.css';
 
@@ -18,7 +19,54 @@ export default function Spreadsheet() {
     const [tempValue, setTempValue] = useState('');
     const inputRef = useRef(null);
 
-    const activeCell = sheetData[selected.r][selected.c];
+    const activeCell = sheetData[selected.r]?.[selected.c] || { value: '', formula: '' };
+
+    useAppAgent({
+        appId: 'spreadsheet-app',
+        appName: 'Spreadsheet',
+        getContext: () => ({
+            selectedCell: `${colName(selected.c)}${selected.r + 1}`,
+            activeValue: activeCell.value,
+            activeFormula: activeCell.formula || null
+        }),
+        suggestedPrompts: [
+            'Create a monthly personal budget with formulas',
+            'How do I calculate compound interest in this sheet?',
+            'Format column B as currency'
+        ],
+        actions: [
+            {
+                name: 'set_cell',
+                description: 'Set value or formula of a specific cell (e.g. A1, B2)',
+                parameters: {
+                    cellRef: { type: 'string', description: 'Cell reference like A1, B5, C10' },
+                    value: { type: 'string', description: 'Value or formula (starting with =)' }
+                },
+                handler: ({ cellRef, value }) => {
+                    const parsed = parseCellRef(cellRef.toUpperCase());
+                    if (!parsed) throw new Error(`Invalid cell reference "${cellRef}"`);
+                    
+                    setSheetData(prev => {
+                        const copy = [...prev];
+                        const newRow = [...copy[parsed.r]];
+                        if (value.startsWith('=')) {
+                            try {
+                                const result = evaluateFormula(value.substring(1), copy);
+                                newRow[parsed.c] = { formula: value, value: result };
+                            } catch (e) {
+                                newRow[parsed.c] = { formula: value, value: '#ERROR' };
+                            }
+                        } else {
+                            newRow[parsed.c] = { formula: '', value };
+                        }
+                        copy[parsed.r] = newRow;
+                        return copy;
+                    });
+                    return { success: true, cell: cellRef, value };
+                }
+            }
+        ]
+    });
 
     // Handle cell selection
     const selectCell = (r, c) => {

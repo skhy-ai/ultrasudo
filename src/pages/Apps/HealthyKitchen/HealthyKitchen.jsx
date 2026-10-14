@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import { RECIPES } from '../../../data/recipes';
 import './HealthyKitchen.css';
-
 
 export default function HealthyKitchen({ embedded = false }) {
     const [filter, setFilter] = useState({ cuisine: 'all', dietary: [] });
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [cookingStep, setCookingStep] = useState(null); // null means not cooking, or index
-    
+
     const filteredRecipes = useMemo(() => {
         return RECIPES.filter(r => {
             const cuisineMatch = filter.cuisine === 'all' || r.cuisine === filter.cuisine;
@@ -16,6 +16,66 @@ export default function HealthyKitchen({ embedded = false }) {
             return cuisineMatch && dietaryMatch;
         });
     }, [filter]);
+
+    useAppAgent({
+        appId: 'healthy-kitchen',
+        appName: 'Healthy Kitchen',
+        getContext: () => ({
+            selectedRecipe: selectedRecipe ? selectedRecipe.title : null,
+            cookingStep: cookingStep !== null ? cookingStep + 1 : null,
+            totalRecipes: filteredRecipes.length,
+            activeFilters: filter
+        }),
+        suggestedPrompts: [
+            'Suggest a quick high-protein dinner',
+            'Export ingredients to my Grocery List',
+            'Explain nutritional profile of this meal'
+        ],
+        actions: [
+            {
+                name: 'select_recipe',
+                description: 'Select and view a specific recipe',
+                parameters: {
+                    recipeTitle: { type: 'string', description: 'Title of the recipe to select' }
+                },
+                handler: ({ recipeTitle }) => {
+                    const found = RECIPES.find(r => r.title.toLowerCase().includes(recipeTitle.toLowerCase()));
+                    if (found) {
+                        setSelectedRecipe(found);
+                        return { success: true, selected: found.title };
+                    }
+                    throw new Error(`Recipe "${recipeTitle}" not found`);
+                }
+            },
+            {
+                name: 'export_to_grocery',
+                description: 'Export all ingredients of the current recipe to the Smart Grocery List',
+                parameters: {
+                    recipeTitle: { type: 'string', description: 'Optional recipe name' }
+                },
+                handler: ({ recipeTitle }) => {
+                    const target = recipeTitle ? RECIPES.find(r => r.title.toLowerCase().includes(recipeTitle.toLowerCase())) : selectedRecipe;
+                    if (!target || !target.ingredients) throw new Error('No recipe selected with ingredients');
+                    
+                    const storedRaw = localStorage.getItem('smart_shop_list');
+                    let currentList = [];
+                    try { currentList = JSON.parse(storedRaw) || []; } catch (_) {}
+
+                    const newItems = target.ingredients.map(ing => ({
+                        id: Date.now() + Math.random(),
+                        name: ing,
+                        type: 'recipe-ingredient',
+                        gi: 'Low',
+                        color: '#10b981',
+                        checked: false
+                    }));
+
+                    localStorage.setItem('smart_shop_list', JSON.stringify([...currentList, ...newItems]));
+                    return { success: true, addedIngredientsCount: newItems.length };
+                }
+            }
+        ]
+    });
 
     const toggleDietary = (tag) => {
         setFilter(f => ({

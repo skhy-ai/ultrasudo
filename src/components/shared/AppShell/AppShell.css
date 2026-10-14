@@ -118,3 +118,42 @@
     padding: 0;
 }
 
+/* ── Copilot Trigger Button ── */
+.nav-copilot-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #f1f5f9;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-copilot-btn i {
+    color: #a855f7;
+    font-size: 0.9rem;
+}
+
+.nav-copilot-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(168, 85, 247, 0.35));
+    border-color: rgba(168, 85, 247, 0.7);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+    transform: translateY(-1px);
+}
+
+.copilot-kbd {
+    font-size: 0.68rem;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #cbd5e1;
+}
+

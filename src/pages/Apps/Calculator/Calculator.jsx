@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import './Calculator.css';
 
 export default function Calculator() {
@@ -7,6 +8,35 @@ export default function Calculator() {
     const [currentOperand, setCurrentOperand] = useState('');
     const [previousOperand, setPreviousOperand] = useState('');
     const [operation, setOperation] = useState(undefined);
+
+    useAppAgent({
+        appId: 'calculator',
+        appName: 'Calculator & Unit Converter',
+        getContext: () => ({
+            activeTab,
+            currentDisplay: currentOperand || '0',
+            previousOperand,
+            pendingOperation: operation
+        }),
+        suggestedPrompts: [
+            'Calculate 18% tip on an $85 bill',
+            'Convert 75 kilograms to pounds',
+            'Calculate compound growth of $10,000 at 7% over 10 years'
+        ],
+        actions: [
+            {
+                name: 'set_calculator_display',
+                description: 'Set the calculator display to a computed value',
+                parameters: {
+                    value: { type: 'string', description: 'Numeric result to display' }
+                },
+                handler: ({ value }) => {
+                    setCurrentOperand(String(value));
+                    return { success: true, display: String(value) };
+                }
+            }
+        ]
+    });
 
     // Unit Converter State
     const [category, setCategory] = useState('length');

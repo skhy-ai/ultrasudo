@@ -1,14 +1,64 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/shared/AppShell/AppShell';
 import useLocalStore from '../../../hooks/useLocalStore';
+import { useAppAgent } from '../../../hooks/useAppAgent';
 import { GLYCEMIC_FOODS, DELIVERY_SERVICES_BY_COUNTRY } from '../../../data/groceryData';
 import './Grocery.css';
-
 
 export default function Grocery() {
     const [list, setList] = useLocalStore('smart_shop_list', []);
     const [country, setCountry] = useLocalStore('smart_shop_country', 'us');
     const [customItem, setCustomItem] = useState('');
+
+    useAppAgent({
+        appId: 'grocery',
+        appName: 'Smart Grocery List',
+        getContext: () => ({
+            itemsCount: list.length,
+            uncheckedCount: list.filter(i => !i.checked).length,
+            country,
+            items: list.map(i => ({ id: i.id, name: i.name, checked: i.checked, gi: i.gi }))
+        }),
+        suggestedPrompts: [
+            'Add healthy ingredients: Avocados, Greek yogurt, Blueberries',
+            'Suggest low glycemic dinner staples',
+            'Clear all checked grocery items'
+        ],
+        actions: [
+            {
+                name: 'add_grocery_item',
+                description: 'Add an item to the smart grocery shopping list',
+                parameters: {
+                    name: { type: 'string', description: 'Item name' },
+                    type: { type: 'string', description: 'Food category or type' },
+                    gi: { type: 'string', description: 'Glycemic index score (Low, Med, High)' }
+                },
+                handler: ({ name, type = 'general', gi = '?' }) => {
+                    if (!name) throw new Error('Item name is required');
+                    const newItem = {
+                        id: Date.now(),
+                        name: name.trim(),
+                        type,
+                        gi,
+                        color: '#3b82f6',
+                        checked: false
+                    };
+                    setList(prev => [...prev, newItem]);
+                    return { success: true, item: newItem };
+                }
+            },
+            {
+                name: 'clear_checked',
+                description: 'Clear all checked/purchased grocery items',
+                parameters: {},
+                isDestructive: true,
+                handler: () => {
+                    setList(prev => prev.filter(i => !i.checked));
+                    return { success: true };
+                }
+            }
+        ]
+    });
 
     const addItem = (item) => {
         const existing = list.find(x => x.name === item.name);
