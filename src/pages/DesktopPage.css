@@ -416,6 +416,68 @@
     color: #a5b4fc;
 }
 
+/* ── Favorites Pin Buttons ── */
+.hub-fav-star-btn {
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.hub-fav-star-btn:hover {
+    color: #fbbf24;
+    transform: scale(1.15);
+}
+
+.hub-fav-star-btn.is-fav {
+    color: #f59e0b;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+}
+
+.subapp-chip-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.15s ease;
+}
+
+.subapp-chip-wrapper:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.subapp-chip-wrapper .subapp-chip {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding-right: 6px;
+}
+
+.subapp-fav-pin {
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 11px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.subapp-fav-pin:hover {
+    color: #fbbf24;
+    transform: scale(1.15);
+}
+
+.subapp-fav-pin.is-fav {
+    color: #f59e0b;
+}
+
 /* App Cards Grid (Legacy or Compact mode if needed) */
 .app-grid {
     display: grid;

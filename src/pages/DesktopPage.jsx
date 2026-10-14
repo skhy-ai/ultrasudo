@@ -7,13 +7,15 @@ import { useAppAgent } from '../hooks/useAppAgent';
 import CopilotDrawer from '../components/shared/CopilotDrawer/CopilotDrawer';
 import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
 import AuthModal from '../components/AuthModal/AuthModal';
-import NewsFeed from '../components/NewsFeed/NewsFeed';
+import QuickLaunch from '../components/QuickLaunch/QuickLaunch';
+import { useFavorites } from '../hooks/useFavorites';
 import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './DesktopPage.css';
 
 export default function DesktopPage() {
     const navigate = useNavigate();
     const { setupComplete, loadFromStorage } = useSystemStore();
+    const { toggleFavorite, isFavorite } = useFavorites();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -252,7 +254,19 @@ export default function DesktopPage() {
                                                 <h3 className="hub-title" onClick={() => handleLaunch(hub)}>
                                                     {hub.name}
                                                 </h3>
-                                                {hub.badge && <span className="hub-badge">{hub.badge}</span>}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    {hub.badge && <span className="hub-badge">{hub.badge}</span>}
+                                                    <button
+                                                        className={`hub-fav-star-btn ${isFavorite(hub.id) ? 'is-fav' : ''}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleFavorite(hub.id);
+                                                        }}
+                                                        title={isFavorite(hub.id) ? "Remove from Quick Launch" : "Pin to Quick Launch"}
+                                                    >
+                                                        <i className="fas fa-star"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <p className="hub-desc">{hub.description}</p>
                                         </div>
@@ -269,16 +283,28 @@ export default function DesktopPage() {
                                         <div className="subapps-chips-grid">
                                             {hub.subApps?.map(sub => {
                                                 const matchesQuery = isSearchMatch && sub.name.toLowerCase().includes(searchQuery.toLowerCase());
+                                                const isSubFav = isFavorite(sub.id);
                                                 return (
-                                                    <button
-                                                        key={sub.id}
-                                                        className={`subapp-chip ${matchesQuery ? 'chip-highlight' : ''}`}
-                                                        onClick={() => handleLaunch(sub)}
-                                                        title={`Open ${sub.name}`}
-                                                    >
-                                                        <i className={sub.icon}></i>
-                                                        <span>{sub.name}</span>
-                                                    </button>
+                                                    <div key={sub.id} className="subapp-chip-wrapper">
+                                                        <button
+                                                            className={`subapp-chip ${matchesQuery ? 'chip-highlight' : ''}`}
+                                                            onClick={() => handleLaunch(sub)}
+                                                            title={`Open ${sub.name}`}
+                                                        >
+                                                            <i className={sub.icon}></i>
+                                                            <span>{sub.name}</span>
+                                                        </button>
+                                                        <button
+                                                            className={`subapp-fav-pin ${isSubFav ? 'is-fav' : ''}`}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                toggleFavorite(sub.id);
+                                                            }}
+                                                            title={isSubFav ? "Unpin from Quick Launch" : "Pin to Quick Launch"}
+                                                        >
+                                                            <i className="fas fa-star"></i>
+                                                        </button>
+                                                    </div>
                                                 );
                                             })}
                                         </div>
@@ -288,8 +314,8 @@ export default function DesktopPage() {
                         })}
                     </div>
 
-                    {/* Integrated News Feed Section */}
-                    <NewsFeed />
+                    {/* Quick Launch Favourites Tray (Replaces News Rail) */}
+                    <QuickLaunch />
                 </main>
             </div>
 

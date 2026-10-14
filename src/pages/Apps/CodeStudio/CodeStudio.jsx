@@ -1,0 +1,643 @@
+import React, { useState, useMemo } from 'react';
+import AppShell from '../../../components/shared/AppShell/AppShell';
+import { useAppAgent } from '../../../hooks/useAppAgent';
+import useLocalStore from '../../../hooks/useLocalStore';
+import { CODE_PRESETS } from '../../../data/agenticCodeData';
+import './CodeStudio.css';
+
+export default function CodeStudio() {
+  const [selectedPresetId, setSelectedPresetId] = useState('sme-invoicing-app');
+  const [promptText, setPromptText] = useState(CODE_PRESETS[0].prompt);
+  const [activeStage, setActiveStage] = useState('plan'); // plan | architect | structure | sequence | verify | code
+
+  // State with local persistence
+  const [currentProject, setCurrentProject] = useLocalStore('code_studio_active_project', CODE_PRESETS[0]);
+  const [isVerified, setIsVerified] = useLocalStore('code_studio_is_verified', false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedFileIndex, setSelectedFileIndex] = useState(0);
+  const [userVerificationNotes, setUserVerificationNotes] = useState('');
+
+  // Handle Preset Selection
+  const handleSelectPreset = (presetId) => {
+    setSelectedPresetId(presetId);
+    const found = CODE_PRESETS.find(p => p.id === presetId);
+    if (found) {
+      setCurrentProject(found);
+      setPromptText(found.prompt);
+      setIsVerified(false);
+      setActiveStage('plan');
+    }
+  };
+
+  // Trigger Plan & Blueprint Generation
+  const handleGenerateBlueprint = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      // Dynamic generation based on prompt
+      const newProject = {
+        id: `proj-${Date.now()}`,
+        name: promptText.slice(0, 40) || 'Custom Agentic Project',
+        category: 'Custom Project',
+        icon: 'fas fa-laptop-code',
+        prompt: promptText,
+        plan: {
+          overview: `Custom implementation plan for: "${promptText}". Built for high security, offline resilience, and modular performance.`,
+          functionalRequirements: [
+            'Core state management and domain data models.',
+            'Responsive user interface with dark/light theme tokens.',
+            'Direct input validation, error boundaries, and user feedback.',
+            'Local persistence with optional Supabase cloud synchronization.'
+          ],
+          nonFunctionalRequirements: [
+            'Sub-150ms execution latency with client-side reactive caching.',
+            'Zero plain-text logging of sensitive user or payment data.'
+          ],
+          milestones: [
+            { phase: 'Phase 1', task: 'Specification & schema definitions' },
+            { phase: 'Phase 2', task: 'UI Component tree and reactive store' },
+            { phase: 'Phase 3', task: 'End-to-end integration & verification' }
+          ]
+        },
+        architect: {
+          pattern: 'Clean Architecture with Unidirectional State Flow',
+          frontend: 'React 19 + Modular CSS Custom Variables',
+          stateManagement: 'Local-First Hook Architecture (`useLocalStore`)',
+          dataFlow: 'User Events -> Action Handlers -> State Store -> Visual UI Sync',
+          security: 'Client-side data isolation with zero tracking.'
+        },
+        structure: [
+          { path: 'src/App.jsx', type: 'file', desc: 'Main orchestrator and view routing' },
+          { path: 'src/components/MainView.jsx', type: 'file', desc: 'Interactive primary interface and controls' },
+          { path: 'src/utils/engine.js', type: 'file', desc: 'Core logic, state reducers, and calculations' },
+          { path: 'src/styles/theme.css', type: 'file', desc: 'Theme variables and layout system' }
+        ],
+        sequence: {
+          title: 'Custom Workflow Interaction Flow',
+          participants: ['User', 'ReactUI', 'EngineService', 'Storage'],
+          steps: [
+            { from: 'User', to: 'ReactUI', action: 'Submits user action / event' },
+            { from: 'ReactUI', to: 'EngineService', action: 'Validates payload and processes logic' },
+            { from: 'EngineService', to: 'Storage', action: 'Writes verified state to local store' },
+            { from: 'Storage', to: 'ReactUI', action: 'Emits state update notification' },
+            { from: 'ReactUI', to: 'User', action: 'Re-renders updated interface with success confirmation' }
+          ],
+          mermaid: `sequenceDiagram
+    autonumber
+    User->>ReactUI: Trigger Action
+    ReactUI->>EngineService: Execute calculation
+    EngineService->>Storage: Save state
+    Storage-->>ReactUI: Hydrate updated state
+    ReactUI-->>User: Visual feedback`
+        },
+        codeFiles: [
+          {
+            filename: 'src/App.jsx',
+            language: 'jsx',
+            code: `import React, { useState } from 'react';
+import './styles/theme.css';
+
+export default function App() {
+  const [data, setData] = useState([]);
+
+  return (
+    <div className="custom-app-container">
+      <h2>${promptText.slice(0, 35)}</h2>
+      <p>Generated by UltraSudo Agentic Code Studio.</p>
+    </div>
+  );
+}`
+          },
+          {
+            filename: 'src/utils/engine.js',
+            language: 'javascript',
+            code: `// Core Engine Logic
+export function processAction(input) {
+  return {
+    success: true,
+    processedAt: new Date().toISOString(),
+    payload: input
+  };
+}`
+          }
+        ]
+      };
+
+      setCurrentProject(newProject);
+      setIsVerified(false);
+      setIsGenerating(false);
+      setActiveStage('plan');
+    }, 600);
+  };
+
+  // User Verification Handler
+  const handleApproveAndGenerate = () => {
+    setIsVerified(true);
+    setActiveStage('code');
+  };
+
+  // AI Copilot Integration
+  useAppAgent({
+    appId: 'code-studio',
+    appName: 'Agentic Code Developer Studio',
+    getContext: () => ({
+      activeStage,
+      isVerified,
+      projectName: currentProject.name,
+      fileCount: currentProject.structure?.length || 0,
+      codeFilesCount: currentProject.codeFiles?.length || 0
+    }),
+    suggestedPrompts: [
+      'Explain the architectural decisions for this project',
+      'What edge cases are missing from the functional plan?',
+      'Add a sequence step for error handling and fallback',
+      'Approve this blueprint and write the full code files'
+    ],
+    actions: [
+      {
+        name: 'generate_blueprint',
+        description: 'Generate Plan, Architecture, Project Structure, and Sequence Diagram for a prompt',
+        parameters: {
+          prompt: { type: 'string', description: 'Application concept to plan and architect' }
+        },
+        handler: ({ prompt }) => {
+          setPromptText(prompt);
+          handleGenerateBlueprint();
+          return { success: true, message: 'Blueprint generation initiated' };
+        }
+      },
+      {
+        name: 'approve_and_generate_code',
+        description: 'User-verified gateway: approve blueprint and generate code files',
+        parameters: {
+          confirmation: { type: 'boolean', description: 'Confirm all artifacts have been verified' }
+        },
+        handler: ({ confirmation }) => {
+          if (!confirmation) throw new Error('Confirmation must be true to approve code generation');
+          handleApproveAndGenerate();
+          return { success: true, message: 'Blueprint approved. Code files ready.' };
+        }
+      }
+    ]
+  });
+
+  const activeCodeFile = currentProject.codeFiles?.[selectedFileIndex] || currentProject.codeFiles?.[0];
+
+  const handleCopyCode = () => {
+    if (activeCodeFile?.code) {
+      navigator.clipboard.writeText(activeCodeFile.code);
+      alert(`Copied ${activeCodeFile.filename} to clipboard!`);
+    }
+  };
+
+  return (
+    <AppShell title="Agentic Code Developer Studio" icon="fas fa-terminal">
+      <div className="code-studio-container">
+        {/* Top Control Bar: Concept & Preset Selection */}
+        <div className="studio-top-bar">
+          <div className="top-bar-inputs">
+            <div className="preset-selector-group">
+              <label><i className="fas fa-cubes"></i> Presets:</label>
+              <select
+                value={selectedPresetId}
+                onChange={(e) => handleSelectPreset(e.target.value)}
+                className="studio-preset-select"
+              >
+                {CODE_PRESETS.map(p => (
+                  <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="prompt-input-group">
+              <input
+                type="text"
+                value={promptText}
+                onChange={(e) => setPromptText(e.target.value)}
+                placeholder="Describe your application (e.g., 'Real-time WebSocket chat', 'SME Invoicing')..."
+                className="studio-prompt-input"
+              />
+              <button
+                className="studio-gen-btn"
+                onClick={handleGenerateBlueprint}
+                disabled={isGenerating}
+              >
+                {isGenerating ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-wand-magic-sparkles"></i>}
+                <span>Generate Blueprint</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 5-Stage Sequential Verification Ribbon */}
+        <div className="studio-stages-ribbon">
+          <button
+            className={`stage-nav-btn ${activeStage === 'plan' ? 'active' : ''}`}
+            onClick={() => setActiveStage('plan')}
+          >
+            <span className="stage-num">1</span>
+            <div className="stage-meta">
+              <span className="stage-title">Plan</span>
+              <span className="stage-sub">Requirements</span>
+            </div>
+          </button>
+
+          <button
+            className={`stage-nav-btn ${activeStage === 'architect' ? 'active' : ''}`}
+            onClick={() => setActiveStage('architect')}
+          >
+            <span className="stage-num">2</span>
+            <div className="stage-meta">
+              <span className="stage-title">Architect</span>
+              <span className="stage-sub">System Design</span>
+            </div>
+          </button>
+
+          <button
+            className={`stage-nav-btn ${activeStage === 'structure' ? 'active' : ''}`}
+            onClick={() => setActiveStage('structure')}
+          >
+            <span className="stage-num">3</span>
+            <div className="stage-meta">
+              <span className="stage-title">Project Structure</span>
+              <span className="stage-sub">File Tree</span>
+            </div>
+          </button>
+
+          <button
+            className={`stage-nav-btn ${activeStage === 'sequence' ? 'active' : ''}`}
+            onClick={() => setActiveStage('sequence')}
+          >
+            <span className="stage-num">4</span>
+            <div className="stage-meta">
+              <span className="stage-title">Sequence Diagram</span>
+              <span className="stage-sub">Interaction Flow</span>
+            </div>
+          </button>
+
+          <button
+            className={`stage-nav-btn ${activeStage === 'verify' ? 'active' : ''} ${isVerified ? 'verified-done' : 'verification-needed'}`}
+            onClick={() => setActiveStage('verify')}
+          >
+            <span className="stage-num">{isVerified ? '✓' : '5'}</span>
+            <div className="stage-meta">
+              <span className="stage-title">User Verification</span>
+              <span className="stage-sub">{isVerified ? 'Approved' : 'Approval Gate'}</span>
+            </div>
+          </button>
+
+          <button
+            className={`stage-nav-btn ${activeStage === 'code' ? 'active' : ''} ${!isVerified ? 'disabled' : ''}`}
+            onClick={() => {
+              if (isVerified) setActiveStage('code');
+              else alert('Please verify and approve the blueprint in Stage 5 before code generation can be unlocked.');
+            }}
+          >
+            <span className="stage-num"><i className="fas fa-code"></i></span>
+            <div className="stage-meta">
+              <span className="stage-title">Generated Code</span>
+              <span className="stage-sub">{isVerified ? 'Ready to Run' : 'Locked'}</span>
+            </div>
+          </button>
+        </div>
+
+        {/* Stage 1: PLAN */}
+        {activeStage === 'plan' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box">
+              <h3><i className="fas fa-clipboard-list"></i> Stage 1: Functional Plan & Requirements</h3>
+              <p>Thorough specification of problem scope, user journeys, edge cases, and delivery milestones.</p>
+            </div>
+
+            <div className="plan-grid">
+              <div className="studio-card">
+                <h4><i className="fas fa-bullseye"></i> Problem Statement & Goals</h4>
+                <p className="plan-overview">{currentProject.plan.overview}</p>
+
+                <h4 style={{ marginTop: '20px' }}><i className="fas fa-flag-checkered"></i> Delivery Milestones</h4>
+                <div className="milestones-list">
+                  {currentProject.plan.milestones?.map((m, idx) => (
+                    <div key={idx} className="milestone-item">
+                      <span className="milestone-phase">{m.phase}</span>
+                      <span className="milestone-task">{m.task}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="studio-card">
+                <h4><i className="fas fa-list-check"></i> Functional Requirements</h4>
+                <ul className="reqs-list">
+                  {currentProject.plan.functionalRequirements?.map((req, i) => (
+                    <li key={i}>
+                      <i className="fas fa-check-circle req-icon"></i>
+                      <span>{req}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <h4 style={{ marginTop: '20px' }}><i className="fas fa-shield-virus"></i> Non-Functional & Security Constraints</h4>
+                <ul className="reqs-list">
+                  {currentProject.plan.nonFunctionalRequirements?.map((nfr, i) => (
+                    <li key={i}>
+                      <i className="fas fa-lock req-icon lock"></i>
+                      <span>{nfr}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="stage-footer-actions">
+              <button className="studio-btn primary" onClick={() => setActiveStage('architect')}>
+                Next: Review Architecture <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 2: ARCHITECT */}
+        {activeStage === 'architect' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box">
+              <h3><i className="fas fa-sitemap"></i> Stage 2: Architectural Blueprint</h3>
+              <p>System architecture patterns, component boundaries, and security topology.</p>
+            </div>
+
+            <div className="architect-grid">
+              <div className="studio-card">
+                <div className="arch-spec-item">
+                  <span className="spec-lbl">Architectural Pattern</span>
+                  <div className="spec-val highlight">{currentProject.architect.pattern}</div>
+                </div>
+
+                <div className="arch-spec-item">
+                  <span className="spec-lbl">Frontend & Component Stack</span>
+                  <div className="spec-val">{currentProject.architect.frontend}</div>
+                </div>
+
+                <div className="arch-spec-item">
+                  <span className="spec-lbl">State Management Paradigm</span>
+                  <div className="spec-val">{currentProject.architect.stateManagement}</div>
+                </div>
+              </div>
+
+              <div className="studio-card">
+                <div className="arch-spec-item">
+                  <span className="spec-lbl">Data Flow & Reactivity</span>
+                  <div className="spec-val">{currentProject.architect.dataFlow}</div>
+                </div>
+
+                <div className="arch-spec-item">
+                  <span className="spec-lbl">Security & Data Privacy</span>
+                  <div className="spec-val">{currentProject.architect.security}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stage-footer-actions">
+              <button className="studio-btn secondary" onClick={() => setActiveStage('plan')}>
+                <i className="fas fa-arrow-left"></i> Back to Plan
+              </button>
+              <button className="studio-btn primary" onClick={() => setActiveStage('structure')}>
+                Next: Review File Structure <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 3: PROJECT STRUCTURE */}
+        {activeStage === 'structure' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box">
+              <h3><i className="fas fa-folder-tree"></i> Stage 3: Project File Structure & Manifest</h3>
+              <p>Explicit mapping of every source file, module responsibilities, and exports.</p>
+            </div>
+
+            <div className="studio-card file-tree-card">
+              <div className="tree-header-row">
+                <span>File Path</span>
+                <span>Type</span>
+                <span>Purpose & Architecture Role</span>
+              </div>
+              <div className="tree-files-list">
+                {currentProject.structure?.map((item, idx) => (
+                  <div key={idx} className="tree-file-row">
+                    <div className="file-path-col">
+                      <i className={item.type === 'file' ? 'fas fa-file-code' : 'fas fa-folder'}></i>
+                      <code>{item.path}</code>
+                    </div>
+                    <span className="file-type-pill">{item.type}</span>
+                    <span className="file-desc-col">{item.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="stage-footer-actions">
+              <button className="studio-btn secondary" onClick={() => setActiveStage('architect')}>
+                <i className="fas fa-arrow-left"></i> Back to Architecture
+              </button>
+              <button className="studio-btn primary" onClick={() => setActiveStage('sequence')}>
+                Next: Review Sequence Diagram <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 4: SEQUENCE DIAGRAM */}
+        {activeStage === 'sequence' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box">
+              <h3><i className="fas fa-diagram-project"></i> Stage 4: Execution Sequence Diagram</h3>
+              <p>Step-by-step trace of interactions between UI components, computation engines, and storage.</p>
+            </div>
+
+            <div className="sequence-two-col">
+              <div className="studio-card seq-visual-card">
+                <h4><i className="fas fa-arrows-split-up-and-left"></i> {currentProject.sequence.title}</h4>
+                <div className="seq-steps-trace">
+                  {currentProject.sequence.steps?.map((step, idx) => (
+                    <div key={idx} className="seq-step-item">
+                      <span className="seq-step-num">{idx + 1}</span>
+                      <div className="seq-step-bubble">
+                        <div className="seq-parties">
+                          <span className="party from">{step.from}</span>
+                          <i className="fas fa-arrow-right"></i>
+                          <span className="party to">{step.to}</span>
+                        </div>
+                        <p className="seq-action-text">{step.action}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="studio-card seq-mermaid-card">
+                <div className="card-top-head">
+                  <h4><i className="fas fa-code"></i> Mermaid Diagram Source</h4>
+                  <button
+                    className="copy-btn"
+                    onClick={() => {
+                      navigator.clipboard.writeText(currentProject.sequence.mermaid);
+                      alert('Copied Mermaid Sequence Diagram syntax to clipboard!');
+                    }}
+                  >
+                    <i className="fas fa-copy"></i> Copy Mermaid
+                  </button>
+                </div>
+                <pre className="mermaid-code-block">
+                  <code>{currentProject.sequence.mermaid}</code>
+                </pre>
+              </div>
+            </div>
+
+            <div className="stage-footer-actions">
+              <button className="studio-btn secondary" onClick={() => setActiveStage('structure')}>
+                <i className="fas fa-arrow-left"></i> Back to File Structure
+              </button>
+              <button className="studio-btn primary" onClick={() => setActiveStage('verify')}>
+                Next: User Verification Gate <i className="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 5: USER VERIFICATION & APPROVAL GATEWAY */}
+        {activeStage === 'verify' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box verification-header">
+              <div>
+                <h3><i className="fas fa-shield-check"></i> Stage 5: User Verification & Approval Gateway</h3>
+                <p>Strict quality gate: review and approve all 4 blueprint artifacts before code generation commences.</p>
+              </div>
+              <div className={`gate-status-badge ${isVerified ? 'approved' : 'pending'}`}>
+                {isVerified ? '✓ Approved & Unlocked' : 'Verification Required'}
+              </div>
+            </div>
+
+            <div className="verification-cards-grid">
+              <div className="verify-checklist-card studio-card">
+                <h4><i className="fas fa-list-check"></i> Artifact Review Checklist</h4>
+                
+                <div className="checklist-item">
+                  <i className="fas fa-check-circle verified-icon"></i>
+                  <div>
+                    <strong>Plan & Requirements:</strong>
+                    <span>{currentProject.plan.functionalRequirements?.length || 0} functional specs reviewed.</span>
+                  </div>
+                </div>
+
+                <div className="checklist-item">
+                  <i className="fas fa-check-circle verified-icon"></i>
+                  <div>
+                    <strong>System Architecture:</strong>
+                    <span>{currentProject.architect.pattern} confirmed.</span>
+                  </div>
+                </div>
+
+                <div className="checklist-item">
+                  <i className="fas fa-check-circle verified-icon"></i>
+                  <div>
+                    <strong>Project Structure:</strong>
+                    <span>{currentProject.structure?.length || 0} files & directories mapped.</span>
+                  </div>
+                </div>
+
+                <div className="checklist-item">
+                  <i className="fas fa-check-circle verified-icon"></i>
+                  <div>
+                    <strong>Sequence Interaction Flow:</strong>
+                    <span>{currentProject.sequence.steps?.length || 0} interaction steps verified.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="verify-action-card studio-card">
+                <h4><i className="fas fa-pen"></i> Engineer Approval Notes</h4>
+                <textarea
+                  className="verify-notes-input"
+                  placeholder="Add any specific constraints, naming preferences, or custom requirements before generating code..."
+                  value={userVerificationNotes}
+                  onChange={(e) => setUserVerificationNotes(e.target.value)}
+                  rows={4}
+                />
+
+                <div className="approval-cta-box">
+                  <p className="approval-notice">
+                    <i className="fas fa-circle-info"></i> Clicking approve commits the specification to memory and unlocks code generation.
+                  </p>
+                  <button
+                    className="approve-launch-btn"
+                    onClick={handleApproveAndGenerate}
+                  >
+                    <i className="fas fa-circle-check"></i>
+                    <span>Approve Blueprint & Launch Code Generation</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 6: GENERATED CODE & RUNNER */}
+        {activeStage === 'code' && (
+          <div className="studio-stage-content">
+            <div className="stage-header-box">
+              <div className="code-header-meta">
+                <h3><i className="fas fa-code"></i> Generated Code & Execution Studio</h3>
+                <span className="code-verified-tag">✓ Blueprint Approved</span>
+              </div>
+              <div className="code-header-actions">
+                <button className="studio-btn secondary" onClick={handleCopyCode}>
+                  <i className="fas fa-copy"></i> Copy Current File
+                </button>
+                <button
+                  className="studio-btn primary"
+                  onClick={() => alert(`Project files ready for export! Downloaded ${currentProject.codeFiles?.length} code files.`)}
+                >
+                  <i className="fas fa-download"></i> Download Project Bundle
+                </button>
+              </div>
+            </div>
+
+            <div className="code-editor-layout">
+              {/* File Explorer Sidebar */}
+              <div className="editor-files-sidebar">
+                <div className="sidebar-title">
+                  <i className="fas fa-folder-open"></i> Project Files
+                </div>
+                <div className="files-list">
+                  {currentProject.codeFiles?.map((f, idx) => (
+                    <button
+                      key={idx}
+                      className={`editor-file-btn ${selectedFileIndex === idx ? 'active' : ''}`}
+                      onClick={() => setSelectedFileIndex(idx)}
+                    >
+                      <i className="fas fa-file-code"></i>
+                      <span>{f.filename}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Code Viewer Panel */}
+              <div className="editor-main-panel">
+                <div className="editor-panel-header">
+                  <span className="active-file-label">
+                    <i className="fas fa-file"></i> {activeCodeFile?.filename}
+                  </span>
+                  <span className="active-lang-badge">{activeCodeFile?.language}</span>
+                </div>
+                <div className="code-display-area">
+                  <pre className="code-content-block">
+                    <code>{activeCodeFile?.code}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </AppShell>
+  );
+}

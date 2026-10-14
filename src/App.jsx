@@ -31,6 +31,7 @@ import HealthHub from './pages/Apps/HealthHub/HealthHub';
 import EsgHub from './pages/Apps/EsgHub/EsgHub';
 import BusinessOpsHub from './pages/Apps/BusinessOpsHub/BusinessOpsHub';
 import LegalComplianceHub from './pages/Apps/LegalComplianceHub/LegalComplianceHub';
+import CodeStudio from './pages/Apps/CodeStudio/CodeStudio';
 
 export default function App() {
   return (
@@ -63,6 +64,8 @@ export default function App() {
         <Route path="/app/birthday-card" element={<BirthdayCard />} />
         <Route path="/app/spreadsheet" element={<Spreadsheet />} />
         <Route path="/app/quote-generator" element={<QuoteGenerator />} />
+        <Route path="/app/code-studio" element={<CodeStudio />} />
+        <Route path="/app/code-generator" element={<CodeStudio />} />
 
         {/* Generic Iframe App Viewer — handles all other apps via ?src=&title= */}
         <Route path="/app-view" element={<AppIframe />} />

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthModal from '../components/AuthModal/AuthModal';
+import ThemeSelector from '../components/ThemeSelector/ThemeSelector';
+import QuickLaunch from '../components/QuickLaunch/QuickLaunch';
 import ultrasudoLogo from '../assets/ultrasudo-logo.png';
 import './LandingPage.css';
 
@@ -18,6 +20,7 @@ export default function LandingPage() {
                 <div className="landing-nav-links">
                     <a href="#features">Features</a>
                     <a href="https://github.com/ultrasudo" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <ThemeSelector />
                     <button className="landing-btn landing-btn-secondary" onClick={() => setIsAuthOpen(true)}>
                         <i className="fas fa-user-plus"></i> Sign In / Sign Up
                     </button>
@@ -32,7 +35,7 @@ export default function LandingPage() {
                     <h1>Your personal, secure OS environment.</h1>
                     <p>
                         Ultrasudo isn't just a workspace. It's a fully encapsulated desktop suite with built-in Post-Quantum
-                        Cryptography, peer-to-peer sync, and native apps ranging from Python IDEs to secure wallets.
+                        Cryptography, peer-to-peer sync, and native business suites ranging from ESG carbon accounting to Agentic Code Studios.
                     </p>
 
                     <div className="landing-cta-buttons">
@@ -45,6 +48,14 @@ export default function LandingPage() {
                     </div>
                 </section>
 
+                {/* Instant Quick Launch Section */}
+                <section className="landing-quick-launch-wrap">
+                    <QuickLaunch
+                        title="Instant Quick Launch"
+                        subtitle="Jump directly into your pinned applications and SME hubs"
+                    />
+                </section>
+
                 <section id="features" className="landing-features">
                     <h2 className="landing-section-title">Everything you need, built-in.</h2>
                     <div className="landing-grid">
@@ -55,21 +66,21 @@ export default function LandingPage() {
                         </div>
 
                         <div className="landing-feature-card">
-                            <div className="landing-feature-icon"><i className="fas fa-paper-plane"></i></div>
-                            <h3>Native P2P Transfers</h3>
-                            <p>Send and receive funds securely with other users directly within your browser desktop without relying on bulky third-party gateways.</p>
+                            <div className="landing-feature-icon"><i className="fas fa-leaf"></i></div>
+                            <h3>ESG & Sustainability</h3>
+                            <p>Scope 1 and Scope 2 GHG protocol emissions inventory, upstream Scope 3 scorecard, and solar CapEx payback models.</p>
                         </div>
 
                         <div className="landing-feature-card">
-                            <div className="landing-feature-icon"><i className="fas fa-cloud-arrow-up"></i></div>
-                            <h3>Cross-Device Sync</h3>
-                            <p>Your notes, Kanban tasks, and code snippets automatically sync across your Mac, Windows, and Web clients in real-time via Supabase.</p>
+                            <div className="landing-feature-icon"><i className="fas fa-briefcase"></i></div>
+                            <h3>13-Week Cash Runway</h3>
+                            <p>Direct liquidity forecasting, Smart Invoicing with DSO aging, and Wilson EOQ landed cost logistics built for SMEs.</p>
                         </div>
 
                         <div className="landing-feature-card">
                             <div className="landing-feature-icon"><i className="fas fa-code"></i></div>
-                            <h3>Developer First</h3>
-                            <p>A native Python IDE powered by Pyodide, an AI Code Generator, and centralized API Key management built right into the core OS.</p>
+                            <h3>Agentic Code Studio</h3>
+                            <p>An AI developer that plans, architects, generates project structures and sequence diagrams, awaiting user verification before writing code.</p>
                         </div>
                     </div>
                 </section>

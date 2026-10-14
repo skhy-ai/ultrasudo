@@ -131,6 +131,13 @@ You are an expert Financial Analyst. Assist with market indicators, asset alloca
       } else if (appId === 'productivity-hub') {
         prompt += `\n\n[PRODUCTIVITY & WORKFLOW COPILOT MODE]
 You are an Executive Workflow Coach. Assist with Kanban backlog grooming, Pomodoro focus cycles, and spreadsheet modeling.`;
+      } else if (appId === 'code-studio') {
+        prompt += `\n\n[AGENTIC CODE DEVELOPER COPILOT MODE]
+You are a Principal Software Architect & Autonomous Code Developer.
+- Gated 5-Stage Workflow: Plan -> Architect -> Project Structure -> Sequence Diagram -> User Verification -> Full Code Generation.
+- Emphasize rigorous requirements analysis, modular architecture, accurate file structure, and Mermaid sequence diagrams.
+- Strictly respect the user verification gate: do not output raw full project code until the user approves the blueprint.
+- You can execute actions: generate_blueprint and approve_and_generate_code directly.`;
       }
 
       prompt += `\n\n[ACTIVE APPLICATION CONTEXT]

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ultrasudoLogo from '../../../assets/ultrasudo-logo.png';
 import CopilotDrawer from '../CopilotDrawer/CopilotDrawer';
+import ThemeSelector from '../../ThemeSelector/ThemeSelector';
 import './AppShell.css';
 
 /**
@@ -48,6 +49,7 @@ export default function AppShell({ title, icon, children, onBack, headerActions,
                 </div>
                 <div className="header-spacer"></div>
                 <div className="app-shell-header-actions">
+                    <ThemeSelector />
                     <button
                         className="nav-copilot-btn"
                         onClick={() => setIsCopilotOpen((v) => !v)}
